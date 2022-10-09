@@ -1,5 +1,6 @@
 package cn.lifay.ui;
 
+import cn.lifay.StaticUtil;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -14,9 +15,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.util.Objects;
-
-
+/**
+ *@ClassName LoadingUI
+ *@Description 等待组件
+ *@Author lifay
+ *@Date 2022/10/9 20:26
+ **/
 public class LoadingUI {
 
     protected Stage stage;
@@ -25,7 +29,7 @@ public class LoadingUI {
 
     public LoadingUI(Stage owner) {
         ImageView loadingView = new ImageView(
-                new Image(Objects.requireNonNull(LoadingUI.class.getResourceAsStream("/cn/lifay/ui/loading.gif"))));// 可替换
+                new Image(StaticUtil.loading()));// 可替换
 
         messageLb = new Label("请耐心等待...");
         messageLb.setFont(Font.font(20));
@@ -52,7 +56,12 @@ public class LoadingUI {
         stage.setWidth(owner.getWidth());
     }
 
-    // 显示指定信息
+    /**
+     * 显示指定信息
+     * @param message 1
+     * @author lifay
+     * @return void
+     */
     public void showMessage(String message) {
         Platform.runLater(() -> messageLb.setText(message));
     }
