@@ -46,6 +46,9 @@ public abstract class FormUI<T> extends Stage {
                 if (mouseEvent.getClickCount() == 1) {
                     try {
                         saveBtn.setDisable(true);
+                        //从元素赋值到实例
+                        transferValue();
+                        //执行保存操作
                         if (saveData(t)) {
                             Platform.runLater(() ->{
                                 new Alert(Alert.AlertType.INFORMATION, "保存成功").show();
@@ -66,6 +69,18 @@ public abstract class FormUI<T> extends Stage {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    /*
+     * 从元素赋值到实例
+     *
+     * @author lifay
+     * @return void
+     */
+    private void transferValue() {
+        for (FormElement<T, ?> element : elements) {
+            element.setValueFunc(t);
         }
     }
 
