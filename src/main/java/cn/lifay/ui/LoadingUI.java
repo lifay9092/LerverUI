@@ -1,12 +1,9 @@
 package cn.lifay.ui;
 
 import cn.lifay.StaticUtil;
-import cn.lifay.ui.form.FormElement;
-import cn.lifay.ui.form.User;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -29,9 +26,11 @@ public class LoadingUI {
     protected Stage stage;
     protected StackPane root;
     protected Label messageLb;
+
     public void test() {
-       // FormElement<User,String> f = FormElement.text("测试",new TextField(),User::getName);
+        // FormElement<User,String> f = FormElement.text("测试",new TextField(),User::getName);
     }
+
     public LoadingUI(Stage owner) {
         ImageView loadingView = new ImageView(
                 new Image(StaticUtil.loading()));// 可替换

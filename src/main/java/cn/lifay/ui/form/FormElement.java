@@ -1,11 +1,15 @@
 package cn.lifay.ui.form;
 
-import javafx.scene.Group;
-import javafx.scene.Node;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
-import java.util.Collection;
+import java.util.function.Predicate;
 
 /**
  *@ClassName FormElement
@@ -13,68 +17,92 @@ import java.util.Collection;
  *@Author lifay
  *@Date 2023/1/8 10:09
  **/
-public class FormElement<T, R> extends Group {
+public abstract class FormElement<T, R> extends HBox {
 
-    //    private Function<T, R> getValueFunc;
-    private SetFunc<T, R> setValueFunc;
 
-    private TextField textField = new TextField();
+    private Control control;
+
+    private String fieldName;
+    private boolean primary;
+
+    private Predicate<R> predicate;
 
     private FormElement() {
+        super();
     }
 
-    private FormElement(Node... nodes) {
-        super(nodes);
+    protected FormElement(String label, String fieldName) {
+        this(label, fieldName, false);
     }
 
-    private FormElement(Collection<Node> collection) {
-        super(collection);
+    protected FormElement(String label, String fieldName, boolean primary) {
+        this.setAlignment(Pos.CENTER_LEFT);
+        Label l = new Label(label);
+        l.setPadding(new Insets(5, 10, 5, 10));
+        getChildren().add(l);
+        this.setPadding(new Insets(5, 10, 5, 10));
+        this.fieldName = fieldName;
+        this.primary = primary;
     }
 
-    //
-//    private FormElement(String label, Function<T, R> getValueFunc, SetFunc<T, R> setValueFunc) {
-//        super(new Label(label));
-//        //TextField textField = new TextField();
-//        textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-//
-//        });
-//        getChildren().add(textField);
-//        setAutoSizeChildren(true);
-//        this.getValueFunc = getValueFunc;
-//        this.setValueFunc = setValueFunc;
-//    }
-    private FormElement(String label, SetFunc<T, R> setValueFunc) {
-        new FormElement<>(label, setValueFunc, false);
+    public void init() {
+        this.control = control();
+        getChildren().add(control);
     }
 
-    private FormElement(String label, SetFunc<T, R> setValueFunc, boolean disable) {
-        super(new Label(label));
-        //TextField textField = new TextField();
-        textField.setDisable(disable);
-//        textField.textProperty().addListener((observableValue, oldValue, newValue) -> {
-//
-//        });
-        getChildren().add(textField);
-        setAutoSizeChildren(true);
-        this.setValueFunc = setValueFunc;
+    public boolean isPrimary() {
+        return primary;
     }
 
-    public R value() {
+    public abstract Control control();
 
-        return (R) textField.getText();
+    public abstract R getValue();
+
+
+    public abstract void setValue(Object r);
+
+    protected boolean verify(){
+        if (predicate == null) {
+            return true;
+        }
+        return predicate.test(getValue());
     }
 
-    public String valueStr() {
-        return textField.getText().trim();
+/*
+    public static <T, R> FormElement<T, R> text(String label,String fieldName) {
+        FormElement<T, R> element = new FormElement<>(label, fieldName) {
+        };
+        return element;
     }
+*/
 
-    public void setValueFunc(T t) {
-        setValueFunc.set(t, value());
+  /*  private Class<? extends Type> getType() {
+        TypeVariable<? extends Class<? extends FormElement>>[] typeParameters = this.getClass().getTypeParameters();
+        Type type = this.getClass().getGenericSuperclass();
+        if (type.getTypeName().equals("javafx.scene.layout.HBox")){
+            return null;
+        }
+        return type.getClass();
     }
+*/
 
-    public static <T, R> FormElement<T, R> text(String label, SetFunc<T, R> setValueFunc) {
-
-        return new FormElement<>(label, setValueFunc);
+    public String getFieldName() {
+        return fieldName;
     }
-
+    public void disable(){
+        Platform.runLater(() -> {control.setDisable(true);});
+    }
+    public void clear(){
+        Platform.runLater(() -> {
+            if (control instanceof TextField) {
+                ((TextField) control).clear();
+                if (primary){
+                    control.setDisable(false);
+                    //System.out.println(control.isDisable());
+                }
+            }else if (control instanceof ChoiceBox) {
+                ((ChoiceBox) control).setValue(null);
+            }
+        });
+    }
 }
