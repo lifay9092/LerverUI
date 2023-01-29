@@ -1,6 +1,5 @@
 package cn.lifay.ui.form;
 
-import cn.lifay.ui.form.FormElement;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,10 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.lang.reflect.Field;
@@ -22,15 +19,15 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *@ClassName FormUI
- *@Description form表单：动态添加元素（文本框、选择），基本操作（保存、编辑、删除、清除）
- *@Author lifay
- *@Date 2023/1/8 10:05
+ * FormUI form表单：动态添加元素（文本框、选择），基本操作（保存、编辑、删除、清除）
+ * @author lifay
+ * @date 2023/1/8 10:05
  **/
 public abstract class FormUI<T> extends Stage {
 
     private T t;
-    private GridPane pane = new GridPane();;
+    private GridPane pane = new GridPane();
+    ;
     protected ObservableList<FormElement<T, ?>> elements = FXCollections.observableArrayList();
     protected Button saveBtn = new Button("保存");
     protected Button editBtn = new Button("修改");
@@ -85,10 +82,10 @@ public abstract class FormUI<T> extends Stage {
         int size = elementList.size();
         //System.out.println("元素数量:" + size);
         double s = Math.sqrt(size);//开根号
-        if ((int)s == s) {
+        if ((int) s == s) {
             h = (int) s;
             v = (int) s;
-        }else {
+        } else {
             h = (int) Math.ceil(s);
             v = (int) Math.round(s);
         }
@@ -100,19 +97,19 @@ public abstract class FormUI<T> extends Stage {
                 //System.out.println("x="+x + " y=" + y);
                 FormElement<T, ?> element = elements.get(elementIndex);
                 GridPane.setHalignment(element, HPos.LEFT);
-                pane.add(element,y,x);
+                pane.add(element, y, x);
                 elementIndex++;
-                if (elementIndex== size) {
+                if (elementIndex == size) {
                     break;
                 }
             }
         }
-        pane.add(btnGroup,Math.round(h/2),v);
+        pane.add(btnGroup, Math.round(h / 2), v);
         //布局按钮组
         btnGroup.setAlignment(Pos.BOTTOM_RIGHT);
         btnGroup.setSpacing(20);
         btnGroup.setPadding(new Insets(20));
-        btnGroup.getChildren().addAll(saveBtn, editBtn, delBtn,clearBtn);
+        btnGroup.getChildren().addAll(saveBtn, editBtn, delBtn, clearBtn);
         //pane.getChildren().add(btnGroup);
         //保存
         saveBtn.setOnMouseClicked(mouseEvent -> {
@@ -268,21 +265,27 @@ public abstract class FormUI<T> extends Stage {
             throw new RuntimeException(e);
         }
     }
-    public void checkId(Object id){
+
+    public void checkId(Object id) {
         if (id == null) {
             throw new RuntimeException("主键值不能为空!");
         }
-        boolean blank =  switch (id){
-            case String s ->  s.isBlank();
-            case Integer i ->  i == 0;
-            case Long l ->  l == 0;
-            default -> throw new RuntimeException("不支持当前类型:" + id.getClass());
-        };
+        boolean blank;
+        if (id instanceof String) {
+            blank = ((String) id).isBlank();
+        } else if (id instanceof Integer) {
+            blank = (Integer) id == 0;
+        } else if (id instanceof Long) {
+            blank = (Long) id == 0;
+        } else {
+            throw new RuntimeException("不支持当前类型:" + id.getClass());
+        }
         if (blank) {
             throw new RuntimeException("主键值不能为空!");
         }
 
     }
+
     public abstract List<FormElement<T, ?>> buildElements();
 
     public abstract void saveData(T t);

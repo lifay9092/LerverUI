@@ -1,10 +1,9 @@
 package cn.lifay;
 
 /**
- *@ClassName StaticUtil
- *@Description 静态工具类
- *@Author lifay
- *@Date 2022/10/9 20:26
+ * StaticUtil 静态工具类
+ * @author lifay
+ * @date  2022/10/9 20:26
  **/
 public class StaticUtil {
 

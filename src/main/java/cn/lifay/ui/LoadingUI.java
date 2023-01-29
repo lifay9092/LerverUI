@@ -16,10 +16,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
- *@ClassName LoadingUI
- *@Description 等待组件
- *@Author lifay
- *@Date 2022/10/9 20:26
+ * LoadingUI 等待组件
+ * @author lifay
+ * @date  2022/10/9 20:26
  **/
 public class LoadingUI {
 
@@ -64,7 +63,6 @@ public class LoadingUI {
      * 显示指定信息
      * @param message 1
      * @author lifay
-     * @return void
      */
     public void showMessage(String message) {
         Platform.runLater(() -> messageLb.setText(message));

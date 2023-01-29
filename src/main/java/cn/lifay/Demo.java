@@ -6,10 +6,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- *@ClassName Demo
- *@Description TODO
- *@Author 李方宇
- *@Date 2023/1/9 16:07
+ * Demo 测试类
+ * @author lifay
+ * @date  2023/1/9 16:07
  **/
 public class Demo extends Application {
 

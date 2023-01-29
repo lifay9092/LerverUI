@@ -12,10 +12,9 @@ import javafx.scene.layout.HBox;
 import java.util.function.Predicate;
 
 /**
- *@ClassName FormElement
- *@Description TODO
- *@Author lifay
- *@Date 2023/1/8 10:09
+ * FormElement 表单元素-父类
+ * @author lifay
+ * @date  2022/10/9 20:26
  **/
 public abstract class FormElement<T, R> extends HBox {
 

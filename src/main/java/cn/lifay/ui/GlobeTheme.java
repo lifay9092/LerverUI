@@ -7,14 +7,16 @@ import javafx.application.Application;
 import java.net.URL;
 
 /**
- *@ClassName GlobeTheme
- *@Description 主题全局类
- *@Author lifay
- *@Date 2022/10/9 20:26
+ * GlobeTheme 主题全局类
+ * @author lifay
+ * @date  2022/10/9 20:26
  **/
 public class GlobeTheme {
 
-
+    /**
+     * 设置白色
+     * @author lifay
+     */
     public static void setWhite() {
         URL resource = GlobeTheme.class.getResource(StaticUtil.whiteTheme());
         if (resource == null) {
@@ -23,6 +25,10 @@ public class GlobeTheme {
         Application.setUserAgentStylesheet(resource.toExternalForm());
     }
 
+    /**
+     * 设置暗色
+     * @author lifay
+     */
     public static void setDark() {
         URL resource = GlobeTheme.class.getResource(StaticUtil.darkTheme());
         if (resource == null) {

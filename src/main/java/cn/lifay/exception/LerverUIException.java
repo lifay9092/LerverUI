@@ -1,10 +1,9 @@
 package cn.lifay.exception;
 
 /**
- *@ClassName LerverUIException
- *@Description 自定义异常
- *@Author lifay
- *@Date 2022/10/9 20:26
+ * LerverUIException 自定义异常
+ * @author lifay
+ * @date 2023/1/8 10:05
  **/
 public class LerverUIException extends RuntimeException {
     public LerverUIException(String message) {
