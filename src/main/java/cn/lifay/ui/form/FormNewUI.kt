@@ -101,25 +101,30 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
         return element
     }*/
 
-    inline fun <reified T, R : Any> newCheckElement(
+    inline fun <reified T, reified R : Any> newCheckElement(
         label: String,
         property: KMutableProperty1<T, R>
     ): CheckElement<T, R> {
-        val element = CheckElement(label, property)
+        val type = R::class.java
+        when (type) {
+            is Class<Int> -> {}
+            else -> {}
+        }
+        val element = CheckElement(type, label, property)
         return element
     }
 
-    inline fun <reified T, R : Any> newTextElement(
+    inline fun <reified T, reified R : Any> newTextElement(
         label: String,
         property: KMutableProperty1<T, R>,
         primary: Boolean = false,
         isTextArea: Boolean = false
     ): TextNewElement<T, R> {
-        val element = TextNewElement(label, property, primary, isTextArea)
+        val element = TextNewElement(R::class.java, label, property, primary, isTextArea)
         return element
     }
 
-    inline fun <reified T, R : Any> newSelectElement(
+    inline fun <reified T, reified R : Any> newSelectElement(
         label: String,
         property: KMutableProperty1<T, R>,
         items: Array<R>
@@ -127,12 +132,12 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
         return newSelectElement(label, property, items.toList())
     }
 
-    inline fun <reified T, R : Any> newSelectElement(
+    inline fun <reified T, reified R : Any> newSelectElement(
         label: String,
         property: KMutableProperty1<T, R>,
         items: Collection<R>
     ): SelectElement<T, R> {
-        val element = SelectElement(label, property, items)
+        val element = SelectElement(R::class.java, label, property, items)
         return element
     }
 

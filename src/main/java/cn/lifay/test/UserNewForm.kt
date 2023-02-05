@@ -19,7 +19,8 @@ class UserNewForm(title: String, t: UserData? = null) : FormNewUI<UserData>(titl
         val id = newTextElement("ID:", UserData::id, true)
         val name = newTextElement("名称:", UserData::name, isTextArea = true)
         val type = newSelectElement("类型:", UserData::type, SelectTypeEnum.values())
-        val child = newCheckElement("是否成年:", UserData::child)
+        val child = newCheckElement("是否未成年:", UserData::child)
+
         return listOf(id, name, type, child);
     }
 

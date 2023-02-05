@@ -11,12 +11,13 @@ import kotlin.reflect.KMutableProperty1
  *@Author lifay
  *@Date 2023/2/5 13:39
  **/
-class SelectElement<T, R : Any> constructor(
+class SelectElement<T, R : Any>(
+    r: Class<R>,
     label: String,
     property: KMutableProperty1<T, R>,
     items: Collection<R?>
 ) :
-    FormElement<T, R>(label, property) {
+    FormElement<T, R>(r, label, property) {
 
     protected var control: ChoiceBox<R> = ChoiceBox<R>()
 

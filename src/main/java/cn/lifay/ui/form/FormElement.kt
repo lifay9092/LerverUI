@@ -15,6 +15,7 @@ import kotlin.reflect.KMutableProperty1
  * @Date 2023/1/8 10:09
  */
 abstract class FormElement<T, R : Any>(
+    val r: Class<R>,
     val label: String,
     val property: KMutableProperty1<T, R>,
     var primary: Boolean = false
@@ -41,6 +42,8 @@ abstract class FormElement<T, R : Any>(
     }*/
 
     fun init() {
+
+        println("R: ${r}")
         alignment = Pos.CENTER_LEFT
         val l = Label(label)
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
@@ -56,7 +59,11 @@ abstract class FormElement<T, R : Any>(
         get() {
             return when (control) {
                 is TextField, is TextArea -> {
-                    (control as TextField).text
+                    val text = (control as TextField).text
+                    when (r) {
+                        is String -> {}
+                        else -> {}
+                    }
                 }
                 is ChoiceBox<*> -> {
                     (control as ChoiceBox<*>).value
