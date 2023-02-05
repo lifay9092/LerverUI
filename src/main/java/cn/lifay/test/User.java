@@ -13,6 +13,9 @@ public class User {
 
     private SelectTypeEnum type;
 
+    public User() {
+    }
+
     public User(Integer id, String name) {
         this.id = id;
         this.name = name;

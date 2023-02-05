@@ -1,3 +1,4 @@
+/*
 package cn.lifay.test;
 
 import cn.lifay.ui.form.FormUI;
@@ -10,12 +11,14 @@ import cn.lifay.ui.form.text.StringTextElement;
 import java.util.Arrays;
 import java.util.List;
 
+*/
 /**
  *@ClassName UserForm
  *@Description TODO
  *@Author 李方宇
  *@Date 2023/1/9 16:17
- **/
+ **//*
+
 public class UserForm extends FormUI<User> {
     public UserForm(String title, Class<User> clazz) {
         super(title, clazz);
@@ -23,6 +26,7 @@ public class UserForm extends FormUI<User> {
 
     public UserForm(String title, User entity) {
         super(title, entity);
+        System.out.println(this.getClass().getGenericSuperclass());
     }
 
     @Override
@@ -56,6 +60,7 @@ public class UserForm extends FormUI<User> {
         checkId(primaryValue);
         System.out.println("删除数据操作:" + primaryValue);
     }
+*/
 /*
 
     public Type getType(Object o){
@@ -63,6 +68,7 @@ public class UserForm extends FormUI<User> {
         System.out.println(Arrays.toString(parameterizedType.getActualTypeArguments()));
         return null;
     }
-*/
+*//*
 
-}
+
+}*/

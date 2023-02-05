@@ -1,13 +1,16 @@
+/*
 package cn.lifay.ui.form.text;
 
 import javafx.scene.control.TextInputControl;
 
+*/
 /**
  *@ClassName IntegerTextElement
  *@Description TODO
  *@Author 李方宇
  *@Date 2023/1/11 9:22
- **/
+ **//*
+
 public class IntegerTextElement<T> extends TextElement<T, Integer> {
     public IntegerTextElement(String label, String fieldName) {
         super(label, fieldName);
@@ -30,4 +33,4 @@ public class IntegerTextElement<T> extends TextElement<T, Integer> {
         TextInputControl inputControl = (TextInputControl) control();
         inputControl.setText(value.toString());
     }
-}
+}*/

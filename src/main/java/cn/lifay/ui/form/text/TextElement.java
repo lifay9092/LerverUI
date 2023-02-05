@@ -1,3 +1,4 @@
+/*
 package cn.lifay.ui.form.text;
 
 import cn.lifay.ui.form.FormElement;
@@ -5,12 +6,14 @@ import javafx.scene.control.Control;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
+*/
 /**
  *@ClassName TextElement
  *@Description TODO
  *@Author 李方宇
  *@Date 2023/1/10 17:30
- **/
+ **//*
+
 public abstract class TextElement<T, R> extends FormElement<T, R> {
 
     private TextField textField;
@@ -46,4 +49,4 @@ public abstract class TextElement<T, R> extends FormElement<T, R> {
         }
     }
 
-}
+}*/

@@ -1,14 +1,17 @@
+/*
 package cn.lifay.ui.form.text;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.TextInputControl;
 
+*/
 /**
  *@ClassName StringTextElement
  *@Description TODO
  *@Author 李方宇
  *@Date 2023/1/11 9:20
- **/
+ **//*
+
 public class StringTextElement<T> extends TextElement<T, String> {
     public StringTextElement(String label, String fieldName) {
         super(label, fieldName);
@@ -35,4 +38,4 @@ public class StringTextElement<T> extends TextElement<T, String> {
 
         }
     }
-}
+}*/

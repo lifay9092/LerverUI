@@ -1,107 +1,156 @@
-package cn.lifay.ui.form;
+package cn.lifay.ui.form
 
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-
-import java.util.function.Predicate;
+import javafx.application.Platform
+import javafx.geometry.Insets
+import javafx.geometry.Pos
+import javafx.scene.control.*
+import javafx.scene.layout.HBox
+import java.util.function.Predicate
+import kotlin.reflect.KMutableProperty1
 
 /**
- * FormElement 表单元素-父类
- * @author lifay
- * @date  2022/10/9 20:26
- **/
-public abstract class FormElement<T, R> extends HBox {
+ * @ClassName FormElement
+ * @Description TODO
+ * @Author lifay
+ * @Date 2023/1/8 10:09
+ */
+abstract class FormElement<T, R : Any>(
+    val label: String,
+    val property: KMutableProperty1<T, R>,
+    var primary: Boolean = false
+) :
+    HBox() {
 
-
-    private Control control;
-
-    private String fieldName;
-    private boolean primary;
-
-    private Predicate<R> predicate;
-
-    private FormElement() {
-        super();
-    }
-
-    protected FormElement(String label, String fieldName) {
-        this(label, fieldName, false);
-    }
-
-    protected FormElement(String label, String fieldName, boolean primary) {
-        this.setAlignment(Pos.CENTER_LEFT);
-        Label l = new Label(label);
-        l.setPadding(new Insets(5, 10, 5, 10));
-        getChildren().add(l);
-        this.setPadding(new Insets(5, 10, 5, 10));
-        this.fieldName = fieldName;
-        this.primary = primary;
-    }
-
-    public void init() {
-        this.control = control();
-        getChildren().add(control);
-    }
-
-    public boolean isPrimary() {
-        return primary;
-    }
-
-    public abstract Control control();
-
-    public abstract R getValue();
-
-
-    public abstract void setValue(Object r);
-
-    protected boolean verify(){
-        if (predicate == null) {
-            return true;
-        }
-        return predicate.test(getValue());
-    }
-
+    private var control: Control? = null
 /*
-    public static <T, R> FormElement<T, R> text(String label,String fieldName) {
-        FormElement<T, R> element = new FormElement<>(label, fieldName) {
-        };
-        return element;
-    }
-*/
+    var property: KMutableProperty1<T, R>? = null
 
-  /*  private Class<? extends Type> getType() {
-        TypeVariable<? extends Class<? extends FormElement>>[] typeParameters = this.getClass().getTypeParameters();
-        Type type = this.getClass().getGenericSuperclass();
-        if (type.getTypeName().equals("javafx.scene.layout.HBox")){
-            return null;
+    var isPrimary = false*/
+
+    private val predicate: Predicate<R>? = null
+
+
+/*    protected constructor(label: String, property: KMutableProperty1<T, R>, primary: Boolean = false) {
+        alignment = Pos.CENTER_LEFT
+        val l = Label(label)
+        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+        children.add(l)
+        padding = Insets(5.0, 10.0, 5.0, 10.0)
+        this.property = property
+        isPrimary = primary
+    }*/
+
+    fun init() {
+        alignment = Pos.CENTER_LEFT
+        val l = Label(label)
+        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+        children.add(l)
+        padding = Insets(5.0, 10.0, 5.0, 10.0)
+        control = control()
+        this.elementValue = initControlValue() as R?
+        children.add(control)
+    }
+
+    abstract fun control(): Control?
+    var elementValue: R?
+        get() {
+            return when (control) {
+                is TextField, is TextArea -> {
+                    (control as TextField).text
+                }
+                is ChoiceBox<*> -> {
+                    (control as ChoiceBox<*>).value
+                }
+                is CheckBox -> {
+                    (control as CheckBox).isSelected
+                }
+                else -> {
+                    null
+                }
+            } as R?
         }
-        return type.getClass();
-    }
-*/
+        set(value) {
+            when (control) {
+                is TextField -> {
+                    (control as TextField).text = value.toString()
+                }
+                is TextArea -> {
+                    (control as TextArea).text = value.toString()
+                }
+                is ChoiceBox<*> -> {
+                    (control as ChoiceBox<*>).value = value
+                }
+                is CheckBox -> {
+                    (control as CheckBox).isSelected = value as Boolean
+                }
+                else -> {
 
-    public String getFieldName() {
-        return fieldName;
+                }
+            }
+        }
+    /*
+    var elementValue: R? by Delegates.observable(initControlValue() as R? ) {
+            prop, old, new ->
+        println("$old -> $new")
+        when (control) {
+            is TextField  -> {
+                (control as TextField).text = new.toString()}
+            is TextArea  -> {
+                (control as TextArea).text = new.toString()}
+            is ChoiceBox<*> -> {
+                (control as ChoiceBox<*>).value = new}
+            is CheckBox -> {
+                (control as CheckBox).isSelected = new as Boolean}
+            else -> {
+
+            }
+        }
+    }*/
+
+    private fun initControlValue(): Any? {
+        return when (control) {
+            is TextField, is TextArea -> {
+                ""
+            }
+            is CheckBox -> {
+                false
+            }
+            else -> {
+                null
+            }
+        }
     }
-    public void disable(){
-        Platform.runLater(() -> {control.setDisable(true);});
+
+    protected fun verify(): Boolean {
+        return predicate?.test(elementValue!!) ?: true
     }
-    public void clear(){
-        Platform.runLater(() -> {
-            if (control instanceof TextField) {
-                ((TextField) control).clear();
-                if (primary){
-                    control.setDisable(false);
+
+    fun disable() {
+        Platform.runLater { control!!.isDisable = true }
+    }
+
+    fun clear() {
+        Platform.runLater {
+            if (control is TextField) {
+                (control as TextField).clear()
+                if (primary) {
+                    (control as TextField).setDisable(false)
                     //System.out.println(control.isDisable());
                 }
-            }else if (control instanceof ChoiceBox) {
-                ((ChoiceBox) control).setValue(null);
+            } else if (control is ChoiceBox<*>) {
+                (control as ChoiceBox<*>).setValue(null)
             }
-        });
+        }
     }
+
+    fun setEle(t: T) {
+        val get = property.get(t)
+        this.elementValue = get
+
+    }
+
+    fun setProp(t: T) {
+        property.set(t, elementValue as R)
+    }
+
 }

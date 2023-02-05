@@ -14,7 +14,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -213,8 +212,8 @@ public abstract class FormUI<T> extends Stage {
 
     private Object getPrimaryValue() {
         for (FormElement<T, ?> element : elements) {
-            if (element.isPrimary()) {
-                return element.getValue();
+            if (element.getPrimary()) {
+                return element.getElementValue();
             }
         }
         return null;
@@ -226,19 +225,17 @@ public abstract class FormUI<T> extends Stage {
      * @author lifay
      * @return void
      */
-    private void elementToProp() {
+    private void elementToProp() throws Exception {
         try {
             for (FormElement<T, ?> element : elements) {
-                Object value = element.getValue();
+                /*Object value = element.getElementValue();
                 Field field = t.getClass().getDeclaredField(element.getFieldName());
                 field.setAccessible(true);
-                field.set(t, value);
+                field.set(t, value);*/
                 //System.out.println("赋值了:" + element.getFieldName() + " > " + value);
             }
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new Exception(e);
         }
     }
 
@@ -251,14 +248,14 @@ public abstract class FormUI<T> extends Stage {
     private void propToElement() {
         try {
             for (FormElement<T, ?> element : elements) {
-                Field field = t.getClass().getDeclaredField(element.getFieldName());
+                /*Field field = t.getClass().getDeclaredField(element.getFieldName());
                 field.setAccessible(true);
                 Object value = field.get(t);
-                element.setValue(value);
+//                element.setValue(value);
                 //主键不可编辑
                 if (element.isPrimary()) {
                     element.disable();
-                }
+                }*/
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -283,7 +280,6 @@ public abstract class FormUI<T> extends Stage {
         if (blank) {
             throw new RuntimeException("主键值不能为空!");
         }
-
     }
 
     public abstract List<FormElement<T, ?>> buildElements();

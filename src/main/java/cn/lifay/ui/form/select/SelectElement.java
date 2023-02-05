@@ -1,3 +1,4 @@
+/*
 package cn.lifay.ui.form.select;
 
 import cn.lifay.ui.form.FormElement;
@@ -6,12 +7,14 @@ import javafx.scene.control.Control;
 
 import java.util.List;
 
+*/
 /**
  *@ClassName SelectElement
  *@Description 选择下拉框 T-表单实体 R-ChoiceBox实体 注意：具体显示名称由R的toString()决定
  *@Author 李方宇
  *@Date 2023/1/11 15:02
- **/
+ **//*
+
 public abstract class SelectElement<T,R> extends FormElement<T, R> {
 
     protected ChoiceBox<R> control = new ChoiceBox<>();
@@ -43,4 +46,4 @@ public abstract class SelectElement<T,R> extends FormElement<T, R> {
         control.getItems().clear();
         control.getItems().addAll(items);
     }
-}
+}*/

@@ -7,7 +7,6 @@ package cn.lifay.test;
  *@Date 2023/1/11 15:17
  **/
 public enum SelectTypeEnum {
-
     A,
     B,
     C,
