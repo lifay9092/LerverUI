@@ -19,7 +19,7 @@ class SelectElement<T, R : Any>(
 ) :
     FormElement<T, R>(r, label, property) {
 
-    protected var control: ChoiceBox<R> = ChoiceBox<R>()
+//    protected var control: ChoiceBox<R> = ChoiceBox<R>()
 
     init {
         init()
@@ -27,7 +27,7 @@ class SelectElement<T, R : Any>(
     }
 
     override fun control(): Control {
-        return control
+        return ChoiceBox<R>()
     }
 /*
     fun getValue(): R? {
@@ -39,7 +39,7 @@ class SelectElement<T, R : Any>(
     }*/
 
     fun loadItems(items: Collection<R?>) {
-        control.getItems().clear()
+        (control as ChoiceBox<R>).getItems().clear()
         control.getItems().addAll(items)
     }
 }

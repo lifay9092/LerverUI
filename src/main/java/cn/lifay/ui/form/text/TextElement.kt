@@ -20,8 +20,8 @@ class TextNewElement<T, R : Any> constructor(
     var isTextArea: Boolean = false
 ) :
     FormElement<T, R>(r, label, property, primary) {
-    private var textField: TextField? = null
-    private var textArea: TextArea? = null
+//    private var textField: TextField? = null
+//    private var textArea: TextArea? = null
 
     init {
         init()
@@ -29,15 +29,13 @@ class TextNewElement<T, R : Any> constructor(
 
     override fun control(): Control {
         return if (isTextArea) {
-            if (textArea == null) {
-                textArea = TextArea()
-                textArea!!.isWrapText = false
-            }
+            val textArea = TextArea()
+            textArea!!.isWrapText = false
+
             textArea!!
         } else {
-            if (textField == null) {
-                textField = TextField()
-            }
+            val textField = TextField()
+
             textField!!
         }
     }

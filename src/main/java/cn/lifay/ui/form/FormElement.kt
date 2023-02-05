@@ -22,7 +22,7 @@ abstract class FormElement<T, R : Any>(
 ) :
     HBox() {
 
-    private var control: Control? = null
+    protected val control: Control? = control()
 /*
     var property: KMutableProperty1<T, R>? = null
 
@@ -48,7 +48,6 @@ abstract class FormElement<T, R : Any>(
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
         children.add(l)
         padding = Insets(5.0, 10.0, 5.0, 10.0)
-        control = control()
         this.elementValue = initControlValue() as R?
         children.add(control)
     }
@@ -58,7 +57,7 @@ abstract class FormElement<T, R : Any>(
         get() {
             return when (control) {
                 is TextField -> {
-                    val text = (control as TextField).text
+                    val text = control.text
                     when (r) {
                         java.lang.String::class.java -> {
                             text.trim()
@@ -73,7 +72,7 @@ abstract class FormElement<T, R : Any>(
                     }
                 }
                 is TextArea -> {
-                    val text = (control as TextArea).text
+                    val text = control.text
                     when (r) {
                         java.lang.String::class.java -> {
                             text.trim()
@@ -88,10 +87,10 @@ abstract class FormElement<T, R : Any>(
                     }
                 }
                 is ChoiceBox<*> -> {
-                    (control as ChoiceBox<*>).value
+                    control.value
                 }
                 is CheckBox -> {
-                    (control as CheckBox).isSelected
+                    control.isSelected
                 }
                 else -> {
                     null

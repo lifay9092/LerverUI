@@ -18,14 +18,13 @@ class CheckElement<T, R : Any>(
 ) :
     FormElement<T, R>(r, label, property) {
 
-    protected var control: CheckBox = CheckBox()
 
     init {
         init()
     }
 
     override fun control(): Control {
-        return control
+        return CheckBox()
     }
 /*
     fun getValue(): R? {
