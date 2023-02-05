@@ -4,7 +4,6 @@ import cn.lifay.ui.form.FormElement
 import javafx.scene.control.Control
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
-import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -14,7 +13,7 @@ import kotlin.reflect.KMutableProperty1
  * @Date 2023/1/10 17:30
  */
 class TextNewElement<T, R : Any> constructor(
-    r: KClass<R>,
+    r: Class<R>,
     label: String,
     property: KMutableProperty1<T, R>,
     primary: Boolean = false,

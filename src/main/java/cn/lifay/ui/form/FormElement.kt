@@ -43,7 +43,6 @@ abstract class FormElement<T, R : Any>(
 
     fun init() {
 
-        println("R: ${r}")
         alignment = Pos.CENTER_LEFT
         val l = Label(label)
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
@@ -58,10 +57,33 @@ abstract class FormElement<T, R : Any>(
     var elementValue: R?
         get() {
             return when (control) {
-                is TextField, is TextArea -> {
+                is TextField -> {
                     val text = (control as TextField).text
                     when (r) {
-                        is String -> {}
+                        java.lang.String::class.java -> {
+                            text.trim()
+                        }
+                        java.lang.Integer::class.java -> {
+                            text.toInt()
+                        }
+                        java.lang.Long::class.java -> {
+                            text.toLong()
+                        }
+                        else -> {}
+                    }
+                }
+                is TextArea -> {
+                    val text = (control as TextArea).text
+                    when (r) {
+                        java.lang.String::class.java -> {
+                            text.trim()
+                        }
+                        java.lang.Integer::class.java -> {
+                            text.toInt()
+                        }
+                        java.lang.Long::class.java -> {
+                            text.toLong()
+                        }
                         else -> {}
                     }
                 }

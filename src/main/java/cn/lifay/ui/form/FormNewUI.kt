@@ -105,12 +105,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
         label: String,
         property: KMutableProperty1<T, R>
     ): CheckElement<T, R> {
-        val type = R::class.java
-        when (type) {
-            is Class<Int> -> {}
-            else -> {}
-        }
-        val element = CheckElement(type, label, property)
+        val element = CheckElement(R::class.java, label, property)
         return element
     }
 
