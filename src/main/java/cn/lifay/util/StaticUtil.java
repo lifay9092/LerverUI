@@ -1,4 +1,4 @@
-package cn.lifay;
+package cn.lifay.util;
 
 /**
  * StaticUtil 静态工具类

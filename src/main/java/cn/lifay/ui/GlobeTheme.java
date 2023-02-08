@@ -1,6 +1,6 @@
 package cn.lifay.ui;
 
-import cn.lifay.StaticUtil;
+import cn.lifay.util.StaticUtil;
 import cn.lifay.exception.LerverUIException;
 import javafx.application.Application;
 

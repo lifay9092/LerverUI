@@ -1,23 +1,25 @@
 package cn.lifay.ui.form.select
 
 import cn.lifay.ui.form.FormElement
+import javafx.scene.Node
 import javafx.scene.control.ChoiceBox
-import javafx.scene.control.Control
+import java.awt.SystemColor.text
 import kotlin.reflect.KMutableProperty1
 
 /**
  *@ClassName SelectElement
- *@Description TODO
+ *@Description 选择下拉框-元素
  *@Author lifay
  *@Date 2023/2/5 13:39
  **/
 class SelectElement<T, R : Any>(
     r: Class<R>,
     label: String,
-    property: KMutableProperty1<T, R>,
+    property: KMutableProperty1<T, R?>,
+    required: Boolean = false,
     items: Collection<R?>
 ) :
-    FormElement<T, R>(r, label, property) {
+    FormElement<T, R>(r, label, property,required = required) {
 
 //    protected var control: ChoiceBox<R> = ChoiceBox<R>()
 
@@ -26,20 +28,37 @@ class SelectElement<T, R : Any>(
         loadItems(items)
     }
 
-    override fun control(): Control {
+    override fun registerGraphic(): Node {
         return ChoiceBox<R>()
     }
-/*
-    fun getValue(): R? {
-        return control.getValue()
+
+    override fun graphic(): ChoiceBox<*> {
+        return graphic as ChoiceBox<*>
     }
 
-    fun setValue(r: Any) {
-        control.setValue(r as R)
-    }*/
+    override fun get(): R? {
+        return graphic().value as R?
+    }
+
+    override fun set(v: R?) {
+        graphic().value = v
+    }
+
+    override fun clear() {
+        graphic().value = defaultValue()
+    }
+
+    override fun verify(): Boolean {
+        return graphic().value == null
+    }
+
+    override fun defaultValue(): R? {
+        return null
+    }
 
     fun loadItems(items: Collection<R?>) {
-        (control as ChoiceBox<R>).getItems().clear()
-        control.getItems().addAll(items)
+        val choiceBox = graphic as ChoiceBox<R>
+        choiceBox.items.clear()
+        choiceBox.items.addAll(items)
     }
 }

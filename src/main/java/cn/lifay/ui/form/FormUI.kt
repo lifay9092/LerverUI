@@ -1,6 +1,7 @@
 package cn.lifay.ui.form
 
 import cn.lifay.ui.form.check.CheckElement
+import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextNewElement
 import javafx.application.Platform
@@ -10,11 +11,10 @@ import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.Alert
-import javafx.scene.control.Button
-import javafx.scene.control.ButtonType
+import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import java.lang.reflect.ParameterizedType
 import java.util.function.Consumer
@@ -22,15 +22,17 @@ import kotlin.reflect.KMutableProperty1
 
 
 /**
- *@ClassName FormNewUI
+ *@ClassName FormUI
  *@Description TODO
  *@Author lifay
  *@Date 2023/2/4 18:15
  **/
-abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
+abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
 
     protected var t: T? = null
-    private val pane = GridPane()
+    private val root = VBox(10.0)
+    private val form = GridPane()
+    private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
     protected var saveBtn: Button = Button("保存")
     protected var editBtn: Button = Button("修改")
@@ -49,61 +51,72 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
 */
 
     private fun FormUI() {}
-//
-//    fun FormUI(title: String, clazz: Class<T?>) {
-//        t = try {
-//            clazz.getDeclaredConstructor().newInstance()
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            throw RuntimeException(e)
-//        }
-//        formInit(title)
-//    }
-//    constructor(title: String,t: T?):this(title){
-//        if (t != null) {
-//            this.t = t
-//        }
-//    }
 
     init {
-        this.title = title
-        formInit(title)
+        uiInit(title)
         if (t == null) {
             val type = javaClass.genericSuperclass as ParameterizedType
             val clazz = type.actualTypeArguments[0] as Class<T>
             this.t = clazz.getConstructor().newInstance()
         } else {
-            this.t = t
-            propToElement()
+            refreshForm(t)
+        }
+    }
+    /*
+        界面初始化
+     */
+    private fun uiInit(title: String) {
+        root.children.addAll(form,table)
+
+        //表单布局
+        form.alignment = Pos.CENTER
+        form.hgap = 10.0
+        form.vgap = 10.0
+        form.padding = Insets(25.0, 25.0, 25.0, 25.0)
+        initElements()
+
+        //表格布局
+        this.table.apply {
+            padding = Insets(1.0,2.0,10.0,2.0)
+            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+            columns.addAll(tableHeadColumns())
+            refreshTable()
+            setRowFactory {
+                val row = TableRow<T>()
+                row.setOnMouseClicked { event ->
+                    if (event.clickCount == 2) {
+                        refreshForm(row.item)
+                    }
+                }
+                return@setRowFactory row
+            }
+        }
+        this.title = title
+        this.scene = Scene(root)
+    }
+
+    private fun refreshForm(t : T) {
+        this.t = t
+        propToElement()
+    }
+
+    private fun refreshTable() {
+        Platform.runLater {
+            table.items.clear()
+            table.items.addAll(datas())
         }
     }
 
-//    fun FormUI(title: String, t: T?) {
-//        this.t = t
-//        formInit(title)
-//        propToElement()
-//    }
-
-    private fun formInit(title: String) {
-        pane.alignment = Pos.CENTER
-        pane.hgap = 10.0
-        pane.vgap = 10.0
-        pane.padding = Insets(25.0, 25.0, 25.0, 25.0)
-        this.setTitle(title)
-        this.setScene(Scene(pane))
-        initElements()
+    /*
+        表头设置
+     */
+    private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
+        return elements.map { it.getTableHead() }.toList()
     }
-/*    inline fun <reified T,R> newTextElement(label: String?,
-                                  primary: Boolean = false,
-                                           setFunc: (User,R) -> Unit,
-    getFunc:(User) -> R): TextNewElement<T, R> {
-        val element = TextNewElement<T, R>(label, fieldName)
-        return element
-    }*/
 
     inline fun <reified T, reified R : Any> newCheckElement(
         label: String,
-        property: KMutableProperty1<T, R>
+        property: KMutableProperty1<T, R?>
     ): CheckElement<T, R> {
         val element = CheckElement(R::class.java, label, property)
         return element
@@ -111,28 +124,40 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
 
     inline fun <reified T, reified R : Any> newTextElement(
         label: String,
-        property: KMutableProperty1<T, R>,
+        property: KMutableProperty1<T, R?>,
         primary: Boolean = false,
+        required: Boolean = false,
         isTextArea: Boolean = false
     ): TextNewElement<T, R> {
-        val element = TextNewElement(R::class.java, label, property, primary, isTextArea)
+        val element = TextNewElement(R::class.java, label, property, primary,required, isTextArea)
         return element
     }
 
     inline fun <reified T, reified R : Any> newSelectElement(
         label: String,
-        property: KMutableProperty1<T, R>,
-        items: Array<R>
+        property: KMutableProperty1<T, R?>,
+        items: Array<R>,
+        required: Boolean = false
     ): SelectElement<T, R> {
-        return newSelectElement(label, property, items.toList())
+        return newSelectElement(label, property, items.toList(),required)
     }
 
     inline fun <reified T, reified R : Any> newSelectElement(
         label: String,
-        property: KMutableProperty1<T, R>,
-        items: Collection<R>
+        property: KMutableProperty1<T, R?>,
+        items: Collection<R>,
+        required: Boolean = false
     ): SelectElement<T, R> {
-        val element = SelectElement(R::class.java, label, property, items)
+        val element = SelectElement(R::class.java, label, property,required, items)
+        return element
+    }
+
+    inline fun <reified T> newRadioElement(
+        label: String,
+        property: KMutableProperty1<T, String?>,
+        items: List<String>
+    ): RadioElement<T> {
+        val element = RadioElement(label, property, items)
         return element
     }
 
@@ -143,7 +168,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
      * @author lifay
      * @return
      */
-    fun initElements() {
+    private fun initElements() {
         /*网格布局：元素*/
         val elementList: List<FormElement<T, *>> = buildElements()
         elements.addAll(elementList)
@@ -168,14 +193,14 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                 //System.out.println("x="+x + " y=" + y);
                 val element: FormElement<T, *> = elements[elementIndex]
                 GridPane.setHalignment(element, HPos.LEFT)
-                pane.add(element, y, x)
+                form.add(element, y, x)
                 elementIndex++
                 if (elementIndex == size) {
                     break
                 }
             }
         }
-        pane.add(btnGroup, Math.round((h / 2).toFloat()), v)
+        form.add(btnGroup, Math.round((h / 2).toFloat()), v)
         //布局按钮组
         btnGroup.alignment = Pos.BOTTOM_RIGHT
         btnGroup.spacing = 20.0
@@ -184,9 +209,13 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
         //pane.getChildren().add(btnGroup);
         //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.getClickCount() === 1) {
+            if (mouseEvent.clickCount == 1) {
                 try {
-                    saveBtn.setDisable(true)
+                    saveBtn.isDisable = true
+                    //检查
+                    if (!checkElementValue()) {
+                        return@setOnMouseClicked
+                    }
                     //从元素赋值到实例
                     elementToProp()
                     //执行保存操作
@@ -194,6 +223,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                     Platform.runLater {
                         Alert(Alert.AlertType.INFORMATION, "保存成功").show()
                     }
+                    refreshTable()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Platform.runLater {
@@ -203,15 +233,19 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                         ).show()
                     }
                 } finally {
-                    saveBtn.setDisable(false)
+                    saveBtn.isDisable = false
                 }
             }
         }
         //编辑
         editBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.getClickCount() === 1) {
+            if (mouseEvent.clickCount == 1) {
                 try {
-                    editBtn.setDisable(true)
+                    editBtn.isDisable = true
+                    //检查
+                    if (!checkElementValue()) {
+                        return@setOnMouseClicked
+                    }
                     //从元素赋值到实例
                     elementToProp()
                     //执行保存操作
@@ -219,6 +253,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                     Platform.runLater {
                         Alert(Alert.AlertType.INFORMATION, "编辑成功").show()
                     }
+                    refreshTable()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Platform.runLater {
@@ -228,15 +263,15 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                         ).show()
                     }
                 } finally {
-                    editBtn.setDisable(false)
+                    editBtn.isDisable = false
                 }
             }
         }
         //删除
         delBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.getClickCount() === 1) {
+            if (mouseEvent.clickCount == 1) {
                 try {
-                    delBtn.setDisable(true)
+                    delBtn.isDisable = true
                     //确认
                     val alert =
                         Alert(Alert.AlertType.CONFIRMATION, "是否删除?")
@@ -248,10 +283,11 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                         val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
                         //执行保存操作
                         delData(idValue)
-                        clear()
                         Platform.runLater {
                             Alert(Alert.AlertType.INFORMATION, "删除成功").show()
                         }
+                        clear()
+                        refreshTable()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -262,15 +298,15 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                         ).show()
                     }
                 } finally {
-                    delBtn.setDisable(false)
+                    delBtn.isDisable = false
                 }
             }
         }
         //清空
         clearBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.getClickCount() === 1) {
+            if (mouseEvent.clickCount == 1) {
                 try {
-                    clearBtn.setDisable(true)
+                    clearBtn.isDisable = true
                     clear()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -281,10 +317,19 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
                         ).show()
                     }
                 } finally {
-                    clearBtn.setDisable(false)
+                    clearBtn.isDisable = false
                 }
             }
         }
+    }
+
+    private fun checkElementValue(): Boolean {
+        for (element in elements) {
+            if (!element.checkRequired()) {
+                return false
+            }
+        }
+        return true
     }
 
     private fun clear() {
@@ -327,7 +372,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
     private fun propToElement() {
         try {
             for (element in elements) {
-                element.setEle(t!!)
+                element.setEle(this.t!!)
                 if (element.primary) {
                     element.disable()
                 }
@@ -340,7 +385,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
 
     abstract fun buildElements(): List<FormElement<T, *>>
 
-    abstract fun datas(list: List<T?>?)
+    abstract fun datas(): List<T>
 
     abstract fun saveData(t: T?)
 
@@ -356,7 +401,7 @@ abstract class FormNewUI<T : Any>(title: String, t: T?) : Stage() {
             val blank = when (id) {
                 is String -> id.isBlank();
                 is Int -> id == 0;
-                is Long -> id == 0;
+                is Long -> id == 0L;
                 else -> throw RuntimeException("不支持当前类型:" + id.javaClass);
             };
             if (blank) {

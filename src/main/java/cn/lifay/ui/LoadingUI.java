@@ -1,6 +1,6 @@
 package cn.lifay.ui;
 
-import cn.lifay.StaticUtil;
+import cn.lifay.util.StaticUtil;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 /**
- * LoadingUI 等待组件
+ * LoadingUI 加载中组件
  * @author lifay
  * @date  2022/10/9 20:26
  **/

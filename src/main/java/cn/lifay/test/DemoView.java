@@ -10,10 +10,9 @@ import javafx.event.ActionEvent;
  **/
 public class DemoView {
     public void formTest(ActionEvent actionEvent) {
-        System.out.println("ddd");
         // UserForm userForm = new UserForm("测试",User.class);
 //        UserNewForm userForm = new UserNewForm("测试", new UserData(1, "111111"));
-        UserNewForm userForm = new UserNewForm("测试", new UserData(1, "111111", SelectTypeEnum.C, true));
+        UserForm userForm = new UserForm("测试", new UserData(1, "111111", SelectTypeEnum.C, true,"男"));
         userForm.show();
     }
 

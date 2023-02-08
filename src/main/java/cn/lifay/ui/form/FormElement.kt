@@ -1,9 +1,13 @@
 package cn.lifay.ui.form
 
 import javafx.application.Platform
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.HBox
 import java.util.function.Predicate
 import kotlin.reflect.KMutableProperty1
@@ -17,12 +21,14 @@ import kotlin.reflect.KMutableProperty1
 abstract class FormElement<T, R : Any>(
     val r: Class<R>,
     val label: String,
-    val property: KMutableProperty1<T, R>,
-    var primary: Boolean = false
+    val property: KMutableProperty1<T, R?>,
+    var primary: Boolean = false,
+    var required: Boolean = false,
+    val defaultValue: R? = null
 ) :
     HBox() {
 
-    protected val control: Control? = control()
+    protected val graphic: Node? = registerGraphic()
 /*
     var property: KMutableProperty1<T, R>? = null
 
@@ -42,101 +48,77 @@ abstract class FormElement<T, R : Any>(
     }*/
 
     fun init() {
-
         alignment = Pos.CENTER_LEFT
         val l = Label(label)
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
         children.add(l)
         padding = Insets(5.0, 10.0, 5.0, 10.0)
-        this.elementValue = initControlValue() as R?
-        children.add(control)
+//        this.elementValue = defaultValue()
+        children.add(graphic)
     }
 
-    abstract fun control(): Control?
     var elementValue: R?
         get() {
-            return when (control) {
-                is TextField -> {
-                    val text = control.text
-                    when (r) {
-                        java.lang.String::class.java -> {
-                            text.trim()
-                        }
-                        java.lang.Integer::class.java -> {
-                            text.toInt()
-                        }
-                        java.lang.Long::class.java -> {
-                            text.toLong()
-                        }
-                        else -> {}
-                    }
-                }
-                is TextArea -> {
-                    val text = control.text
-                    when (r) {
-                        java.lang.String::class.java -> {
-                            text.trim()
-                        }
-                        java.lang.Integer::class.java -> {
-                            text.toInt()
-                        }
-                        java.lang.Long::class.java -> {
-                            text.toLong()
-                        }
-                        else -> {}
-                    }
-                }
-                is ChoiceBox<*> -> {
-                    control.value
-                }
-                is CheckBox -> {
-                    control.isSelected
-                }
-                else -> {
-                    null
-                }
-            } as R?
+            val v = get()
+            if (v == null && defaultValue != null) {
+                return defaultValue
+            }
+            return v
         }
         set(value) {
-            when (control) {
-                is TextField -> {
-                    (control as TextField).text = value.toString()
-                }
-                is TextArea -> {
-                    (control as TextArea).text = value.toString()
-                }
-                is ChoiceBox<*> -> {
-                    (control as ChoiceBox<*>).value = value
-                }
-                is CheckBox -> {
-                    (control as CheckBox).isSelected = value as Boolean
-                }
-                else -> {
-
-                }
-            }
+            set(value)
         }
-    /*
-    var elementValue: R? by Delegates.observable(initControlValue() as R? ) {
-            prop, old, new ->
-        println("$old -> $new")
-        when (control) {
-            is TextField  -> {
-                (control as TextField).text = new.toString()}
-            is TextArea  -> {
-                (control as TextArea).text = new.toString()}
-            is ChoiceBox<*> -> {
-                (control as ChoiceBox<*>).value = new}
-            is CheckBox -> {
-                (control as CheckBox).isSelected = new as Boolean}
-            else -> {
 
-            }
-        }
-    }*/
+    /**
+     *  注册输入值控件实例
+     */
+    abstract fun registerGraphic(): Node?
 
+    /**
+     *  获取控件实例
+     */
+    abstract fun graphic():Node
+
+    /**
+     *  获取控件值
+     */
+    abstract fun get():R?
+
+    /**
+     *  设置控件值
+     */
+    abstract fun set(v : R?)
+
+    /**
+     *  置空
+     */
+    abstract fun clear()
+
+    /**
+     * 校验
+     */
+    abstract fun verify():Boolean
+
+    /**
+     *  获取默认值
+     */
+    abstract fun defaultValue():R?
+
+    /**
+     *  检查必传
+     */
+    fun checkRequired(): Boolean {
+        if (required && !verify()) {
+            return false
+         }
+        return true
+    }
+
+    /**
+     *  获取控件值
+     */
     private fun initControlValue(): Any? {
-        return when (control) {
+        return when (graphic) {
             is TextField, is TextArea -> {
                 ""
             }
@@ -149,36 +131,53 @@ abstract class FormElement<T, R : Any>(
         }
     }
 
-    protected fun verify(): Boolean {
-        return predicate?.test(elementValue!!) ?: true
-    }
-
+    /**
+     *  控件不可编辑
+     */
     fun disable() {
-        Platform.runLater { control!!.isDisable = true }
+        Platform.runLater { graphic!!.isDisable = true }
     }
 
-    fun clear() {
-        Platform.runLater {
-            if (control is TextField) {
-                (control as TextField).clear()
-                if (primary) {
-                    (control as TextField).setDisable(false)
-                    //System.out.println(control.isDisable());
+    /**
+     *  对象属性值 转到 元素值
+     */
+    fun setEle(t: T) {
+        val v = property.get(t)
+        this.elementValue = v
+
+    }
+
+    /**
+     *  元素值 转到 对象属性值
+     */
+    fun setProp(t: T) {
+        property.set(t, elementValue)
+    }
+
+    /**
+     *  获取表格的表头
+     */
+    fun getTableHead() : TableColumn<T,R>{
+        val col = TableColumn<T, R>(label.replace(":","").replace("：",""))
+        col.style = "-fx-alignment: CENTER;"
+//        col.prefWidth = 10.0
+        when (r) {
+            java.lang.Boolean::class.java -> {
+                col.setCellValueFactory { p: TableColumn.CellDataFeatures<T, R> ->
+                    val b = property.get(p.value) as Boolean
+                    val v = if (b) "是" else "否"
+                    val property = SimpleStringProperty(v) as ObservableValue<R>
+                    property
                 }
-            } else if (control is ChoiceBox<*>) {
-                (control as ChoiceBox<*>).setValue(null)
+            }
+            else ->{
+                col.cellValueFactory = PropertyValueFactory(property.name)
             }
         }
+        return col
     }
 
-    fun setEle(t: T) {
-        val get = property.get(t)
-        this.elementValue = get
-
-    }
-
-    fun setProp(t: T) {
-        property.set(t, elementValue as R)
-    }
-
+//    private fun getWidth(v:String,head:String):Double{
+//
+//    }
 }
