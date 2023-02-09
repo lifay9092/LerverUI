@@ -1,5 +1,6 @@
 package cn.lifay.ui.form
 
+import cn.lifay.extension.platformRun
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
@@ -101,7 +102,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
     }
 
     private fun refreshTable() {
-        Platform.runLater {
+        platformRun {
             table.items.clear()
             table.items.addAll(datas())
         }
@@ -220,13 +221,13 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                     elementToProp()
                     //执行保存操作
                     saveData(t)
-                    Platform.runLater {
+                    platformRun {
                         Alert(Alert.AlertType.INFORMATION, "保存成功").show()
                     }
                     refreshTable()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Platform.runLater {
+                    platformRun {
                         Alert(
                             Alert.AlertType.ERROR,
                             "保存失败:" + e.message
@@ -250,13 +251,13 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                     elementToProp()
                     //执行保存操作
                     editData(t)
-                    Platform.runLater {
+                    platformRun {
                         Alert(Alert.AlertType.INFORMATION, "编辑成功").show()
                     }
                     refreshTable()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Platform.runLater {
+                    platformRun {
                         Alert(
                             Alert.AlertType.ERROR,
                             "编辑失败:" + e.message
@@ -283,7 +284,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                         val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
                         //执行保存操作
                         delData(idValue)
-                        Platform.runLater {
+                        platformRun {
                             Alert(Alert.AlertType.INFORMATION, "删除成功").show()
                         }
                         clear()
@@ -291,7 +292,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Platform.runLater {
+                    platformRun {
                         Alert(
                             Alert.AlertType.ERROR,
                             "删除失败:" + e.message
@@ -310,7 +311,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                     clear()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Platform.runLater {
+                    platformRun {
                         Alert(
                             Alert.AlertType.ERROR,
                             "操作失败:" + e.message
@@ -409,7 +410,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Platform.runLater {
+            platformRun {
                 Alert(Alert.AlertType.ERROR, e.message).show()
             }
         }

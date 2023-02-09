@@ -1,9 +1,12 @@
 package cn.lifay.ui.form.text
 
+import cn.lifay.extension.borderColor
+import cn.lifay.extension.platformRun
 import cn.lifay.ui.form.FormElement
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.control.*
+import javafx.scene.paint.Color
 import java.awt.SystemColor.text
 import kotlin.reflect.KMutableProperty1
 
@@ -78,7 +81,7 @@ class TextNewElement<T, R : Any> constructor(
     }
 
     override fun clear(){
-        Platform.runLater {
+        platformRun {
             when (graphic) {
                 is TextField -> {
                     graphic.clear()
@@ -100,7 +103,8 @@ class TextNewElement<T, R : Any> constructor(
 
     override fun verify(): Boolean {
         if (graphic().text.isBlank()) {
-            graphic!!.style = "-fx-border-color: red;"
+//            graphic!!.borderColor("red")
+            graphic!!.borderColor(Color.PINK)
             return false
         }
         graphic!!.style = null

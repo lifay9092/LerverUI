@@ -1,5 +1,6 @@
 package cn.lifay.ui.form
 
+import cn.lifay.extension.platformRun
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
@@ -135,7 +136,7 @@ abstract class FormElement<T, R : Any>(
      *  控件不可编辑
      */
     fun disable() {
-        Platform.runLater { graphic!!.isDisable = true }
+        platformRun { graphic!!.isDisable = true }
     }
 
     /**
