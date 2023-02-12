@@ -11,6 +11,8 @@ public class StaticUtil {
     public static final String ROOT_PATH_UI = "/cn/lifay/ui/";
     public static final String ROOT_PATH_CSS = "/cn/lifay/css/";
 
+    public static final String ROOT_PATH_IMG = "/cn/lifay/img/";
+
     public static final String WHITE_CSS = "modena.css";
     public static final String DARK_CSS = "modena_dark.css";
 

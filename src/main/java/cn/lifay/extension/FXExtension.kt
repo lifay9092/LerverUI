@@ -25,12 +25,12 @@ fun Node.backgroundColor(color: Color) {
     this.backgroundColor(color.toWeb())
 }
 
-fun Node.textFill(color: String) {
+fun Node.textFillColor(color: String) {
     this.appendStyle("-fx-text-fill: ${color};")
 }
 
 fun Node.textFillColor(color: Color) {
-    this.backgroundColor(color.toWeb())
+    this.textFillColor(color.toWeb())
 }
 
 fun Node.borderColor(color: String) {
