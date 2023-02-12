@@ -1,7 +1,7 @@
 package cn.lifay.ui;
 
-import cn.lifay.util.StaticUtil;
 import cn.lifay.exception.LerverUIException;
+import cn.lifay.util.StaticUtil;
 import javafx.application.Application;
 
 import java.net.URL;
@@ -9,7 +9,7 @@ import java.net.URL;
 /**
  * GlobeTheme 主题全局类
  * @author lifay
- * @date  2022/10/9 20:26
+ * @date 2022/10/9 20:26
  **/
 public class GlobeTheme {
 

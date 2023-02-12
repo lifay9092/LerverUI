@@ -18,7 +18,7 @@ import javafx.stage.StageStyle;
 /**
  * LoadingUI 加载中组件
  * @author lifay
- * @date  2022/10/9 20:26
+ * @date 2022/10/9 20:26
  **/
 public class LoadingUI {
 

@@ -3,11 +3,11 @@ package cn.lifay.ui.form.text
 import cn.lifay.extension.borderColor
 import cn.lifay.extension.platformRun
 import cn.lifay.ui.form.FormElement
-import javafx.application.Platform
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.TextArea
+import javafx.scene.control.TextField
+import javafx.scene.control.TextInputControl
 import javafx.scene.paint.Color
-import java.awt.SystemColor.text
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -16,15 +16,25 @@ import kotlin.reflect.KMutableProperty1
  * @Author 李方宇
  * @Date 2023/1/10 17:30
  */
-class TextNewElement<T, R : Any> constructor(
+class TextElement<T, R : Any> constructor(
     r: Class<R>,
     label: String,
     property: KMutableProperty1<T, R?>,
     primary: Boolean = false,
     required: Boolean = false,
-    private var isTextArea: Boolean = false
+    private val isTextArea: Boolean = false
 ) :
-    FormElement<T, R>(r, label, property, primary,required) {
+    FormElement<T, R>(r, label, property, primary, required) {
+
+    companion object {
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R?>,
+            primary: Boolean = false,
+            required: Boolean = false,
+            isTextArea: Boolean = false
+        ) = TextElement(R::class.java, label, property, primary, required, isTextArea)
+    }
 
     init {
         init()
@@ -80,7 +90,7 @@ class TextNewElement<T, R : Any> constructor(
         }
     }
 
-    override fun clear(){
+    override fun clear() {
         platformRun {
             when (graphic) {
                 is TextField -> {
@@ -116,10 +126,10 @@ class TextNewElement<T, R : Any> constructor(
             java.lang.String::class.java -> {
                 ""
             }
-            java.lang.Integer::class.java,java.lang.Long::class.java -> {
+            java.lang.Integer::class.java, java.lang.Long::class.java -> {
                 0
             }
-            java.lang.Double::class.java,java.lang.Float::class.java -> {
+            java.lang.Double::class.java, java.lang.Float::class.java -> {
                 0.0
             }
             else -> {}

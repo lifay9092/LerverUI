@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 /**
  * Demo 测试类
  * @author lifay
- * @date  2023/1/9 16:07
+ * @date 2023/1/9 16:07
  **/
 public class Demo extends Application {
 

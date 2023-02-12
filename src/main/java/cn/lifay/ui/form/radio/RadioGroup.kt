@@ -10,11 +10,11 @@ import javafx.scene.layout.HBox
  * @author lifay
  * @date 2023/2/6 14:52
  **/
-class RadioGroup() : HBox(10.0)  {
-//    protected lateinit var items : Collection<String>
+class RadioGroup() : HBox(10.0) {
+    //    protected lateinit var items : Collection<String>
     protected val group = ToggleGroup()
 
-    var text:String
+    var text: String
         get() {
             return (group.toggles.first { it.isSelected } as RadioButton).text
         }
@@ -26,8 +26,8 @@ class RadioGroup() : HBox(10.0)  {
         this.alignment = Pos.CENTER
     }
 
-    fun addItems(items : Collection<String>){
-        for ((index,item) in items.withIndex()) {
+    fun addItems(items: Collection<String>) {
+        for ((index, item) in items.withIndex()) {
             val button = RadioButton(item)
             button.toggleGroup = group
             if (index == 0) {
@@ -37,7 +37,7 @@ class RadioGroup() : HBox(10.0)  {
         }
     }
 
-    fun set(item :String){
+    fun set(item: String) {
         for (toggle in group.toggles) {
             val radioButton = toggle as RadioButton
             if (radioButton.text == item) {

@@ -3,8 +3,6 @@ package cn.lifay.ui.form.check
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.CheckBox
-import javafx.scene.control.Control
-import java.awt.SystemColor.text
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -20,6 +18,12 @@ class CheckElement<T, R : Any>(
 ) :
     FormElement<T, R>(r, label, property) {
 
+    companion object {
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R?>
+        ) = CheckElement(R::class.java, label, property)
+    }
 
     init {
         init()
@@ -54,6 +58,7 @@ class CheckElement<T, R : Any>(
         return convert(graphic().isSelected)
 
     }
+
     /*
         fun getValue(): R? {
             return control.getValue()
@@ -62,7 +67,7 @@ class CheckElement<T, R : Any>(
         fun setValue(r: Any) {
             control.setValue(r as R)
         }*/
-    private fun convert(b:Boolean):R{
+    private fun convert(b: Boolean): R {
         return when (r) {
             java.lang.Boolean::class.java -> {
                 b
@@ -70,26 +75,32 @@ class CheckElement<T, R : Any>(
             java.lang.String::class.java -> {
                 if (b) "1" else "0"
             }
-            java.lang.Integer::class.java,java.lang.Long::class.java -> {
+            java.lang.Integer::class.java, java.lang.Long::class.java -> {
                 if (b) 1 else 0
             }
-            java.lang.Double::class.java,java.lang.Float::class.java -> {
+            java.lang.Double::class.java, java.lang.Float::class.java -> {
                 if (b) 1.0 else 0.0
             }
             else -> {
-                println("not surport ${b} ${r}")}
+                println("not surport ${b} ${r}")
+            }
         } as R
     }
-    private fun convert(v:R?):Boolean {
+
+    private fun convert(v: R?): Boolean {
         if (v == null) {
             return false
         }
-        if (v is Boolean){
+        if (v is Boolean) {
             return v
         }
         return when (v) {
-            "1",1,1.0 -> {true}
-            else -> {false}
+            "1", 1, 1.0 -> {
+                true
+            }
+            else -> {
+                false
+            }
         }
     }
-    }
+}

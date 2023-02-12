@@ -1,11 +1,7 @@
 package cn.lifay.ui.form
 
-import cn.lifay.extension.platformRun
-import cn.lifay.ui.form.check.CheckElement
+import cn.lifay.extension.*
 import cn.lifay.ui.form.radio.RadioElement
-import cn.lifay.ui.form.select.SelectElement
-import cn.lifay.ui.form.text.TextNewElement
-import javafx.application.Platform
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.geometry.HPos
@@ -35,10 +31,10 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
     private val form = GridPane()
     private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected var saveBtn: Button = Button("保存")
-    protected var editBtn: Button = Button("修改")
-    protected var delBtn: Button = Button("删除")
-    protected var clearBtn: Button = Button("清空")
+    protected var saveBtn: Button = Button("保存").styleInfo()
+    protected var editBtn: Button = Button("修改").stylePrimary()
+    protected var delBtn: Button = Button("删除").styleDanger()
+    protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
 
 /*
@@ -63,11 +59,12 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
             refreshForm(t)
         }
     }
+
     /*
         界面初始化
      */
     private fun uiInit(title: String) {
-        root.children.addAll(form,table)
+        root.children.addAll(form, table)
 
         //表单布局
         form.alignment = Pos.CENTER
@@ -78,7 +75,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
 
         //表格布局
         this.table.apply {
-            padding = Insets(1.0,2.0,10.0,2.0)
+            padding = Insets(1.0, 2.0, 10.0, 2.0)
             columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
             columns.addAll(tableHeadColumns())
             refreshTable()
@@ -96,7 +93,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         this.scene = Scene(root)
     }
 
-    private fun refreshForm(t : T) {
+    private fun refreshForm(t: T) {
         this.t = t
         propToElement()
     }
@@ -114,6 +111,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
     private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
         return elements.map { it.getTableHead() }.toList()
     }
+/*
 
     inline fun <reified T, reified R : Any> newCheckElement(
         label: String,
@@ -129,8 +127,8 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         primary: Boolean = false,
         required: Boolean = false,
         isTextArea: Boolean = false
-    ): TextNewElement<T, R> {
-        val element = TextNewElement(R::class.java, label, property, primary,required, isTextArea)
+    ): TextElement<T, R> {
+        val element = TextElement(R::class.java, label, property, primary,required, isTextArea)
         return element
     }
 
@@ -152,6 +150,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         val element = SelectElement(R::class.java, label, property,required, items)
         return element
     }
+*/
 
     inline fun <reified T> newRadioElement(
         label: String,

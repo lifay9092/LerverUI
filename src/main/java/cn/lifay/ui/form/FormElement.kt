@@ -1,7 +1,6 @@
 package cn.lifay.ui.form
 
 import cn.lifay.extension.platformRun
-import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
@@ -78,17 +77,17 @@ abstract class FormElement<T, R : Any>(
     /**
      *  获取控件实例
      */
-    abstract fun graphic():Node
+    abstract fun graphic(): Node
 
     /**
      *  获取控件值
      */
-    abstract fun get():R?
+    abstract fun get(): R?
 
     /**
      *  设置控件值
      */
-    abstract fun set(v : R?)
+    abstract fun set(v: R?)
 
     /**
      *  置空
@@ -98,12 +97,12 @@ abstract class FormElement<T, R : Any>(
     /**
      * 校验
      */
-    abstract fun verify():Boolean
+    abstract fun verify(): Boolean
 
     /**
      *  获取默认值
      */
-    abstract fun defaultValue():R?
+    abstract fun defaultValue(): R?
 
     /**
      *  检查必传
@@ -111,7 +110,7 @@ abstract class FormElement<T, R : Any>(
     fun checkRequired(): Boolean {
         if (required && !verify()) {
             return false
-         }
+        }
         return true
     }
 
@@ -158,8 +157,8 @@ abstract class FormElement<T, R : Any>(
     /**
      *  获取表格的表头
      */
-    fun getTableHead() : TableColumn<T,R>{
-        val col = TableColumn<T, R>(label.replace(":","").replace("：",""))
+    fun getTableHead(): TableColumn<T, R> {
+        val col = TableColumn<T, R>(label.replace(":", "").replace("：", ""))
         col.style = "-fx-alignment: CENTER;"
 //        col.prefWidth = 10.0
         when (r) {
@@ -171,7 +170,7 @@ abstract class FormElement<T, R : Any>(
                     property
                 }
             }
-            else ->{
+            else -> {
                 col.cellValueFactory = PropertyValueFactory(property.name)
             }
         }

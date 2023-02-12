@@ -3,7 +3,6 @@ package cn.lifay.ui.form.select
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.ChoiceBox
-import java.awt.SystemColor.text
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -16,10 +15,19 @@ class SelectElement<T, R : Any>(
     r: Class<R>,
     label: String,
     property: KMutableProperty1<T, R?>,
-    required: Boolean = false,
-    items: Collection<R?>
+    items: Collection<R?>,
+    required: Boolean = false
 ) :
-    FormElement<T, R>(r, label, property,required = required) {
+    FormElement<T, R>(r, label, property, required = required) {
+
+    companion object {
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R?>,
+            items: Collection<R?>,
+            required: Boolean = false
+        ) = SelectElement(R::class.java, label, property, items, required)
+    }
 
 //    protected var control: ChoiceBox<R> = ChoiceBox<R>()
 

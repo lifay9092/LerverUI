@@ -3,7 +3,7 @@ package cn.lifay.util;
 /**
  * StaticUtil 静态工具类
  * @author lifay
- * @date  2022/10/9 20:26
+ * @date 2022/10/9 20:26
  **/
 public class StaticUtil {
 
