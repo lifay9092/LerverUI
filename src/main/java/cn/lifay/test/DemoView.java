@@ -1,6 +1,8 @@
 package cn.lifay.test;
 
+import cn.lifay.ui.message.ErrorMessage;
 import cn.lifay.ui.message.InfoMessage;
+import cn.lifay.ui.message.WarnMessage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
@@ -23,8 +25,18 @@ public class DemoView {
     }
 
     public void info(ActionEvent actionEvent) {
-
         InfoMessage infoMessage = new InfoMessage(rootPane.getScene().getWindow());
         infoMessage.show("信息。。。。。。。");
     }
+
+    public void warn(ActionEvent actionEvent) {
+        WarnMessage warnMessage = new WarnMessage(rootPane.getScene().getWindow());
+        warnMessage.show("警告。。。。。大萨达多撒多撒多撒大所多所大多大大声的。。");
+    }
+
+    public void error(ActionEvent actionEvent) {
+        ErrorMessage errorMessage = new ErrorMessage(rootPane.getScene().getWindow());
+        errorMessage.show("错误。。。。。。。");
+    }
+
 }

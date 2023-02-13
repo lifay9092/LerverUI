@@ -38,6 +38,7 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
         if (data!!.name!!.isBlank()) {
             throw RuntimeException("名称不能为空!")
         }
+        Thread.sleep(3000)
         println("保存数据操作:$data")
     }
 

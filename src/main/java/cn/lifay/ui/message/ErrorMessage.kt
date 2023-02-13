@@ -3,21 +3,21 @@ package cn.lifay.ui.message
 import javafx.stage.Window
 
 /**
- *@ClassName InfoMessage
- *@Description 信息
+ *@ClassName ErrorMessage
+ *@Description 错误
  *@Author lifay
  *@Date 2023/2/12 18:13
  **/
-class InfoMessage(owner: Window) : BaseMessage(owner) {
+class ErrorMessage(owner: Window) : BaseMessage(owner) {
     override fun registerIcon(): String {
-        return "info.png"
+        return "error.png"
     }
 
     override fun baseColor(): String {
-        return "#6cc446"
+        return "#ed4814"
     }
 
     override fun backgroundColor(): String {
-        return "#f3fbeb"
+        return "#fcece4"
     }
 }

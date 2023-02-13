@@ -20,6 +20,10 @@ public class StaticUtil {
         return ROOT_PATH_UI + "loading.gif";
     }
 
+    public static String loadingGray() {
+        return ROOT_PATH_UI + "loading-gray.gif";
+    }
+
     public static String whiteTheme() {
         return ROOT_PATH_CSS + WHITE_CSS;
     }

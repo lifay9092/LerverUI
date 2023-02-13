@@ -12,6 +12,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.stage.Modality
 import javafx.stage.Stage
 import java.lang.reflect.ParameterizedType
 import java.util.function.Consumer
@@ -37,15 +38,15 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
     protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
 
-/*
-    companion object{
-        inline operator fun <reified T : Any> invoke(): T {
-            println("伴生对象方法")
-            val kClass = T::class.java.newInstance()
-            return kClass
+    /*
+        companion object{
+            inline operator fun <reified T : Any> invoke(): T {
+                println("伴生对象方法")
+                val kClass = T::class.java.newInstance()
+                return kClass
+            }
         }
-    }
-*/
+    */
 
     private fun FormUI() {}
 
@@ -64,6 +65,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         界面初始化
      */
     private fun uiInit(title: String) {
+        this.initModality(Modality.APPLICATION_MODAL)
         root.children.addAll(form, table)
 
         //表单布局
@@ -111,46 +113,6 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
     private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
         return elements.map { it.getTableHead() }.toList()
     }
-/*
-
-    inline fun <reified T, reified R : Any> newCheckElement(
-        label: String,
-        property: KMutableProperty1<T, R?>
-    ): CheckElement<T, R> {
-        val element = CheckElement(R::class.java, label, property)
-        return element
-    }
-
-    inline fun <reified T, reified R : Any> newTextElement(
-        label: String,
-        property: KMutableProperty1<T, R?>,
-        primary: Boolean = false,
-        required: Boolean = false,
-        isTextArea: Boolean = false
-    ): TextElement<T, R> {
-        val element = TextElement(R::class.java, label, property, primary,required, isTextArea)
-        return element
-    }
-
-    inline fun <reified T, reified R : Any> newSelectElement(
-        label: String,
-        property: KMutableProperty1<T, R?>,
-        items: Array<R>,
-        required: Boolean = false
-    ): SelectElement<T, R> {
-        return newSelectElement(label, property, items.toList(),required)
-    }
-
-    inline fun <reified T, reified R : Any> newSelectElement(
-        label: String,
-        property: KMutableProperty1<T, R?>,
-        items: Collection<R>,
-        required: Boolean = false
-    ): SelectElement<T, R> {
-        val element = SelectElement(R::class.java, label, property,required, items)
-        return element
-    }
-*/
 
     inline fun <reified T> newRadioElement(
         label: String,
@@ -210,95 +172,101 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                try {
-                    saveBtn.isDisable = true
-                    //检查
-                    if (!checkElementValue()) {
-                        return@setOnMouseClicked
+                asyncTask(this,"保存中") {
+                    try {
+                        saveBtn.isDisable = true
+                        //检查
+                        if (!checkElementValue()) {
+                            return@asyncTask
+                        }
+                        //从元素赋值到实例
+                        elementToProp()
+                        //执行保存操作
+                        saveData(t)
+                        platformRun {
+                            Alert(Alert.AlertType.INFORMATION, "保存成功").show()
+                        }
+                        refreshTable()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        platformRun {
+                            Alert(
+                                Alert.AlertType.ERROR,
+                                "保存失败:" + e.message
+                            ).show()
+                        }
+                    } finally {
+                        saveBtn.isDisable = false
                     }
-                    //从元素赋值到实例
-                    elementToProp()
-                    //执行保存操作
-                    saveData(t)
-                    platformRun {
-                        Alert(Alert.AlertType.INFORMATION, "保存成功").show()
-                    }
-                    refreshTable()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    platformRun {
-                        Alert(
-                            Alert.AlertType.ERROR,
-                            "保存失败:" + e.message
-                        ).show()
-                    }
-                } finally {
-                    saveBtn.isDisable = false
                 }
             }
         }
         //编辑
         editBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                try {
-                    editBtn.isDisable = true
-                    //检查
-                    if (!checkElementValue()) {
-                        return@setOnMouseClicked
+                asyncTask(this) {
+                    try {
+                        editBtn.isDisable = true
+                        //检查
+                        if (!checkElementValue()) {
+                            return@asyncTask
+                        }
+                        //从元素赋值到实例
+                        elementToProp()
+                        //执行保存操作
+                        editData(t)
+                        platformRun {
+                            Alert(Alert.AlertType.INFORMATION, "编辑成功").show()
+                        }
+                        refreshTable()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        platformRun {
+                            Alert(
+                                Alert.AlertType.ERROR,
+                                "编辑失败:" + e.message
+                            ).show()
+                        }
+                    } finally {
+                        editBtn.isDisable = false
                     }
-                    //从元素赋值到实例
-                    elementToProp()
-                    //执行保存操作
-                    editData(t)
-                    platformRun {
-                        Alert(Alert.AlertType.INFORMATION, "编辑成功").show()
-                    }
-                    refreshTable()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    platformRun {
-                        Alert(
-                            Alert.AlertType.ERROR,
-                            "编辑失败:" + e.message
-                        ).show()
-                    }
-                } finally {
-                    editBtn.isDisable = false
                 }
             }
         }
         //删除
         delBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                try {
-                    delBtn.isDisable = true
-                    //确认
-                    val alert =
-                        Alert(Alert.AlertType.CONFIRMATION, "是否删除?")
-                    val buttonType = alert.showAndWait()
-                    if (buttonType.isPresent && buttonType.get() == ButtonType.OK) {
-                        //从元素赋值到实例
-                        elementToProp()
-                        //获取主键值
-                        val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
-                        //执行保存操作
-                        delData(idValue)
-                        platformRun {
-                            Alert(Alert.AlertType.INFORMATION, "删除成功").show()
+                asyncTask(this) {
+                    try {
+                        delBtn.isDisable = true
+                        //确认
+                        val alert =
+                            Alert(Alert.AlertType.CONFIRMATION, "是否删除?")
+                        val buttonType = alert.showAndWait()
+                        if (buttonType.isPresent && buttonType.get() == ButtonType.OK) {
+                            //从元素赋值到实例
+                            elementToProp()
+                            //获取主键值
+                            val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
+                            //执行保存操作
+                            delData(idValue)
+                            platformRun {
+                                Alert(Alert.AlertType.INFORMATION, "删除成功").show()
+                            }
+                            clear()
+                            refreshTable()
                         }
-                        clear()
-                        refreshTable()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        platformRun {
+                            Alert(
+                                Alert.AlertType.ERROR,
+                                "删除失败:" + e.message
+                            ).show()
+                        }
+                    } finally {
+                        delBtn.isDisable = false
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    platformRun {
-                        Alert(
-                            Alert.AlertType.ERROR,
-                            "删除失败:" + e.message
-                        ).show()
-                    }
-                } finally {
-                    delBtn.isDisable = false
                 }
             }
         }
