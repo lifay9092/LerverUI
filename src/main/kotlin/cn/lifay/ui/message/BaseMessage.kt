@@ -1,6 +1,5 @@
 package cn.lifay.ui.message
 
-import cn.lifay.Demo
 import cn.lifay.extension.appendStyle
 import cn.lifay.extension.backgroundColor
 import cn.lifay.extension.platformRun
@@ -66,7 +65,7 @@ abstract class BaseMessage(owner: Window) {
             requestFocus()
             //绑定位置
             children.addAll(
-                ImageView(Image(Demo::class.java.getResourceAsStream(StaticUtil.ROOT_PATH_IMG + registerIcon()))),
+                ImageView(Image(BaseMessage::class.java.getResourceAsStream(StaticUtil.ROOT_PATH_IMG + registerIcon()))),
                 text
             )
         }

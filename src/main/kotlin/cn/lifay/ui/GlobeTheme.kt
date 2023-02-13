@@ -1,41 +1,32 @@
-package cn.lifay.ui;
+package cn.lifay.ui
 
-import cn.lifay.exception.LerverUIException;
-import cn.lifay.util.StaticUtil;
-import javafx.application.Application;
-
-import java.net.URL;
+import cn.lifay.exception.LerverUIException
+import cn.lifay.util.StaticUtil
+import javafx.application.Application
 
 /**
  * GlobeTheme 主题全局类
  * @author lifay
  * @date 2022/10/9 20:26
- **/
-public class GlobeTheme {
-
+ */
+object GlobeTheme {
     /**
      * 设置白色
      * @author lifay
      */
-    public static void setWhite() {
-        URL resource = GlobeTheme.class.getResource(StaticUtil.whiteTheme());
-        if (resource == null) {
-            throw new LerverUIException("获取不到css文件:" + StaticUtil.whiteTheme());
-        }
-        Application.setUserAgentStylesheet(resource.toExternalForm());
+    fun setWhite() {
+        val resource = GlobeTheme::class.java.getResource(StaticUtil.whiteTheme())
+            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.whiteTheme())
+        Application.setUserAgentStylesheet(resource.toExternalForm())
     }
 
     /**
      * 设置暗色
      * @author lifay
      */
-    public static void setDark() {
-        URL resource = GlobeTheme.class.getResource(StaticUtil.darkTheme());
-        if (resource == null) {
-            throw new LerverUIException("获取不到css文件:" + StaticUtil.darkTheme());
-        }
-        Application.setUserAgentStylesheet(resource.toExternalForm());
+    fun setDark() {
+        val resource = GlobeTheme::class.java.getResource(StaticUtil.darkTheme())
+            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
+        Application.setUserAgentStylesheet(resource.toExternalForm())
     }
-
-
 }
