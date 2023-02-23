@@ -47,9 +47,20 @@
             <artifactId>kotlinx-coroutines-core</artifactId>
             <version>1.6.4</version>
         </dependency>
-
+        <dependency>
+            <groupId>xyz.yuelai</groupId>
+            <artifactId>easyfx</artifactId>
+            <version>1.1.2-release</version>
+        </dependency>
     </dependencies>
-
+    <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
+    <repositories>
+        <repository>
+            <id>randore-easyfx-easyfx</id>
+            <name>easyfx</name>
+            <url>https://randore-maven.pkg.coding.net/repository/easyfx/easyfx/</url>
+        </repository>
+    </repositories>
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
