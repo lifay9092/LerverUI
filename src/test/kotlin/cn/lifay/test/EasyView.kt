@@ -3,6 +3,7 @@ package cn.lifay.test
 import xyz.yuelai.View
 import xyz.yuelai.control.Notification
 import java.net.URL
+import java.util.*
 
 
 /**
@@ -11,6 +12,9 @@ import java.net.URL
  * @date 2023/2/21 8:56
  **/
 class EasyView : View() {
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+    }
+
     override fun fxml(): URL? {
         val resource = this::class.java.getResource("easy.fxml")
         println(resource)
