@@ -3,8 +3,19 @@ package cn.lifay.extension
 import cn.lifay.ui.form.FormUI
 import javafx.application.Platform
 import javafx.scene.Node
+import javafx.scene.control.Alert
 import javafx.scene.control.Button
+import javafx.scene.control.ButtonType
 import javafx.scene.paint.Color
+import xyz.yuelai.View
+
+fun View.checkParam(value: Any, name: String):Boolean {
+    if (value.toString().isBlank()) {
+        Platform.runLater { Alert(Alert.AlertType.ERROR, "${name}不能为空", ButtonType.CLOSE).show()}
+        return false
+    }
+    return true
+}
 
 inline fun platformRun(crossinline f: () -> Unit) {
     Platform.runLater { f() }

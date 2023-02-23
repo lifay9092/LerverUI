@@ -2,8 +2,6 @@ package cn.lifay;
 
 import cn.lifay.test.EasyView;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import xyz.yuelai.FXApplication;
@@ -27,6 +25,7 @@ public class Demo extends Application {
         Scene scene = new Scene(load);
         primaryStage.setScene(scene);
         primaryStage.show();*/
+
         FXApplication.setElementStyleEnable(true);
         EasyView view = View.createView(EasyView.class);
         Scene scene = new Scene(view.getRoot());
