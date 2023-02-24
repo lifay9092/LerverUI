@@ -1,10 +1,10 @@
 package cn.lifay.ui
 
+import cn.lifay.extension.asyncTask
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXReceiver
 import cn.lifay.ui.message.Message
 import cn.lifay.ui.message.Notification
-import javafx.concurrent.Task
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
@@ -16,7 +16,6 @@ import javafx.stage.StageStyle
 import javafx.stage.Window
 import java.net.URL
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import kotlin.reflect.KMutableProperty0
 
 
@@ -62,14 +61,9 @@ abstract class BaseView<R : Pane>() : Initializable {
         for (method in clazz.declaredMethods) {
             val fxReceiver = method.getAnnotation(FXReceiver::class.java)
             if (fxReceiver != null) {
-//                println(fxReceiver.id)
-                /*if (FXReceiver.has(fxReceiver.id,clazz.name)) {
-                    throw FXEventBusException("@FXReceiver[${fxReceiver.id}]已经存在")
-                }*/
                 FXReceiver.add(fxReceiver.id, this, method::invoke)
             }
         }
-//        println()
     }
 
     /**
@@ -105,7 +99,9 @@ abstract class BaseView<R : Pane>() : Initializable {
         if (FXReceiver.has(element.className, element.methodName)) {
             throw FXEventBusException("@FXReceiver 函数不能循环：class=${element.className} method=${element.methodName}")
         }
-        FXReceiver.invoke(id, args)
+        asyncTask {
+            FXReceiver.invoke(id, args)
+        }
     }
 
     /**
@@ -166,29 +162,11 @@ abstract class BaseView<R : Pane>() : Initializable {
 
 
     /**
-     * 显示一则默认类型默认延迟的消息
-     *
-     * @param message 通知信息
-     */
-    protected open fun showMessage(message: String?) {
-        showMessage(message, Message.Type.INFO)
-    }
-
-    /**
      * 显示一则指定类型默认延迟的消息
      *
      * @param message 通知信息
      */
-    protected open fun showMessage(message: String?, type: Message.Type?) {
-        showMessage(message, type, Message.DEFAULT_DELAY)
-    }
-
-    /**
-     * 显示一则默认类型指定延迟的消息
-     *
-     * @param message 通知信息
-     */
-    protected open fun showMessage(message: String?, delay: Long) {
+    protected open fun showMessage(message: String, delay: Long = 3000) {
         showMessage(message, Message.Type.INFO, delay)
     }
 
@@ -197,45 +175,18 @@ abstract class BaseView<R : Pane>() : Initializable {
      *
      * @param message 通知信息
      */
-    protected open fun showMessage(message: String?, type: Message.Type?, delay: Long) {
+    @JvmOverloads
+    protected open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 3000) {
         val root = getRoot()
         if (root !is Pane) {
-            System.err.println("owner 必须是 Pane 或其子类")
+            alertError("root 必须是 Pane 或其子类 : ${root}")
             return
         }
-        Message.show(root as Pane, message, type, delay)
+        Message.show(root, message, type, delay)
     }
 
-    /**
-     * 显示一则默认类型的通知， 用户手动关闭
-     *
-     * @param message 通知信息
-     */
-    protected open fun showNotification(message: String?) {
-        showNotification(message, Notification.Type.INFO)
-    }
-
-    /**
-     * 显示一则指定类型的通知，用户手动关闭
-     *
-     * @param message 通知信息
-     * @param type    通知类型
-     */
-    protected open fun showNotification(message: String?, type: Notification.Type) {
-        showNotification(message, type, 0)
-    }
-
-    /**
-     * 显示一则指定类型的通知，自动关闭，默认显示一秒
-     *
-     * @param message 通知信息
-     */
-    protected open fun showNotificationAutoClose(message: String?) {
-        showNotificationAutoClose(message, Notification.Type.INFO)
-    }
-
-    protected open fun showNotificationAutoClose(message: String?, type: Notification.Type) {
-        showNotification(message, type, Notification.DEFAULT_DELAY)
+    protected open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
+        showNotification(message, Notification.Type.INFO, Notification.DEFAULT_DELAY)
     }
 
     /**
@@ -245,21 +196,19 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @param type         通知类型
      * @param milliseconds 延迟时间 毫秒
      */
-    protected open fun showNotification(message: String?, type: Notification.Type, milliseconds: Long) {
+    @JvmOverloads
+    protected open fun showNotification(
+        message: String,
+        type: Notification.Type,
+        milliseconds: Long = Notification.DEFAULT_DELAY
+    ) {
         val root = getRoot()
         if (root !is Pane) {
-            System.err.println("owner 必须是 Pane 或其子类")
+            alertError("root 必须是 Pane 或其子类 : ${root}")
             return
         }
-        Notification.showAutoClose(root as Pane, message, type, milliseconds)
+        Notification.showAutoClose(root, message, type, milliseconds)
     }
 
-    /**
-     * 异步执行任务
-     *
-     * @param task 任务
-     */
-    protected open fun runAsync(task: Task<*>?) {
-        CompletableFuture.runAsync(task)
-    }
+
 }

@@ -20,7 +20,7 @@ annotation class FXReceiver(
             receivers.add(Pair(obj, f))
             val referenceImpl = f as FunctionReferenceImpl
             val method = referenceImpl.boundReceiver as Method
-            println("f:" + method.name)
+//            println("f:" + method.name)
             RECEIVER_MAP[id] = receivers
             CLASS_METHOD_LIST.add("${obj.javaClass.name}_${method.name}")
         }

@@ -1,113 +1,94 @@
-package cn.lifay.ui.message;
+package cn.lifay.ui.message
 
-import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import cn.lifay.extension.asyncTask
+import cn.lifay.extension.platformRun
+import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
+import javafx.scene.control.Label
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
+import javafx.scene.layout.VBox
+import java.util.*
 
 /**
  * @author zhong
  * @date 2020-09-30 13:46:43 周三
  */
-public class Message {
-
-    public enum Type {
+class Message constructor() {
+    enum class Type {
         /**
          * 信息展示
          */
         INFO,
+
         /**
          * 警告用户
          */
         WARNING,
+
         /**
          * 提示用户错误
          */
         ERROR,
+
         /**
          * 告知用户成功
          */
         SUCCESS
     }
 
-    private HBox root;
     @FXML
-    private Label message;
-    private Pane owner;
+    private var root: HBox? = null
 
-    private Message() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/Message.fxml"));
-        fxmlLoader.setController(this);
-        try {
-            root = fxmlLoader.load();
-            System.out.println("fxmlLoader.load()");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    @FXML
+    private var message: Label? = null
 
-    private static Map<Pane, VBox> messageContainerMap = new HashMap<>();
+    private var owner: Pane? = null
 
-    public static final long DEFAULT_DELAY = 3000;
-
-    public static void show(Pane owner, String message) {
-        show(owner, message, Type.INFO, DEFAULT_DELAY);
-    }
-
-    public static void show(Pane owner, String message, long delay) {
-        show(owner, message, Type.INFO, delay);
-    }
-
-    public static void show(Pane owner, String message, Type type) {
-        show(owner, message, type, DEFAULT_DELAY);
-    }
-
-    public static void show(Pane owner, String message, Type type, long delay) {
-        Message instance = new Message();
-        instance.owner = owner;
-        instance.message.setText(message);
-        if (type == null) {
-            type = Type.INFO;
-        }
-        instance.root.getStyleClass().add("message-" + type.name().toLowerCase());
-        VBox container = messageContainerMap.computeIfAbsent(owner, pane -> {
-            VBox vBox = new VBox();
-            vBox.setManaged(false);
-            vBox.setSpacing(15);
-            vBox.setLayoutY(15);
-            vBox.layoutXProperty().bind(owner.widthProperty().subtract(instance.root.widthProperty()).divide(2));
-            owner.getChildren().add(vBox);
-            return vBox;
-        });
-        container.getChildren().add(instance.root);
-
-        if (delay <= 0) {
-            delay = DEFAULT_DELAY;
-        }
-
-        instance.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> container.getChildren().remove(instance.root));
-            }
-        }, delay);
-    }
-
-    private static Timer timer;
-
-    private void schedule(TimerTask task, long milliseconds) {
+    private fun schedule(task: TimerTask, milliseconds: Long) {
         if (timer == null) {
-            timer = new Timer(true);
+            timer = Timer(true)
         }
-        timer.schedule(task, milliseconds);
+        timer!!.schedule(task, milliseconds)
+    }
+
+    companion object {
+        private val messageContainerMap: MutableMap<Pane, VBox> = HashMap()
+
+        fun show(owner: Pane, message: String?, type: Type, delay: Long) {
+            asyncTask {
+                val fxmlLoader = FXMLLoader(javaClass.getResource("/fxml/Message.fxml"))
+                fxmlLoader.load<Pane>()
+                val instance = fxmlLoader.getController<Message>()
+                platformRun {
+                    instance.owner = owner
+                    instance.message!!.text = message
+                    instance.root!!.styleClass.add("message-" + type!!.name.lowercase(Locale.getDefault()))
+                }
+                val container = messageContainerMap.computeIfAbsent(owner) { pane: Pane? ->
+                    val vBox = VBox()
+                    vBox.isManaged = false
+                    vBox.spacing = 15.0
+                    vBox.layoutY = 15.0
+                    vBox.layoutXProperty()
+                        .bind(owner.widthProperty().subtract(instance.root!!.widthProperty()).divide(2))
+                    platformRun {
+                        owner.children.add(vBox)
+                    }
+                    vBox
+                }
+                platformRun {
+                    container.children.add(instance.root)
+                }
+                instance.schedule(object : TimerTask() {
+                    override fun run() {
+                        platformRun { container.children.remove(instance.root) }
+                    }
+                }, delay)
+            }
+
+        }
+
+        private var timer: Timer? = null
     }
 }

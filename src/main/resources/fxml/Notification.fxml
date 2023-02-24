@@ -4,9 +4,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.*?>
-<HBox maxHeight="-Infinity" maxWidth="880" minHeight="-Infinity" minWidth="380" prefWidth="380"
+<HBox fx:id="root" maxHeight="-Infinity" maxWidth="880" minHeight="-Infinity" minWidth="380" prefWidth="380"
       styleClass="notification,notification-info" stylesheets="@../css/notification.css"
-      xmlns="http://javafx.com/javafx/" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cn.lifay.ui.message.Notification">
     <Label fx:id="iconType" styleClass="icon-type">
         <HBox.margin>
             <Insets right="10.0"/>
@@ -16,7 +17,8 @@
         <Label fx:id="title" styleClass="title">
         </Label>
         <HBox>
-            <Label fx:id="content" maxWidth="1.7976931348623157E308" styleClass="content" text="这是一条不会自动关闭的消息"
+            <Label fx:id="content" maxWidth="1.7976931348623157E308" styleClass="content"
+                   text="这是一条不会自动关闭的消息"
                    wrapText="true" HBox.hgrow="ALWAYS">
                 <HBox.margin>
                     <Insets top="6.0"/>

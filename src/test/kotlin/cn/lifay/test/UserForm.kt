@@ -6,6 +6,8 @@ import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextElement
+import java.net.URL
+import java.util.*
 
 /**
  *@ClassName UserNewForm
@@ -19,6 +21,8 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
 //            this.t = t
 //        }
 //    }
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+    }
     override fun buildElements(): List<FormElement<UserData, *>> {
         val id = TextElement("ID:", UserData::id, true)
         val name = TextElement("名称:", UserData::name, isTextArea = true, required = true)
@@ -38,8 +42,10 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
         if (data!!.name!!.isBlank()) {
             throw RuntimeException("名称不能为空!")
         }
-        Thread.sleep(3000)
+        Thread.sleep(1000)
         println("保存数据操作:$data")
+//        showMessage("保存数据操作:$data",1000)
+        showNotification("保存数据操作:$data")
     }
 
     override fun editData(data: UserData?) {
@@ -53,6 +59,8 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
         checkId(primaryValue)
         println("删除数据操作:$primaryValue")
     }
+
+
 
     override fun datas(): List<UserData> {
         return listOf(

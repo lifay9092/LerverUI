@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.EasyView">
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.EasyView">
     <children>
-        <Button layoutX="60.0" layoutY="25.0" mnemonicParsing="false" onAction="#test" text="动态表单" />
-        <Button layoutX="229.0" layoutY="25.0" mnemonicParsing="false" onAction="#msgTest" text="信息提示" />
-        <TabPane fx:id="tabPane" layoutX="63.0" layoutY="95.0" prefHeight="749.0" prefWidth="397.0" tabClosingPolicy="UNAVAILABLE">
+        <Button layoutX="60.0" layoutY="25.0" mnemonicParsing="false" onAction="#test" text="动态表单"/>
+        <Button layoutX="229.0" layoutY="25.0" mnemonicParsing="false" onAction="#msgTest" text="信息提示"/>
+        <TabPane fx:id="tabPane" layoutX="63.0" layoutY="95.0" prefHeight="749.0" prefWidth="397.0"
+                 tabClosingPolicy="UNAVAILABLE">
 
             <tabs>
                 <Tab text="Untitled Tab 1">
                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
                     </content>
                 </Tab>
 
             </tabs>
         </TabPane>
-      <Button layoutX="343.0" layoutY="25.0" mnemonicParsing="false" onAction="#sendTest" text="消息总线" />
+        <Button layoutX="343.0" layoutY="25.0" mnemonicParsing="false" onAction="#sendTest" text="消息总线"/>
 
     </children>
 

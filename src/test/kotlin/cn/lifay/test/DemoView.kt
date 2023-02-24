@@ -1,8 +1,5 @@
 package cn.lifay.test
 
-import cn.lifay.ui.message.ErrorMessage
-import cn.lifay.ui.message.InfoMessage
-import cn.lifay.ui.message.WarnMessage
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -77,18 +74,13 @@ class DemoView : Initializable {
     }
 
     fun info(actionEvent: ActionEvent?) {
-        val infoMessage = InfoMessage(rootPane.scene.window)
-        infoMessage.show("信息。。。。。。。")
+
     }
 
     fun warn(actionEvent: ActionEvent?) {
-        val warnMessage = WarnMessage(rootPane.scene.window)
-        warnMessage.show("警告。。。。。大萨达多撒多撒多撒大所多所大多大大声的。。")
     }
 
     fun error(actionEvent: ActionEvent?) {
-        val errorMessage = ErrorMessage(rootPane.scene.window)
-        errorMessage.show("错误。。。。。。。")
     }
 
     fun tableText(actionEvent: ActionEvent) {

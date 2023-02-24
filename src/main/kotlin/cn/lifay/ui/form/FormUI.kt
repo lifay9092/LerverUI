@@ -1,9 +1,12 @@
 package cn.lifay.ui.form
 
 import cn.lifay.extension.*
+import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.radio.RadioElement
+import cn.lifay.ui.message.Message
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import javafx.event.EventHandler
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -14,21 +17,24 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
+import javafx.stage.WindowEvent
 import java.lang.reflect.ParameterizedType
 import java.util.function.Consumer
+import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.KMutableProperty1
 
 
 /**
  *@ClassName FormUI
- *@Description TODO
+ *@Description
  *@Author lifay
  *@Date 2023/2/4 18:15
  **/
-abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
+abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
 
     protected var t: T? = null
-    private val root = VBox(10.0)
+    private val stage = Stage()
+    private var root = VBox(10.0)
     private val form = GridPane()
     private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
@@ -61,11 +67,20 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         }
     }
 
+    /**
+     * 注册根容器
+     * @author lifay
+     * @return
+     */
+    override fun rootPane(): KMutableProperty0<VBox> {
+        return this::root
+    }
+
     /*
         界面初始化
      */
     private fun uiInit(title: String) {
-        this.initModality(Modality.APPLICATION_MODAL)
+        stage.initModality(Modality.APPLICATION_MODAL)
         root.children.addAll(form, table)
 
         //表单布局
@@ -91,8 +106,8 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                 return@setRowFactory row
             }
         }
-        this.title = title
-        this.scene = Scene(root)
+        stage.title = title
+        stage.scene = Scene(root)
     }
 
     private fun refreshForm(t: T) {
@@ -172,7 +187,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(this, "保存中") {
+                asyncTaskLoading(stage, "保存中") {
                     try {
                         saveBtn.isDisable = true
                         //检查
@@ -183,18 +198,11 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                         elementToProp()
                         //执行保存操作
                         saveData(t)
-                        platformRun {
-                            Alert(Alert.AlertType.INFORMATION, "保存成功").show()
-                        }
+                        showMessage("保存成功", Message.Type.SUCCESS)
                         refreshTable()
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        platformRun {
-                            Alert(
-                                Alert.AlertType.ERROR,
-                                "保存失败:" + e.message
-                            ).show()
-                        }
+                        showMessage("保存失败:" + e.message, Message.Type.ERROR)
                     } finally {
                         saveBtn.isDisable = false
                     }
@@ -204,7 +212,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //编辑
         editBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(this) {
+                asyncTaskLoading(stage) {
                     try {
                         editBtn.isDisable = true
                         //检查
@@ -215,18 +223,11 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                         elementToProp()
                         //执行保存操作
                         editData(t)
-                        platformRun {
-                            Alert(Alert.AlertType.INFORMATION, "编辑成功").show()
-                        }
+                        showMessage("编辑成功", Message.Type.SUCCESS)
                         refreshTable()
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        platformRun {
-                            Alert(
-                                Alert.AlertType.ERROR,
-                                "编辑失败:" + e.message
-                            ).show()
-                        }
+                        showMessage("编辑失败:" + e.message, Message.Type.ERROR)
                     } finally {
                         editBtn.isDisable = false
                     }
@@ -236,7 +237,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //删除
         delBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(this) {
+                asyncTaskLoading(stage) {
                     try {
                         delBtn.isDisable = true
                         //确认
@@ -250,20 +251,13 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                             val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
                             //执行保存操作
                             delData(idValue)
-                            platformRun {
-                                Alert(Alert.AlertType.INFORMATION, "删除成功").show()
-                            }
+                            showMessage("删除成功", Message.Type.SUCCESS)
                             clear()
                             refreshTable()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        platformRun {
-                            Alert(
-                                Alert.AlertType.ERROR,
-                                "删除失败:" + e.message
-                            ).show()
-                        }
+                        showMessage("删除失败:" + e.message, Message.Type.ERROR)
                     } finally {
                         delBtn.isDisable = false
                     }
@@ -278,12 +272,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
                     clear()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    platformRun {
-                        Alert(
-                            Alert.AlertType.ERROR,
-                            "操作失败:" + e.message
-                        ).show()
-                    }
+                    showMessage("操作失败:" + e.message, Message.Type.ERROR)
                 } finally {
                     clearBtn.isDisable = false
                 }
@@ -382,5 +371,22 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
             }
         }
     }
+
+    fun show() {
+        stage.show()
+    }
+
+    fun showAndWait() {
+        stage.showAndWait()
+    }
+
+    fun close() {
+        stage.close()
+    }
+
+    fun setOnCloseRequest(value: EventHandler<WindowEvent>) {
+        stage.onCloseRequest = value
+    }
+
 }
 

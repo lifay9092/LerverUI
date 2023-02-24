@@ -1,7 +1,6 @@
 package cn.lifay.extension
 
 import cn.lifay.ui.LoadingUI
-import cn.lifay.ui.form.FormUI
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.control.Alert
@@ -145,6 +144,7 @@ fun Button.styleDanger(): Button {
     return this
 }
 
+/*
 inline fun <T : Any> formUI(block: FormUI<T>.() -> FormUI<T>) {
 //    block(FormUI<T>())
-}
+}*/

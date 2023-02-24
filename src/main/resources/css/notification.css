@@ -68,7 +68,7 @@
     -fx-background-color: #67c23a;
 }
 
-.notification-error .title{
+.notification-error .title {
     -fx-wrap-text: "错误";
 }
 
@@ -80,6 +80,7 @@
     -fx-min-width: 10px;
     -fx-min-height: 10px;
 }
+
 .icon-close:hover {
     -fx-background-color: #606266;
 }
