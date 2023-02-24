@@ -29,23 +29,23 @@ abstract class FormElement<T, R : Any>(
     HBox() {
 
     protected val graphic: Node? = registerGraphic()
-/*
-    var property: KMutableProperty1<T, R>? = null
+    /*
+        var property: KMutableProperty1<T, R>? = null
 
-    var isPrimary = false*/
+        var isPrimary = false*/
 
     private val predicate: Predicate<R>? = null
 
 
-/*    protected constructor(label: String, property: KMutableProperty1<T, R>, primary: Boolean = false) {
-        alignment = Pos.CENTER_LEFT
-        val l = Label(label)
-        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
-        children.add(l)
-        padding = Insets(5.0, 10.0, 5.0, 10.0)
-        this.property = property
-        isPrimary = primary
-    }*/
+    /*    protected constructor(label: String, property: KMutableProperty1<T, R>, primary: Boolean = false) {
+            alignment = Pos.CENTER_LEFT
+            val l = Label(label)
+            l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+            children.add(l)
+            padding = Insets(5.0, 10.0, 5.0, 10.0)
+            this.property = property
+            isPrimary = primary
+        }*/
 
     fun init() {
         alignment = Pos.CENTER_LEFT
@@ -122,9 +122,11 @@ abstract class FormElement<T, R : Any>(
             is TextField, is TextArea -> {
                 ""
             }
+
             is CheckBox -> {
                 false
             }
+
             else -> {
                 null
             }
@@ -170,6 +172,7 @@ abstract class FormElement<T, R : Any>(
                     property
                 }
             }
+
             else -> {
                 col.cellValueFactory = PropertyValueFactory(property.name)
             }

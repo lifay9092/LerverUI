@@ -172,12 +172,12 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTask(this,"保存中") {
+                asyncTaskLoading(this, "保存中") {
                     try {
                         saveBtn.isDisable = true
                         //检查
                         if (!checkElementValue()) {
-                            return@asyncTask
+                            return@asyncTaskLoading
                         }
                         //从元素赋值到实例
                         elementToProp()
@@ -204,12 +204,12 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //编辑
         editBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTask(this) {
+                asyncTaskLoading(this) {
                     try {
                         editBtn.isDisable = true
                         //检查
                         if (!checkElementValue()) {
-                            return@asyncTask
+                            return@asyncTaskLoading
                         }
                         //从元素赋值到实例
                         elementToProp()
@@ -236,7 +236,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : Stage() {
         //删除
         delBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTask(this) {
+                asyncTaskLoading(this) {
                     try {
                         delBtn.isDisable = true
                         //确认

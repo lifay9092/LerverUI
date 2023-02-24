@@ -1,6 +1,7 @@
 /*
 package cn.lifay.test
 
+import cn.lifay.mq.FXReceiver
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.message.Notification
 import javafx.fxml.FXML
@@ -22,18 +23,14 @@ import java.util.*
  * @date 2023/2/21 8:56
  **//*
 
-class EasyView2 : BaseView() {
+class EasyView : BaseView() {
     @FXML
-    val rootPane = AnchorPane()
+    var rootPane = AnchorPane()
 
     @FXML
     var tabPane = TabPane()
     override fun rootPane(): Pane {
         return rootPane
-    }
-
-    fun aaa(): String {
-        return "aaaaaaaaaa"
     }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
@@ -65,12 +62,12 @@ class EasyView2 : BaseView() {
 
 //        tabPane.tabs.add(tab1)
         println("ddddddddddddd")
-         //  showNotification("测试消息")
-         //  showNotification("测试消息2", Notification.Type.SUCCESS)
-          // showNotification("测试消息3",Notification.Type.ERROR,2000)
+        //  showNotification("测试消息")
+        //  showNotification("测试消息2", Notification.Type.SUCCESS)
+        // showNotification("测试消息3",Notification.Type.ERROR,2000)
 
 
-           showMessage("showMessage")
+        showMessage("showMessage")
     }
 
     fun msgTest() {
@@ -82,7 +79,7 @@ class EasyView2 : BaseView() {
         println(tabPane.tabs.size)
         println("ddddddddddddd")
 
-        showNotification("测试消息3",Notification.Type.ERROR,2000)
+        showNotification("测试消息3", Notification.Type.ERROR, 2000)
         */
 /*  showNotification("测试消息")
           showNotification("测试消息2",Notification.Type.SUCCESS)
@@ -91,5 +88,14 @@ class EasyView2 : BaseView() {
 
           showMessage("showMessage")*//*
 
+    }
+
+    fun sendTest() {
+        send("mq", "ddddddddddd")
+    }
+
+    @FXReceiver("mq")
+    fun mq(text: String) {
+        println("text:$text")
     }
 }*/

@@ -1,8 +1,6 @@
 /*
 package cn.lifay.test
 
-import cn.lifay.ui.BaseView
-import cn.lifay.ui.message.Notification
 import javafx.fxml.FXML
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -10,7 +8,8 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
+import xyz.yuelai.View
+import xyz.yuelai.control.Notification
 import java.net.URL
 import java.util.*
 
@@ -22,19 +21,12 @@ import java.util.*
  * @date 2023/2/21 8:56
  **//*
 
-class EasyView2 : BaseView() {
+class EasyView2 : View() {
     @FXML
     val rootPane = AnchorPane()
 
     @FXML
     var tabPane = TabPane()
-    override fun rootPane(): Pane {
-        return rootPane
-    }
-
-    fun aaa(): String {
-        return "aaaaaaaaaa"
-    }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         println("initialize")
@@ -50,8 +42,8 @@ class EasyView2 : BaseView() {
 //        tabPane.tabs.add(tab1)
     }
 
-    fun fxml(): URL? {
-        val resource = this::class.java.getResource("easy.fxml")
+    override fun fxml(): URL? {
+        val resource = this::class.java.getResource("easy2.fxml")
         println(resource)
         return resource
     }
@@ -82,7 +74,7 @@ class EasyView2 : BaseView() {
         println(tabPane.tabs.size)
         println("ddddddddddddd")
 
-        showNotification("测试消息3",Notification.Type.ERROR,2000)
+        showNotification("测试消息3", Notification.Type.ERROR,2000)
         */
 /*  showNotification("测试消息")
           showNotification("测试消息2",Notification.Type.SUCCESS)

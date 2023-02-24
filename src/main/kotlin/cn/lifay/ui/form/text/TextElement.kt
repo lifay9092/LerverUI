@@ -64,18 +64,23 @@ class TextElement<T, R : Any> constructor(
             java.lang.String::class.java -> {
                 text.trim()
             }
+
             java.lang.Integer::class.java -> {
                 text.trim().toInt()
             }
+
             java.lang.Long::class.java -> {
                 text.trim().toLong()
             }
+
             java.lang.Double::class.java -> {
                 text.trim().toDouble()
             }
+
             java.lang.Float::class.java -> {
                 text.trim().toFloat()
             }
+
             else -> {
                 println("not surport")
             }
@@ -99,12 +104,14 @@ class TextElement<T, R : Any> constructor(
                         graphic.setDisable(false)
                     }
                 }
+
                 is TextArea -> {
                     graphic.clear()
                     if (primary) {
                         graphic.setDisable(false)
                     }
                 }
+
                 else -> {
                 }
             }
@@ -126,12 +133,15 @@ class TextElement<T, R : Any> constructor(
             java.lang.String::class.java -> {
                 ""
             }
+
             java.lang.Integer::class.java, java.lang.Long::class.java -> {
                 0
             }
+
             java.lang.Double::class.java, java.lang.Float::class.java -> {
                 0.0
             }
+
             else -> {}
         } as R
     }

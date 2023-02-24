@@ -13,12 +13,9 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.AnchorPane
-import javafx.util.Callback
 import java.net.URL
 import java.util.*
-import java.util.Collections.addAll
 import java.util.concurrent.Callable
 
 /**
@@ -27,37 +24,35 @@ import java.util.concurrent.Callable
  * @Author 李方宇
  * @Date 2023/1/9 16:14
  */
-class DemoView : Initializable{
+class DemoView : Initializable {
     @FXML
-    var tableView =  TableView<TableTestVO>()
+    var tableView = TableView<TableTestVO>()
 
     @FXML
-    lateinit var rootPane : AnchorPane
-    override fun initialize(p0: URL?, p1: ResourceBundle?)
-    {
+    lateinit var rootPane: AnchorPane
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
         tableView.apply {
             columns.addAll(
-                TableColumn<TableTestVO,String>("文本").apply {
+                TableColumn<TableTestVO, String>("文本").apply {
                     this.cellValueFactory = PropertyValueFactory("text")
                 },
-                TableColumn<TableTestVO,String>("文本2").apply {
+                TableColumn<TableTestVO, String>("文本2").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
                         SimpleStringProperty(p.value.info)
                     }
                 },
-                TableColumn<TableTestVO,String>("消息").apply {
+                TableColumn<TableTestVO, String>("消息").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
                         p.value.msg
                     }
-                }
-                ,
-                TableColumn<TableTestVO,Double>("进度条").apply {
+                },
+                TableColumn<TableTestVO, Double>("进度条").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, Double> ->
-                        Bindings.createObjectBinding(object : Callable<Double>{
+                        Bindings.createObjectBinding(object : Callable<Double> {
                             override fun call(): Double {
                                 return p.value.processBar.value
                             }
-                        },p.value.processBar)
+                        }, p.value.processBar)
 
                     }
                     this.cellFactory = ProgressBarTableCell.forTableColumn()
@@ -67,12 +62,13 @@ class DemoView : Initializable{
             items.apply {
                 clear()
                 addAll(
-                    TableTestVO("111","1111", SimpleStringProperty("111"), SimpleDoubleProperty(0.0)),
-                    TableTestVO("222","2222", SimpleStringProperty("222"), SimpleDoubleProperty(0.0))
+                    TableTestVO("111", "1111", SimpleStringProperty("111"), SimpleDoubleProperty(0.0)),
+                    TableTestVO("222", "2222", SimpleStringProperty("222"), SimpleDoubleProperty(0.0))
                 )
             }
         }
     }
+
     fun formTest(actionEvent: ActionEvent?) {
         // UserForm userForm = new UserForm("测试",User.class);
 //        UserNewForm userForm = new UserNewForm("测试", new UserData(1, "111111"));

@@ -72,15 +72,19 @@ class CheckElement<T, R : Any>(
             java.lang.Boolean::class.java -> {
                 b
             }
+
             java.lang.String::class.java -> {
                 if (b) "1" else "0"
             }
+
             java.lang.Integer::class.java, java.lang.Long::class.java -> {
                 if (b) 1 else 0
             }
+
             java.lang.Double::class.java, java.lang.Float::class.java -> {
                 if (b) 1.0 else 0.0
             }
+
             else -> {
                 println("not surport ${b} ${r}")
             }
@@ -98,6 +102,7 @@ class CheckElement<T, R : Any>(
             "1", 1, 1.0 -> {
                 true
             }
+
             else -> {
                 false
             }

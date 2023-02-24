@@ -1,5 +1,6 @@
 package cn.lifay.extension
 
+import cn.lifay.ui.LoadingUI
 import cn.lifay.ui.form.FormUI
 import javafx.application.Platform
 import javafx.scene.Node
@@ -7,14 +8,68 @@ import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
 import javafx.scene.paint.Color
-import xyz.yuelai.View
+import javafx.stage.Stage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-fun View.checkParam(value: Any, name: String):Boolean {
+/**
+ * 检查参数
+ * @param name 名称
+ * @param value 值
+ * @author lifay
+ * @return
+ */
+fun checkParam(name: String, value: Any): Boolean {
     if (value.toString().isBlank()) {
-        Platform.runLater { Alert(Alert.AlertType.ERROR, "${name}不能为空", ButtonType.CLOSE).show()}
+        platformRun { Alert(Alert.AlertType.ERROR, "${name}不能为空", ButtonType.CLOSE).show() }
         return false
     }
     return true
+}
+
+
+/**
+ * 异步执行耗时操作
+ * @author lifay
+ * @return
+ */
+inline fun asyncTask(
+    crossinline block: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        try {
+            //执行任务
+            block()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+/**
+ * 异步执行耗时操作,同时有加载提示
+ * @author lifay
+ * @return
+ */
+inline fun asyncTaskLoading(
+    owner: Stage,
+    msg: String = "请耐心等待...",
+    animation: Boolean = false,
+    crossinline block: () -> Unit
+) {
+    val loadingUI = LoadingUI(owner, animation = animation, msg = msg)
+    CoroutineScope(Dispatchers.Default).launch {
+        try {
+            loadingUI.show()
+            //执行任务
+            block()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            loadingUI.closeStage()
+        }
+    }
 }
 
 inline fun platformRun(crossinline f: () -> Unit) {

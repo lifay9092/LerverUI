@@ -5,14 +5,14 @@ import javafx.application.Application;
 
 */
 /**
- * Startup 启动类
+ * Startup2 TODO
  * @author lifay
- * @date 2023/1/9 16:07
+ * @date 2023/2/24 10:05
  **//*
 
-public class Startup {
+public class Startup2 {
 
     public static void main(String[] args) {
-        Application.launch(Demo.class);
+        Application.launch(DemoTest2.class);
     }
 }*/

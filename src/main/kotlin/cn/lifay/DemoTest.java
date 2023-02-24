@@ -15,26 +15,10 @@ import javafx.stage.Stage;
  * @date 2023/1/9 16:07
  **//*
 
-public class Demo extends Application {
+public class DemoTest extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-//        MyTypeToken<User> myTypeToken = new MyTypeToken<User>();
-//        Type type = myTypeToken.getType();
-//        System.out.println("泛型T name:" + type.getTypeName());
-*/
-/*
-        FXMLLoader fxmlLoader = new FXMLLoader(Demo.class.getResource("demo.fxml"));
-        Parent load = fxmlLoader.load();
-        Scene scene = new Scene(load);
-        primaryStage.setScene(scene);
-        primaryStage.show();*//*
-
-
-//        FXApplication.setElementStyleEnable(true);
-//        EasyView view = View.createView(EasyView.class);
-//        Scene scene = new Scene(view.getRoot());
-
         FXMLLoader fxmlLoader = new FXMLLoader(EasyView.class.getResource("easy.fxml"));
         Parent load = fxmlLoader.load();
         Scene scene = new Scene(load);

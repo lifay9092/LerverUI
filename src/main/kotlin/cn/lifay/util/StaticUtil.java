@@ -1,5 +1,7 @@
 package cn.lifay.util;
 
+import javafx.stage.Screen;
+
 /**
  * StaticUtil 静态工具类
  * @author lifay
@@ -7,7 +9,15 @@ package cn.lifay.util;
  **/
 public class StaticUtil {
 
+    /**
+     * 布局参数
+     */
+    public static final Double SCREEN_WIDTH = Screen.getPrimary().getBounds().getWidth();
+    public static final Double SCREEN_HEIGHT = Screen.getPrimary().getBounds().getHeight();
 
+    /**
+     * 资源文件
+     */
     public static final String ROOT_PATH_UI = "/cn/lifay/ui/";
     public static final String ROOT_PATH_CSS = "/cn/lifay/css/";
 
