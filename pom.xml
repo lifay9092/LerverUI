@@ -22,6 +22,9 @@
         <repository>
             <id>local-repo-release</id>
             <name>GitHub Release</name>
+            <!-- /volume3/homes/admin/www/maven-repo/cn/lifay/LerverUI/ -->
+            <!-- http://192.168.1.40:8080/maven-repo/ -->
+            <!-- http://www.lifay.cn:33333/maven-repo/ -->
             <url>file://${project.basedir}/repodir</url>
         </repository>
     </distributionManagement>
