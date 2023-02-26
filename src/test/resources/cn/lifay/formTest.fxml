@@ -2,11 +2,11 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
-
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.FormUIView">
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.FormUIView">
     <children>
-        <Button layoutX="124.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单" />
-      <Button layoutX="255.0" layoutY="110.0" mnemonicParsing="false" onAction="#formMsg" text="表单消息" />
+        <Button layoutX="124.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单"/>
+        <Button layoutX="255.0" layoutY="110.0" mnemonicParsing="false" onAction="#formMsg" text="表单消息"/>
 
     </children>
 </AnchorPane>

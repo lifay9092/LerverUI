@@ -10,6 +10,13 @@ import javafx.application.Application
  * @date 2022/10/9 20:26
  */
 object GlobeTheme {
+
+    var ELEMENT_STYLE = false
+
+    fun enableElement(b: Boolean) {
+        ELEMENT_STYLE = b
+    }
+
     /**
      * 设置白色
      * @author lifay

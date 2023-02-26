@@ -115,32 +115,37 @@ fun Color.toWeb(): String {
 }
 
 fun Button.styleInfo(): Button {
-    this.backgroundColor("#5264AE")
-    this.textFill = Color.WHITE
+    //this.backgroundColor("#5264AE")
+    // this.textFill = Color.WHITE
+    this.styleClass.add("button-info")
     return this
 }
 
 fun Button.stylePrimary(): Button {
-    this.backgroundColor("#2c8cf4")
-    this.textFill = Color.WHITE
+    //  this.backgroundColor("#2c8cf4")
+    // this.textFill = Color.WHITE
+    this.styleClass.add("button-primary")
     return this
 }
 
 fun Button.styleSuccess(): Button {
-    this.backgroundColor("#1cbc6c")
-    this.textFill = Color.WHITE
+    //  this.backgroundColor("#1cbc6c")
+    //  this.textFill = Color.WHITE
+    this.styleClass.add("button-success")
     return this
 }
 
 fun Button.styleWarn(): Button {
-    this.backgroundColor("#fc9c04")
-    this.textFill = Color.WHITE
+    //  this.backgroundColor("#fc9c04")
+    //  this.textFill = Color.WHITE
+    this.styleClass.add("button-warning")
     return this
 }
 
 fun Button.styleDanger(): Button {
-    this.backgroundColor("#ec4414")
-    this.textFill = Color.WHITE
+    //  this.backgroundColor("#ec4414")
+    // this.textFill = Color.WHITE
+    this.styleClass.add("button-danger")
     return this
 }
 

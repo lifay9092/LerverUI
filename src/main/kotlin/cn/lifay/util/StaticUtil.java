@@ -4,6 +4,7 @@ import javafx.stage.Screen;
 
 /**
  * StaticUtil 静态工具类
+ *
  * @author lifay
  * @date 2022/10/9 20:26
  **/

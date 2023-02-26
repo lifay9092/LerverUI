@@ -2,6 +2,7 @@ package cn.lifay.ui.form
 
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
+import cn.lifay.ui.GlobeTheme
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.message.Message
 import javafx.collections.FXCollections
@@ -38,8 +39,8 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private val form = GridPane()
     private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected var saveBtn: Button = Button("保存").styleInfo()
-    protected var editBtn: Button = Button("修改").stylePrimary()
+    protected var saveBtn: Button = Button("保存").stylePrimary()
+    protected var editBtn: Button = Button("修改").styleInfo()
     protected var delBtn: Button = Button("删除").styleDanger()
     protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
@@ -80,6 +81,9 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         界面初始化
      */
     private fun uiInit(title: String) {
+        if (GlobeTheme.ELEMENT_STYLE) {
+            root.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+        }
         stage.initModality(Modality.APPLICATION_MODAL)
         root.children.addAll(form, table)
 

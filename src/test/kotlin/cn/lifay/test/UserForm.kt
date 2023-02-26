@@ -22,7 +22,9 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
 //        }
 //    }
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        println("initialize")
     }
+
     override fun buildElements(): List<FormElement<UserData, *>> {
         val id = TextElement("ID:", UserData::id, true)
         val name = TextElement("名称:", UserData::name, isTextArea = true, required = true)
@@ -59,7 +61,6 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
         checkId(primaryValue)
         println("删除数据操作:$primaryValue")
     }
-
 
 
     override fun datas(): List<UserData> {

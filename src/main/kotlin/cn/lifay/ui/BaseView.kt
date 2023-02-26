@@ -34,12 +34,15 @@ import kotlin.reflect.KMutableProperty0
  **/
 abstract class BaseView<R : Pane>() : Initializable {
 
-    private var ELEMENT_STYLE = false
 
     companion object {
+
         fun <T : BaseView<R>, R : Pane> createView(fxml: URL): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
+            if (GlobeTheme.ELEMENT_STYLE) {
+                load.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+            }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
             }
@@ -48,6 +51,9 @@ abstract class BaseView<R : Pane>() : Initializable {
         fun <T : BaseView<R>, R : Pane> createView(fxml: URL, initFunc: T.() -> Unit): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
+            if (GlobeTheme.ELEMENT_STYLE) {
+                load.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+            }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
                 initFunc()
@@ -70,10 +76,6 @@ abstract class BaseView<R : Pane>() : Initializable {
      * 注册根容器
      */
     protected abstract fun rootPane(): KMutableProperty0<R>
-
-    fun enableElement(b: Boolean) {
-        ELEMENT_STYLE = b
-    }
 
     open fun getRoot(): Parent {
         return rootPane().get()
@@ -153,7 +155,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         alert.buttonTypes.addAll(*buttonTypes)
         alert.initOwner(getWindow())
         alert.contentText = message
-        if (ELEMENT_STYLE) {
+        if (GlobeTheme.ELEMENT_STYLE) {
             val s = javaClass.getResource("/css/element-ui.css").toExternalForm()
             alert.dialogPane.stylesheets.add(s)
         }
