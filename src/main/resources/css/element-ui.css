@@ -6,6 +6,11 @@
     -fx-font-smoothing-type: GRAY;
 }
 
+.label {
+    /*-fx-text-fill: #606266;*/
+    -fx-font-size: 12px;
+
+}
 /*========================button============================*/
 /* default button */
 .button {
@@ -16,7 +21,7 @@
     -fx-background-color: #fff;
     -fx-text-fill: #606266;
     -fx-font-weight: 500;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-background-insets: 0;
     -fx-padding: 10px 20px;
     -fx-border-radius: 4px;
@@ -148,7 +153,7 @@
     -fx-pref-height: 40px;
     -fx-padding: 0 15px;
     -fx-font-weight: 400;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .text-area:hover,
@@ -172,7 +177,7 @@
 
 .text-area {
     -fx-cursor: hand;
-    -fx-padding: 5px 10px;
+    -fx-padding: 2px 5px;
     -fx-text-fill: #606266;
     -fx-border-width: 1px;
     -fx-border-style: solid;
@@ -181,7 +186,7 @@
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
     -fx-wrap-text: true;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .text-area .content {
@@ -250,15 +255,16 @@
 /*========================ChoiceBox============================*/
 .choice-box {
     -fx-cursor: hand;
-    -fx-pref-width: 200px;
+    /*-fx-pref-width: 200px;*/
+    -fx-min-width: 100px;
     -fx-background-color: #fff;
     -fx-border-color: #dcdfe6;
     -fx-background-radius: 4px;
     -fx-border-radius: 4px;
     -fx-background-insets: 0;
-    -fx-pref-height: 40px;
+    /*-fx-pref-height: 40px;*/
     -fx-padding: 0 15px;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .choice-box:hover {
@@ -277,15 +283,20 @@
 /*========================ComboBox============================*/
 .combo-box {
     -fx-cursor: hand;
+    /*
     -fx-pref-width: 240px;
+    */
+    -fx-min-width: 100px;
     -fx-background-color: #fff;
     -fx-border-color: #dcdfe6;
     -fx-background-radius: 4px;
     -fx-border-radius: 4px;
     -fx-background-insets: 0;
+    /*
     -fx-pref-height: 40px;
+    */
     -fx-padding: 0 15px;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
 }
 
 .combo-box:hover {
@@ -312,7 +323,7 @@
 }
 
 .list-view .list-cell {
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-padding: 0 20px;
     -fx-pref-height: 34px;
     -fx-text-fill: #606266;
@@ -352,8 +363,8 @@
     -fx-border-color: #ebebeb;
     -fx-border-radius: 3px;
     -fx-background-radius: 3px;
-    -fx-padding: 20px;
-    -fx-font-size: 14px;
+    -fx-padding: 10px;
+    -fx-font-size: 12px;
 }
 
 .table-view:hover {
@@ -373,13 +384,13 @@
 }
 
 .table-view .table-column .label {
-    -fx-padding: 15px 7.7px;
+    -fx-padding: 10px 5.2px;
 
 }
 
 .table-view .table-cell {
     -fx-text-fill: #606266;
-    -fx-padding: 15px 10px;
+    -fx-padding: 10px 7px;
     -fx-border-color: #f5f7fa;
     -fx-border-width: 0;
 }
@@ -579,7 +590,7 @@
 }
 
 .header-panel .content {
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-text-fill: #606266;
 }
 
@@ -592,7 +603,7 @@
 .pagination .number-button {
     -fx-background-color: #f4f4f5;
     -fx-text-fill: #606266;
-    -fx-font-size: 14px;
+    -fx-font-size: 12px;
     -fx-padding: 0 4px;
     -fx-min-width: 30px;
     -fx-border-width: 0;

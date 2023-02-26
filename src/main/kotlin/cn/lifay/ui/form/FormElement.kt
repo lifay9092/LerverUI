@@ -1,6 +1,7 @@
 package cn.lifay.ui.form
 
 import cn.lifay.extension.platformRun
+import cn.lifay.extension.textFillColor
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
@@ -49,7 +50,7 @@ abstract class FormElement<T, R : Any>(
 
     fun init() {
         alignment = Pos.CENTER_LEFT
-        val l = Label(label)
+        val l = Label(label).textFillColor("#606266")
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
         children.add(l)
         padding = Insets(5.0, 10.0, 5.0, 10.0)

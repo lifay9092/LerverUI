@@ -55,11 +55,11 @@
             <artifactId>kotlin-reflect</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-<!--        <dependency>
-            <groupId>xyz.yuelai</groupId>
-            <artifactId>easyfx</artifactId>
-            <version>1.1.2-release</version>
-        </dependency>-->
+        <!--        <dependency>
+                    <groupId>xyz.yuelai</groupId>
+                    <artifactId>easyfx</artifactId>
+                    <version>1.1.2-release</version>
+                </dependency>-->
     </dependencies>
     <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
 
@@ -81,21 +81,23 @@
                             <jvmTarget>17</jvmTarget>
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-<!--
-                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
--->
+                                <!--
+                                                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                -->
                             </sourceDirs>
                         </configuration>
                     </execution>
                     <execution>
                         <id>test-compile</id>
-                        <goals> <goal>test-compile</goal> </goals>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
                         <configuration>
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-<!--
-                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
--->
+                                <!--
+                                                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                -->
                             </sourceDirs>
                         </configuration>
                     </execution>

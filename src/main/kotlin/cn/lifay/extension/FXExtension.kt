@@ -75,35 +75,36 @@ inline fun platformRun(crossinline f: () -> Unit) {
     Platform.runLater { f() }
 }
 
-fun Node.appendStyle(styleStr: String) {
+fun <T : Node> T.appendStyle(styleStr: String): T {
     val styles = this.style.split(";")
     val list = styles.filter { it.isNotBlank() }.map { it.replace(";", "") }.toMutableList()
     list.add(if (styleStr.endsWith(";")) ("$styleStr;") else styleStr)
     this.style = list.joinToString(";")
+    return this
 }
 
-fun Node.backgroundColor(color: String) {
-    this.appendStyle("-fx-background-color: ${color};")
+fun <T : Node> T.backgroundColor(color: String): T {
+    return this.appendStyle("-fx-background-color: ${color};")
 }
 
-fun Node.backgroundColor(color: Color) {
-    this.backgroundColor(color.toWeb())
+fun <T : Node> T.backgroundColor(color: Color): T {
+    return this.backgroundColor(color.toWeb())
 }
 
-fun Node.textFillColor(color: String) {
-    this.appendStyle("-fx-text-fill: ${color};")
+fun <T : Node> T.textFillColor(color: String): T {
+    return this.appendStyle("-fx-text-fill: ${color};")
 }
 
-fun Node.textFillColor(color: Color) {
-    this.textFillColor(color.toWeb())
+fun <T : Node> T.textFillColor(color: Color): T {
+    return this.textFillColor(color.toWeb())
 }
 
-fun Node.borderColor(color: String) {
-    this.appendStyle("-fx-border-color: ${color};")
+fun <T : Node> T.borderColor(color: String): T {
+    return this.appendStyle("-fx-border-color: ${color};")
 }
 
-fun Node.borderColor(color: Color) {
-    this.borderColor(color.toWeb())
+fun <T : Node> T.borderColor(color: Color): T {
+    return this.borderColor(color.toWeb())
 }
 
 fun Color.toWeb(): String {
