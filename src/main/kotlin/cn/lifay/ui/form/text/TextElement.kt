@@ -28,10 +28,27 @@ class TextElement<T : Any, R : Any> constructor(
 ) :
     FormElement<T, R>(r, label, property, customProp, primary, required) {
 
+    /*constructor(r: Class<R>,
+                label: String,
+                property: KMutableProperty1<T, R>?,
+                customProp: DelegateProp<T, R>? = null,
+                primary: Boolean = false,
+                required: Boolean = false,
+                isTextArea: Boolean = false
+    ):this(r,label, property, customProp, primary, required)*/
     companion object {
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
+            primary: Boolean = false,
+            required: Boolean = false,
+            isTextArea: Boolean = false
+        ) = TextElement(R::class.java, label, property, null, primary, required, isTextArea){
+
+        }
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R>,
             primary: Boolean = false,
             required: Boolean = false,
             isTextArea: Boolean = false
@@ -46,6 +63,16 @@ class TextElement<T : Any, R : Any> constructor(
         ) = TextElement(R::class.java, label, null, customProp, primary, required, isTextArea)
 
     }
+
+    constructor(
+        r: Class<R>,
+        label: String,
+        property: KMutableProperty1<T, R>,
+        customProp: Nothing?,
+        primary: Boolean,
+        required: Boolean,
+        isTextArea: Boolean
+    ) : this(r,label, property, customProp, primary, required)
 
     init {
         init()

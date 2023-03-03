@@ -11,6 +11,7 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.HBox
+import sun.jvm.hotspot.oops.CellTypeState.value
 import java.util.function.Predicate
 import kotlin.reflect.KMutableProperty1
 
@@ -23,13 +24,10 @@ import kotlin.reflect.KMutableProperty1
 abstract class FormElement<T : Any, R : Any>(
     val r: Class<R>,
     val label: String,
-    val property: KMutableProperty1<T, R?>?,
-    var customProp: DelegateProp<T, R>? = null,
     var primary: Boolean = false,
     var required: Boolean = false,
     val defaultValue: R? = null
-) :
-    HBox() {
+) : HBox() {
 
     protected val graphic: Node? = registerGraphic()
     /*
@@ -38,26 +36,32 @@ abstract class FormElement<T : Any, R : Any>(
         var isPrimary = false*/
 
     private val predicate: Predicate<R>? = null
+    var property: KMutableProperty1<T, R?>?  = null
+    var property2: KMutableProperty1<T, R>?  = null
+    var customProp: DelegateProp<T, R>? = null
 
+    constructor( r: Class<R>,
+                 label: String,
+                property: KMutableProperty1<T, R?>?,
+                customProp: DelegateProp<T, R>?,
+                 primary: Boolean = false,
+                 required: Boolean = false,
+                 defaultValue: R? = null
+    ):this(r,label, primary, required, defaultValue){
+        this.property = property
+        this.customProp = customProp
+    }
 
-    /*    protected constructor(label: String, property: KMutableProperty1<T, R>, primary: Boolean = false) {
-            alignment = Pos.CENTER_LEFT
-            val l = Label(label)
-            l.padding = Insets(5.0, 10.0, 5.0, 10.0)
-            children.add(l)
-            padding = Insets(5.0, 10.0, 5.0, 10.0)
-            this.property = property
-            isPrimary = primary
-        }*/
-
-    fun init() {
-        alignment = Pos.CENTER_LEFT
-        val l = Label(label).textFillColor("#606266")
-        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
-        children.add(l)
-        padding = Insets(5.0, 10.0, 5.0, 10.0)
-//        this.elementValue = defaultValue()
-        children.add(graphic)
+    constructor( r: Class<R>,
+                 label: String,
+                property: KMutableProperty1<T, R>?,
+                customProp: DelegateProp<T, R>?,
+                 primary: Boolean = false,
+                 required: Boolean = false,
+                 defaultValue: R? = null
+    ):this(r,label, primary, required, defaultValue){
+        this.property2 = property
+        this.customProp = customProp
     }
 
     var elementValue: R?
@@ -71,6 +75,16 @@ abstract class FormElement<T : Any, R : Any>(
         set(value) {
             set(value)
         }
+
+    fun init() {
+        alignment = Pos.CENTER_LEFT
+        val l = Label(label).textFillColor("#606266")
+        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+        children.add(l)
+        padding = Insets(5.0, 10.0, 5.0, 10.0)
+//        this.elementValue = defaultValue()
+        children.add(graphic)
+    }
 
     /**
      *  注册输入值控件实例
@@ -148,7 +162,11 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun getPropName(): String {
         return if (customProp == null) {
-            property!!.name
+            if (property2 != null) {
+                property2!!.name
+            } else {
+                property!!.name
+            }
         } else {
             customProp!!.fieldName
         }
@@ -174,7 +192,11 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun setEle(t: T) {
         this.elementValue = if (customProp == null) {
-            property!!.get(t)
+            if (property2 != null) {
+                property2!!.get(t)
+            } else {
+                property!!.get(t)
+            }
         } else {
             customProp!!.getValue(t)
         }
@@ -185,7 +207,11 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun setProp(t: T) {
         if (customProp == null) {
-            property!!.set(t, elementValue)
+            if (property2 != null) {
+                elementValue?.let { property2!!.set(t, it) }
+            } else {
+                elementValue?.let { property!!.set(t, it) }
+            }
         } else {
             customProp!!.setValue(t, elementValue)
         }

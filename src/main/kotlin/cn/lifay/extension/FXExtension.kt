@@ -6,6 +6,8 @@ import javafx.scene.Node
 import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
@@ -154,3 +156,11 @@ fun Button.styleDanger(): Button {
 inline fun <T : Any> formUI(block: FormUI<T>.() -> FormUI<T>) {
 //    block(FormUI<T>())
 }*/
+fun Stage.bindEscKey(): Stage {
+    addEventHandler(KeyEvent.KEY_PRESSED) {
+        if (it.code == KeyCode.ESCAPE) {
+            close()
+        }
+    }
+    return this
+}

@@ -32,7 +32,7 @@ import kotlin.reflect.KMutableProperty0
 abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
 
     protected var t: T? = null
-    private val stage = Stage()
+    private val stage = Stage().bindEscKey()
     private var root = VBox(10.0)
     private val form = GridPane()
     private val table = TableView<T>()
