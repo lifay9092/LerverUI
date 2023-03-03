@@ -3,7 +3,6 @@ package cn.lifay.ui.form
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
-import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.message.Message
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -22,7 +21,6 @@ import javafx.stage.WindowEvent
 import java.lang.reflect.ParameterizedType
 import java.util.function.Consumer
 import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KMutableProperty1
 
 
 /**
@@ -133,14 +131,16 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         return elements.map { it.getTableHead() }.toList()
     }
 
-    inline fun <reified T> newRadioElement(
-        label: String,
-        property: KMutableProperty1<T, String?>,
-        items: List<String>
-    ): RadioElement<T> {
-        val element = RadioElement(label, property, items)
-        return element
-    }
+    /*
+        inline fun <reified T> newRadioElement(
+            label: String,
+            property: KMutableProperty1<T, String?>,
+            items: List<String>
+        ): RadioElement<T> {
+            val element = RadioElement(label, property, items)
+            return element
+        }
+    */
 
 
     /**

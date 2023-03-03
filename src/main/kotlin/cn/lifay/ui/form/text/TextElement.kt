@@ -2,6 +2,7 @@ package cn.lifay.ui.form.text
 
 import cn.lifay.extension.borderColor
 import cn.lifay.extension.platformRun
+import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.TextArea
@@ -16,15 +17,16 @@ import kotlin.reflect.KMutableProperty1
  * @Author 李方宇
  * @Date 2023/1/10 17:30
  */
-class TextElement<T, R : Any> constructor(
+class TextElement<T : Any, R : Any> constructor(
     r: Class<R>,
     label: String,
-    property: KMutableProperty1<T, R?>,
+    property: KMutableProperty1<T, R?>?,
+    customProp: DelegateProp<T, R>? = null,
     primary: Boolean = false,
     required: Boolean = false,
     private val isTextArea: Boolean = false
 ) :
-    FormElement<T, R>(r, label, property, primary, required) {
+    FormElement<T, R>(r, label, property, customProp, primary, required) {
 
     companion object {
         inline operator fun <reified T : Any, reified R : Any> invoke(
@@ -33,7 +35,16 @@ class TextElement<T, R : Any> constructor(
             primary: Boolean = false,
             required: Boolean = false,
             isTextArea: Boolean = false
-        ) = TextElement(R::class.java, label, property, primary, required, isTextArea)
+        ) = TextElement(R::class.java, label, property, null, primary, required, isTextArea)
+
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            customProp: DelegateProp<T, R>,
+            primary: Boolean = false,
+            required: Boolean = false,
+            isTextArea: Boolean = false
+        ) = TextElement(R::class.java, label, null, customProp, primary, required, isTextArea)
+
     }
 
     init {

@@ -2,6 +2,7 @@ package cn.lifay.ui.form
 
 import cn.lifay.extension.platformRun
 import cn.lifay.extension.textFillColor
+import cn.lifay.ui.DelegateProp
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
@@ -19,10 +20,11 @@ import kotlin.reflect.KMutableProperty1
  * @Author lifay
  * @Date 2023/1/8 10:09
  */
-abstract class FormElement<T, R : Any>(
+abstract class FormElement<T : Any, R : Any>(
     val r: Class<R>,
     val label: String,
-    val property: KMutableProperty1<T, R?>,
+    val property: KMutableProperty1<T, R?>?,
+    var customProp: DelegateProp<T, R>? = null,
     var primary: Boolean = false,
     var required: Boolean = false,
     val defaultValue: R? = null
@@ -142,19 +144,51 @@ abstract class FormElement<T, R : Any>(
     }
 
     /**
+     *  获取对象属性名称
+     */
+    fun getPropName(): String {
+        return if (customProp == null) {
+            property!!.name
+        } else {
+            customProp!!.fieldName
+        }
+    }
+
+    /*
+        */
+    /**
+     *  获取对象属性值
+     *//*
+
+    fun getPropValue(t: T):R? {
+        return if (customProp == null) {
+            property!!.get(t)
+        } else {
+            customProp!!.getValue(t)
+        }
+    }
+*/
+
+    /**
      *  对象属性值 转到 元素值
      */
     fun setEle(t: T) {
-        val v = property.get(t)
-        this.elementValue = v
-
+        this.elementValue = if (customProp == null) {
+            property!!.get(t)
+        } else {
+            customProp!!.getValue(t)
+        }
     }
 
     /**
      *  元素值 转到 对象属性值
      */
     fun setProp(t: T) {
-        property.set(t, elementValue)
+        if (customProp == null) {
+            property!!.set(t, elementValue)
+        } else {
+            customProp!!.setValue(t, elementValue)
+        }
     }
 
     /**
@@ -167,7 +201,7 @@ abstract class FormElement<T, R : Any>(
         when (r) {
             java.lang.Boolean::class.java -> {
                 col.setCellValueFactory { p: TableColumn.CellDataFeatures<T, R> ->
-                    val b = property.get(p.value) as Boolean
+                    val b = this.elementValue as Boolean
                     val v = if (b) "是" else "否"
                     val property = SimpleStringProperty(v) as ObservableValue<R>
                     property
@@ -175,7 +209,7 @@ abstract class FormElement<T, R : Any>(
             }
 
             else -> {
-                col.cellValueFactory = PropertyValueFactory(property.name)
+                col.cellValueFactory = PropertyValueFactory(getPropName())
             }
         }
         return col

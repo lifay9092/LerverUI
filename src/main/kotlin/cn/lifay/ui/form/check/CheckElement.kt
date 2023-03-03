@@ -1,5 +1,6 @@
 package cn.lifay.ui.form.check
 
+import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.CheckBox
@@ -11,18 +12,26 @@ import kotlin.reflect.KMutableProperty1
  *@Author lifay
  *@Date 2023/2/5 13:53
  **/
-class CheckElement<T, R : Any>(
+class CheckElement<T : Any, R : Any>(
     r: Class<R>,
     label: String,
-    property: KMutableProperty1<T, R?>
+    property: KMutableProperty1<T, R?>?,
+    customProp: DelegateProp<T, R>? = null
 ) :
-    FormElement<T, R>(r, label, property) {
+    FormElement<T, R>(r, label, property, customProp) {
 
     companion object {
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>
         ) = CheckElement(R::class.java, label, property)
+
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            customProp: DelegateProp<T, R>
+        ) = CheckElement(R::class.java, label, null, customProp)
+
+
     }
 
     init {

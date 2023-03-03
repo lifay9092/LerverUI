@@ -6,7 +6,8 @@
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.FormUIView">
     <children>
         <Button layoutX="124.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单"/>
-        <Button layoutX="255.0" layoutY="110.0" mnemonicParsing="false" onAction="#formMsg" text="表单消息"/>
+        <Button layoutX="255.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest2" text="动态表单-java"/>
+        <Button layoutX="395.0" layoutY="110.0" mnemonicParsing="false" onAction="#formMsg" text="表单消息"/>
 
     </children>
 </AnchorPane>

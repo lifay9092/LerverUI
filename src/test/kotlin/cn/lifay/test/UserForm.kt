@@ -30,7 +30,7 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
         val name = TextElement("名称:", UserData::name, isTextArea = true, required = true)
         val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
         val child = CheckElement("是否未成年:", UserData::child)
-        val sex = RadioElement("性别:", UserData::sex, listOf("男", "女"))
+        val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
 
         /*        val name = newTextElement("名称:", UserData::name, isTextArea = true, required = true)
         val type = newSelectElement("类型:", UserData::type, SelectTypeEnum.values())

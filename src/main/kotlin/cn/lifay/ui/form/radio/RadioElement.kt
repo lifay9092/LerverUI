@@ -1,5 +1,6 @@
 package cn.lifay.ui.form.radio
 
+import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import kotlin.reflect.KMutableProperty1
@@ -10,16 +11,38 @@ import kotlin.reflect.KMutableProperty1
  * @author lifay
  * @date 2023/2/6 14:47
  **/
-class RadioElement<T> constructor(
+class RadioElement<T : Any, R : Any>(
+    r: Class<R>,
     label: String,
-    property: KMutableProperty1<T, String?>,
-    val items: List<String>
-) : FormElement<T, String>(String::class.java, label, property) {
+    property: KMutableProperty1<T, R?>?,
+    customProp: DelegateProp<T, R>? = null,
+    val items: List<R>
+) : FormElement<T, R>(r, label, property, customProp) {
 
-    //    private var items : Collection<String>
+    /*  constructor(label: String,
+                  property: KMutableProperty1<T, R?>,
+                  items: List<String>):this(r,label,property,null,items)
+
+      constructor(label: String,
+                  customProp : DelegateProp<T, String>,
+                  items: List<String>):this(label,null,customProp,items)*/
+    companion object {
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R?>,
+            items: List<R>
+        ) = RadioElement(R::class.java, label, property, null, items)
+
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            customProp: DelegateProp<T, R>,
+            items: List<R>
+        ) = RadioElement(R::class.java, label, null, customProp, items)
+    }
+
     init {
 //        this.items = items
-        graphic().addItems(items)
+        graphic().addItems(items.map { it.toString() }.toList())
         init()
     }
 
@@ -32,27 +55,27 @@ class RadioElement<T> constructor(
         return graphic as RadioGroup
     }
 
-    override fun get(): String? {
+    override fun get(): R? {
         val text = graphic().text
         if (text.isBlank()) {
             return null
         }
-        return graphic().text
+        return graphic().text as R
     }
 
-    override fun set(v: String?) {
-        graphic().text = v ?: defaultValue()
+    override fun set(v: R?) {
+        graphic().text = (v ?: defaultValue()).toString()
     }
 
     override fun clear() {
-        graphic().text = defaultValue()
+        graphic().text = defaultValue() as String
     }
 
     override fun verify(): Boolean {
         return false
     }
 
-    override fun defaultValue(): String {
+    override fun defaultValue(): R {
         return items[0]
     }
 }
