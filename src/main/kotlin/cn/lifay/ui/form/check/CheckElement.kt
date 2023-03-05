@@ -4,6 +4,7 @@ import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.CheckBox
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -13,29 +14,46 @@ import kotlin.reflect.KMutableProperty1
  *@Date 2023/2/5 13:53
  **/
 class CheckElement<T : Any, R : Any>(
+    t: KClass<T>,
     r: Class<R>,
     label: String,
+    property2: KMutableProperty1<T, R>?,
     property: KMutableProperty1<T, R?>?,
-    customProp: DelegateProp<T, R>? = null
+    customProp: DelegateProp<T, R>?,
+    required: Boolean
 ) :
-    FormElement<T, R>(r, label, property, customProp) {
-
-    companion object {
-        inline operator fun <reified T : Any, reified R : Any> invoke(
-            label: String,
-            property: KMutableProperty1<T, R?>
-        ) = CheckElement(R::class.java, label, property)
-
-        inline operator fun <reified T : Any, reified R : Any> invoke(
-            label: String,
-            customProp: DelegateProp<T, R>
-        ) = CheckElement(R::class.java, label, null, customProp)
-
-
-    }
+    FormElement<T, R>(r, label, required = required) {
 
     init {
+        super.property2 = property2
+        super.property = property
+        super.customProp = customProp
+        super.tc = t
+
         init()
+    }
+
+    companion object {
+        /*注入 property 返回值不为空 对应var 没有? */
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R>
+        ) = CheckElement(T::class, R::class.java, label, property, null, null, true)
+
+        /*注入 property 返回值不为空 对应var ? */
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R?>,
+            required: Boolean = false
+        ) = CheckElement(T::class, R::class.java, label, null, property, null, required)
+
+        /*注入 customProp javabean */
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            customProp: DelegateProp<T, R>,
+            required: Boolean = false
+        ) = CheckElement(T::class, R::class.java, label, null, null, customProp, required)
+
     }
 
     override fun registerGraphic(): Node {

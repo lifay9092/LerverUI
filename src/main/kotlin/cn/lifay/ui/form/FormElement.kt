@@ -11,8 +11,8 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.HBox
-import sun.jvm.hotspot.oops.CellTypeState.value
 import java.util.function.Predicate
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -34,35 +34,37 @@ abstract class FormElement<T : Any, R : Any>(
         var property: KMutableProperty1<T, R>? = null
 
         var isPrimary = false*/
+//    abstract var test :String
 
     private val predicate: Predicate<R>? = null
-    var property: KMutableProperty1<T, R?>?  = null
-    var property2: KMutableProperty1<T, R>?  = null
+    var property: KMutableProperty1<T, R?>? = null
+    var property2: KMutableProperty1<T, R>? = null
     var customProp: DelegateProp<T, R>? = null
+    var tc: KClass<T>? = null
 
-    constructor( r: Class<R>,
-                 label: String,
-                property: KMutableProperty1<T, R?>?,
-                customProp: DelegateProp<T, R>?,
-                 primary: Boolean = false,
-                 required: Boolean = false,
-                 defaultValue: R? = null
-    ):this(r,label, primary, required, defaultValue){
-        this.property = property
-        this.customProp = customProp
-    }
+    /*    constructor( r: Class<R>,
+                     label: String,
+                    property: KMutableProperty1<T, R?>?,
+                    customProp: DelegateProp<T, R>?,
+                     primary: Boolean = false,
+                     required: Boolean = false,
+                     defaultValue: R? = null
+        ):this(r,label, primary, required, defaultValue){
+            this.property = property
+            this.customProp = customProp
+        }*/
 
-    constructor( r: Class<R>,
-                 label: String,
-                property: KMutableProperty1<T, R>?,
-                customProp: DelegateProp<T, R>?,
-                 primary: Boolean = false,
-                 required: Boolean = false,
-                 defaultValue: R? = null
-    ):this(r,label, primary, required, defaultValue){
-        this.property2 = property
-        this.customProp = customProp
-    }
+    /*    constructor( r: Class<R>,
+                     label: String,
+                    property: KMutableProperty1<T, R>?,
+                    customProp: DelegateProp<T, R>?,
+                     primary: Boolean = false,
+                     required: Boolean = false,
+                     defaultValue: R? = null
+        ):this(r,label, primary, required, defaultValue){
+            this.property2 = property
+            this.customProp = customProp
+        }*/
 
     var elementValue: R?
         get() {
@@ -191,14 +193,16 @@ abstract class FormElement<T : Any, R : Any>(
      *  对象属性值 转到 元素值
      */
     fun setEle(t: T) {
-        this.elementValue = if (customProp == null) {
-            if (property2 != null) {
-                property2!!.get(t)
+        platformRun {
+            this.elementValue = if (customProp == null) {
+                if (property2 != null) {
+                    property2!!.get(t)
+                } else {
+                    property!!.get(t)
+                }
             } else {
-                property!!.get(t)
+                customProp!!.getValue(t)
             }
-        } else {
-            customProp!!.getValue(t)
         }
     }
 
@@ -218,11 +222,26 @@ abstract class FormElement<T : Any, R : Any>(
     }
 
     /**
-     *  获取表格的表头
+     *  获取元素在表格的表头
      */
     fun getTableHead(): TableColumn<T, R> {
         val col = TableColumn<T, R>(label.replace(":", "").replace("：", ""))
-        col.style = "-fx-alignment: CENTER;"
+        /* col.style = "-fx-alignment: CENTER;"
+         col.setCellFactory { v ->
+             val tableCell: TableCell<T, R> = object : TableCell<T, R>() {
+                 override fun updateItem(item: R?, empty: Boolean) {
+                     if (!empty && "" != item) {
+                         val label = Label(item?.toString() ?: "")
+                         label.alignment = Pos.CENTER_LEFT
+                         graphic = label
+                     } else {
+                         graphic = null
+                     }
+                 }
+             }
+             tableCell.alignment = Pos.CENTER
+             tableCell
+         }*/
 //        col.prefWidth = 10.0
         when (r) {
             java.lang.Boolean::class.java -> {
@@ -233,7 +252,6 @@ abstract class FormElement<T : Any, R : Any>(
                     property
                 }
             }
-
             else -> {
                 col.cellValueFactory = PropertyValueFactory(getPropName())
             }

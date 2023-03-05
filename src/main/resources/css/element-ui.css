@@ -415,7 +415,7 @@
 
 .table-view .table-column .label,
 .table-view .table-column {
-    -fx-alignment: center-left;
+    -fx-alignment: center;
 }
 
 /* Progress */

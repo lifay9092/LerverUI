@@ -10,7 +10,8 @@ import javafx.event.ActionEvent
  **/
 class FormUIView {
     fun formTest(actionEvent: ActionEvent) {
-        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
+        val userForm = UserForm()
+//        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.show()
     }
 

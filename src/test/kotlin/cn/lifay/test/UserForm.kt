@@ -6,8 +6,6 @@ import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextElement
-import java.net.URL
-import java.util.*
 
 /**
  *@ClassName UserNewForm
@@ -15,19 +13,17 @@ import java.util.*
  *@Author lifay
  *@Date 2023/2/4 18:24
  **/
-class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) {
+class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t) {
     //    constructor(title: String,t: UserData?):this(title){
 //        if (t != null) {
 //            this.t = t
 //        }
 //    }
-    override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        println("initialize")
-    }
+
 
     override fun buildElements(): List<FormElement<UserData, *>> {
         val id = TextElement("ID:", UserData::id, true)
-        val name = TextElement("名称:", UserData::name, isTextArea = true, required = true)
+        val name = TextElement("名称:", UserData::name, isTextArea = true)
         val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
         val child = CheckElement("是否未成年:", UserData::child)
         val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
@@ -58,7 +54,6 @@ class UserForm(title: String, t: UserData? = null) : FormUI<UserData>(title, t) 
     }
 
     override fun delData(primaryValue: Any?) {
-        checkId(primaryValue)
         println("删除数据操作:$primaryValue")
     }
 

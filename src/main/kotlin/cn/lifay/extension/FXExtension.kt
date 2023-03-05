@@ -13,6 +13,7 @@ import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.FutureTask
 
 /**
  * 检查参数
@@ -62,19 +63,25 @@ inline fun asyncTaskLoading(
     val loadingUI = LoadingUI(owner, animation = animation, msg = msg)
     CoroutineScope(Dispatchers.Default).launch {
         try {
-            loadingUI.show()
+            platformRun { loadingUI.show() }
             //执行任务
             block()
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
-            loadingUI.closeStage()
+            platformRun { loadingUI.closeStage() }
         }
     }
 }
 
 inline fun platformRun(crossinline f: () -> Unit) {
     Platform.runLater { f() }
+}
+
+inline fun <R> platformGet(crossinline f: () -> R): R {
+    val task = FutureTask { f() }
+    Platform.runLater { task }
+    return task.get()
 }
 
 fun <T : Node> T.appendStyle(styleStr: String): T {

@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.EasyView3">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.BaseViewDemoView">
     <children>
         <Button layoutX="60.0" layoutY="25.0" mnemonicParsing="false" onAction="#test" text="动态表单"/>
         <Button layoutX="229.0" layoutY="25.0" mnemonicParsing="false" onAction="#msgTest" text="信息提示"/>

@@ -69,7 +69,7 @@ class DemoView : Initializable {
     fun formTest(actionEvent: ActionEvent?) {
         // UserForm userForm = new UserForm("测试",User.class);
 //        UserNewForm userForm = new UserNewForm("测试", new UserData(1, "111111"));
-        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
+        val userForm = UserForm(UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.show()
     }
 

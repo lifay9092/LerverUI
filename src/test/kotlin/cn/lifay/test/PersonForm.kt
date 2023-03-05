@@ -31,7 +31,7 @@ class PersonForm(t: Person? = null) : FormUI<Person>("人", t) {
     }
 
     override fun delData(primaryValue: Any?) {
-        println(t)
+        println(entity)
 
     }
 

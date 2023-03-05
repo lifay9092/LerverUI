@@ -4,6 +4,7 @@ import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
 import javafx.scene.control.ChoiceBox
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -13,38 +14,55 @@ import kotlin.reflect.KMutableProperty1
  *@Date 2023/2/5 13:39
  **/
 class SelectElement<T : Any, R : Any> constructor(
+    t: KClass<T>,
     r: Class<R>,
     label: String,
+    property2: KMutableProperty1<T, R>?,
     property: KMutableProperty1<T, R?>?,
-    customProp: DelegateProp<T, R>? = null,
+    customProp: DelegateProp<T, R>?,
     items: Collection<R?>,
     required: Boolean = false
 ) :
-    FormElement<T, R>(r, label, property, customProp, required = required) {
+    FormElement<T, R>(r, label, required = required) {
+
+    init {
+        super.property2 = property2
+        super.property = property
+        super.customProp = customProp
+        super.tc = t
+
+        init()
+        loadItems(items)
+    }
 
     companion object {
+        /*注入 property 返回值不为空 对应var 没有? */
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R>,
+            items: Collection<R?>,
+        ) = SelectElement(T::class, R::class.java, label, property, null, null, items, false)
+
+        /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
             items: Collection<R?>,
             required: Boolean = false
-        ) = SelectElement(R::class.java, label, property, null, items, required)
+        ) = SelectElement(T::class, R::class.java, label, null, property, null, items, required)
 
+        /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
             items: Collection<R?>,
             required: Boolean = false
-        ) = SelectElement(R::class.java, label, null, customProp, items, required)
+        ) = SelectElement(T::class, R::class.java, label, null, null, customProp, items, required)
 
     }
 
 //    protected var control: ChoiceBox<R> = ChoiceBox<R>()
 
-    init {
-        init()
-        loadItems(items)
-    }
 
     override fun registerGraphic(): Node {
         return ChoiceBox<R>()

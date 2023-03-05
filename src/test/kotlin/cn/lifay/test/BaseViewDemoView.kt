@@ -1,4 +1,3 @@
-/*
 package cn.lifay.test
 
 import cn.lifay.ui.BaseView
@@ -10,26 +9,25 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
-import javafx.scene.layout.Pane
 import java.net.URL
 import java.util.*
+import kotlin.reflect.KMutableProperty0
 
 
-*/
-/**
+/*
  * EasyView TODO
  * @author lifay
  * @date 2023/2/21 8:56
- **//*
+ */
 
-class EasyView2 : BaseView() {
+class BaseViewDemoView : BaseView<AnchorPane>() {
     @FXML
-    val rootPane = AnchorPane()
+    var rootPane = AnchorPane()
 
     @FXML
     var tabPane = TabPane()
-    override fun rootPane(): Pane {
-        return rootPane
+    override fun rootPane(): KMutableProperty0<AnchorPane> {
+        return this::rootPane
     }
 
     fun aaa(): String {
@@ -37,7 +35,9 @@ class EasyView2 : BaseView() {
     }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        println("initialize")
+        super.initialize(p0, p1)
+//        println("initialize")
+
         val tab1 = Tab("2222").apply {
             id = "3333"
             content = Label("22222")
@@ -51,19 +51,18 @@ class EasyView2 : BaseView() {
     }
 
     fun fxml(): URL? {
-        val resource = this::class.java.getResource("easy.fxml")
+        val resource = this::class.java.getResource("baseViewDemo.fxml")
         println(resource)
         return resource
     }
 
     fun test() {
-        */
-/*     val tab1 = Tab("2222").apply {
-                 id = "2222"
-                 content = HBox(Button("22222"))
-             }*//*
+        val tab1 = Tab("2222").apply {
+            id = "2222"
+            content = HBox(Button("22222"))
+        }
 
-//        tabPane.tabs.add(tab1)
+        tabPane.tabs.add(tab1)
         println("ddddddddddddd")
          //  showNotification("测试消息")
          //  showNotification("测试消息2", Notification.Type.SUCCESS)
@@ -82,14 +81,13 @@ class EasyView2 : BaseView() {
         println(tabPane.tabs.size)
         println("ddddddddddddd")
 
-        showNotification("测试消息3",Notification.Type.ERROR,2000)
-        */
-/*  showNotification("测试消息")
-          showNotification("测试消息2",Notification.Type.SUCCESS)
+        showNotification("测试消息3", Notification.Type.ERROR, 2000)
+        showNotification("测试消息")
+        showNotification("测试消息2", Notification.Type.SUCCESS)
           showNotification("测试消息3",Notification.Type.ERROR,2000)
 
 
-          showMessage("showMessage")*//*
+        showMessage("showMessage")
 
     }
-}*/
+}

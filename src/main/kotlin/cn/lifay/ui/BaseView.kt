@@ -1,22 +1,27 @@
 package cn.lifay.ui
 
+import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.asyncTask
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXReceiver
 import cn.lifay.ui.message.Message
 import cn.lifay.ui.message.Notification
+import cn.lifay.ui.tree.TreeViewHelp
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.ButtonType
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.layout.Pane
 import javafx.stage.StageStyle
 import javafx.stage.Window
 import java.net.URL
 import java.util.*
 import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.KProperty1
 
 
 /**
@@ -26,14 +31,13 @@ import kotlin.reflect.KMutableProperty0
  *          1. instance
  *              val indexPane = FXMLLoader.load<Pane>(ResourceUtil.getResource("index.fxml"))
  *          2. instance
- *             val httpToolView = createView<HttpToolController,VBox>(ResourceUtil.getResource("httpTool.fxml")){
- *             initForm(indexController, httpTool.id)
+ *             val VView = createView<VController,VBox>(ResourceUtil.getResource("V.fxml")){
+ *             initForm(indexController, V.id)
  *         }
  * @author lifay
  * @date 2023/2/23 17:01
  **/
 abstract class BaseView<R : Pane>() : Initializable {
-
 
     companion object {
 
@@ -76,6 +80,15 @@ abstract class BaseView<R : Pane>() : Initializable {
      * 注册根容器
      */
     protected abstract fun rootPane(): KMutableProperty0<R>
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        if (GlobeTheme.ELEMENT_STYLE) {
+            getRoot().stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+        }
+    }
+
+    open fun InitElemntStyle() {
+
+    }
 
     open fun getRoot(): Parent {
         return rootPane().get()
@@ -117,6 +130,17 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
     /**
+     * 弹窗提示
+     *
+     * @param message 弹窗确认
+     * @return 接收用户确认结果
+     */
+    protected open fun alertConfirmation(message: String): Boolean {
+        val buttonType = alert(message, AlertType.CONFIRMATION)
+        return buttonType.isPresent && buttonType.get() == ButtonType.OK
+    }
+
+    /**
      * 弹窗警告
      *
      * @param message 弹窗展示信息
@@ -148,13 +172,12 @@ abstract class BaseView<R : Pane>() : Initializable {
         alertType: AlertType,
         vararg buttonTypes: ButtonType?
     ): Optional<ButtonType> {
-        val alert = Alert(alertType)
-        alert.initStyle(StageStyle.TRANSPARENT)
-        val scene = alert.dialogPane.scene
-        scene.fill = null
-        alert.buttonTypes.addAll(*buttonTypes)
-        alert.initOwner(getWindow())
-        alert.contentText = message
+        val alert = Alert(alertType, message, *buttonTypes).apply {
+            initStyle(StageStyle.TRANSPARENT)
+            dialogPane.scene.fill = null
+            initOwner(getWindow())
+            contentText = message
+        }
         if (GlobeTheme.ELEMENT_STYLE) {
             val s = javaClass.getResource("/css/element-ui.css").toExternalForm()
             alert.dialogPane.stylesheets.add(s)
@@ -168,7 +191,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      *
      * @param message 通知信息
      */
-    protected open fun showMessage(message: String, delay: Long = 3000) {
+    protected open fun showMessage(message: String, delay: Long = 2500) {
         showMessage(message, Message.Type.INFO, delay)
     }
 
@@ -178,7 +201,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @param message 通知信息
      */
     @JvmOverloads
-    protected open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 3000) {
+    protected open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
         val root = getRoot()
         if (root !is Pane) {
             alertError("root 必须是 Pane 或其子类 : ${root}")
@@ -188,7 +211,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
     protected open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
-        showNotification(message, Notification.Type.INFO, Notification.DEFAULT_DELAY)
+        showNotification(message, Notification.Type.INFO, milliseconds)
     }
 
     /**
@@ -210,6 +233,109 @@ abstract class BaseView<R : Pane>() : Initializable {
             return
         }
         Notification.showAutoClose(root, message, type, milliseconds)
+    }
+
+
+    /*树视图部分*/
+    val HELP_MAP = HashMap<String, TreeViewHelp<*, *>>()
+    val <T> TreeView<T>.treeId: String
+        get() {
+            return this.id ?: this.hashCode().toString()
+        }
+
+    fun <V, B> TreeView<V>.Register(
+        idProp: KProperty1<V, B>,
+        parentProp: KProperty1<V, B>
+    ) {
+        HELP_MAP[treeId] = TreeViewHelp(idProp, parentProp)
+    }
+
+    inline fun <reified V, B> TreeView<V>.InitTreeItems(datas: List<V>) {
+        if (!HELP_MAP.containsKey(treeId)) {
+            throw LerverUIException("TreeView未进行注册:${treeId}")
+        }
+        val help = HELP_MAP[treeId] as TreeViewHelp<V, B>
+        val prop = help.TREE_VIEW_PROP
+        AddChildren(this.root, prop, datas.toTypedArray())
+        //添加索引
+        InitIndexs(this.root, prop.first)
+        // println(findTreeItem("ee1feccca35a4645a3940bc51dd90836"))
+    }
+
+    fun <V, B> TreeView<V>.AddChildren(
+        panTreeItem: TreeItem<V>,
+        prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
+        datas: Array<V>
+    ) {
+        //获取子节点
+        val childtren = datas.filter { prop.first.get(panTreeItem.value!!) == prop.second.get(it) }.map {
+            val item = TreeItem(it)
+            AddChildren(item, prop, datas)
+            item
+        }
+        //添加子节点
+        if (childtren.isNotEmpty()) {
+            panTreeItem.children.addAll(childtren)
+        }
+    }
+
+    fun <V, B> TreeView<V>.AddChild(
+        panTreeItem: TreeItem<V>,
+        prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
+        data: V
+    ) {
+        //获取子节点
+        val child = TreeItem(data)
+        //添加子节点
+        panTreeItem.children.add(child)
+    }
+
+    fun <V, B> TreeView<V>.InitIndexs(treeItem: TreeItem<V>, idProp: KProperty1<V, B>, indexs: String = "") {
+        for ((i, child) in treeItem.children.withIndex()) {
+            //添加索引
+            val tempIndexs = if (indexs.isBlank()) i.toString() else "${indexs}-$i"
+            //TREE_ITEM_INDEX[idProp.get(child.value)] = tempIndexs
+            AddIndex(idProp.get(child.value), tempIndexs)
+            //子节点
+            if (child.children.isNotEmpty()) {
+                InitIndexs(child, idProp, tempIndexs)
+            }
+        }
+    }
+
+    fun <V, B> TreeView<V>.AddIndex(id: B, indexs: String) {
+        if (!HELP_MAP.containsKey(treeId)) {
+            throw LerverUIException("TreeView未进行注册:${treeId}")
+        }
+        val help = HELP_MAP[treeId]!! as TreeViewHelp<V, B>
+        help.TREE_VIEW_INDEX[id] = indexs
+    }
+
+    fun <V, B> TreeView<V>.FindTreeItem(id: B): TreeItem<V>? {
+        if (!HELP_MAP.containsKey(treeId)) {
+            throw LerverUIException("TreeView未进行注册:${treeId}")
+        }
+        val help = HELP_MAP[treeId]!! as TreeViewHelp<V, B>
+        val indexs = help.TREE_VIEW_INDEX[id]
+        var temp: TreeItem<V>? = null
+        for (index in indexs!!.split("-")) {
+            if (temp == null) {
+                temp = this.root
+            }
+            temp = GetChildByIndex(temp!!, index.toInt(), help.TREE_VIEW_PROP.first)
+            if (temp == null) {
+                return null;
+            }
+        }
+        return temp
+    }
+
+    fun <V, B> TreeView<V>.GetChildByIndex(node: TreeItem<V>, index: Int, idProp: KProperty1<V, B>): TreeItem<V>? {
+        if (index >= node.children.size) {
+            println("节点:${idProp.get(node.value)} 没有索引:${index}")
+            return null
+        }
+        return node.children[index]
     }
 
 

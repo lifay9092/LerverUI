@@ -1,5 +1,6 @@
 package cn.lifay.ui.form
 
+import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
@@ -11,16 +12,21 @@ import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableRow
+import javafx.scene.control.TableView
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
-import java.lang.reflect.ParameterizedType
+import java.net.URL
+import java.util.*
 import java.util.function.Consumer
 import kotlin.reflect.KMutableProperty0
+import kotlin.reflect.full.primaryConstructor
 
 
 /**
@@ -31,7 +37,7 @@ import kotlin.reflect.KMutableProperty0
  **/
 abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
 
-    protected var t: T? = null
+    protected var entity: T? = null
     private val stage = Stage().bindEscKey()
     private var root = VBox(10.0)
     private val form = GridPane()
@@ -43,26 +49,45 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
 
-    /*
-        companion object{
-            inline operator fun <reified T : Any> invoke(): T {
-                println("伴生对象方法")
-                val kClass = T::class.java.newInstance()
-                return kClass
-            }
-        }
-    */
-
     private fun FormUI() {}
 
     init {
-        uiInit(title)
-        if (t == null) {
-            val type = javaClass.genericSuperclass as ParameterizedType
-            val clazz = type.actualTypeArguments[0] as Class<T>
-            this.t = clazz.getConstructor().newInstance()
-        } else {
-            refreshForm(t)
+        try {
+            uiInit(title)
+            if (t == null) {
+                val tc = elements[0].tc
+                val args = getElementInitValue()
+                this.entity = tc!!.primaryConstructor!!.call(*args)
+                //            val type = javaClass.genericSuperclass as ParameterizedType
+                //            val clazz = type.actualTypeArguments[0] as Class<T>
+                //            for (constructor in clazz.constructors) {
+                //                println()
+                //                val args = getElementInitValue()
+                //                constructor.newInstance(args)
+                //                break
+                //            }
+                //            this.t = clazz.getConstructor().newInstance()
+            } else {
+                refreshForm(t)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw LerverUIException("表单初始化失败:${e.message}")
+        }
+    }
+
+    /**
+     * 表单不是fxml导入，子类不需要当前方法
+     */
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+    }
+
+    private fun getElementInitValue(): Array<Any?> {
+        return Array(elements.size) {
+            val element = elements[it]
+            val get = element.defaultValue()
+//            println("${element.label} = ${get}")
+            get
         }
     }
 
@@ -113,7 +138,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     }
 
     private fun refreshForm(t: T) {
-        this.t = t
+        this.entity = t
         propToElement()
     }
 
@@ -131,18 +156,6 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         return elements.map { it.getTableHead() }.toList()
     }
 
-    /*
-        inline fun <reified T> newRadioElement(
-            label: String,
-            property: KMutableProperty1<T, String?>,
-            items: List<String>
-        ): RadioElement<T> {
-            val element = RadioElement(label, property, items)
-            return element
-        }
-    */
-
-
     /**
      * 加载布局
      *
@@ -152,6 +165,9 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private fun initElements() {
         /*网格布局：元素*/
         val elementList: List<FormElement<T, *>> = buildElements()
+        if (elementList.isEmpty()) {
+            throw LerverUIException("未获取到有效表单元素!")
+        }
         elements.addAll(elementList)
         //网格布局 算法 前提：纵向数量<=横向数量
         var h = 0
@@ -201,7 +217,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
                         //从元素赋值到实例
                         elementToProp()
                         //执行保存操作
-                        saveData(t)
+                        saveData(entity)
                         showMessage("保存成功", Message.Type.SUCCESS)
                         refreshTable()
                     } catch (e: Exception) {
@@ -225,8 +241,11 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
                         }
                         //从元素赋值到实例
                         elementToProp()
+                        //获取主键值
+                        val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
+                        checkPrimaryValue(idValue)
                         //执行保存操作
-                        editData(t)
+                        editData(entity)
                         showMessage("编辑成功", Message.Type.SUCCESS)
                         refreshTable()
                     } catch (e: Exception) {
@@ -241,29 +260,28 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         //删除
         delBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(stage) {
-                    try {
-                        delBtn.isDisable = true
-                        //确认
-                        val alert =
-                            Alert(Alert.AlertType.CONFIRMATION, "是否删除?")
-                        val buttonType = alert.showAndWait()
-                        if (buttonType.isPresent && buttonType.get() == ButtonType.OK) {
+                //确认
+                if (alertConfirmation("将要执行删除操作,是否继续?")) {
+                    asyncTaskLoading(stage) {
+                        try {
+                            delBtn.isDisable = true
                             //从元素赋值到实例
                             elementToProp()
                             //获取主键值
                             val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
                             //执行保存操作
+                            checkPrimaryValue(idValue)
                             delData(idValue)
                             showMessage("删除成功", Message.Type.SUCCESS)
                             clear()
                             refreshTable()
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            showMessage("删除失败:" + e.message, Message.Type.ERROR)
+                        } finally {
+                            delBtn.isDisable = false
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showMessage("删除失败:" + e.message, Message.Type.ERROR)
-                    } finally {
-                        delBtn.isDisable = false
                     }
                 }
             }
@@ -294,7 +312,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     }
 
     private fun clear() {
-        elements.forEach(Consumer<FormElement<T, *>> { obj: FormElement<T, *> -> obj.clear() })
+        elements.forEach(Consumer { obj: FormElement<T, *> -> platformRun { obj.clear() } })
     }
 
     private fun getPrimaryValue(): Any? {
@@ -315,7 +333,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private fun elementToProp() {
         try {
             for (element in elements) {
-                element.setProp(t!!)
+                element.setProp(entity!!)
             }
         } catch (e: NoSuchFieldException) {
             throw RuntimeException(e)
@@ -333,7 +351,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private fun propToElement() {
         try {
             for (element in elements) {
-                element.setEle(this.t!!)
+                element.setEle(this.entity!!)
                 if (element.primary) {
                     element.disable()
                 }
@@ -344,35 +362,43 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         }
     }
 
+    /**
+     * 构建表单元素
+     */
     abstract fun buildElements(): List<FormElement<T, *>>
 
+    /**
+     * 构建表单元素
+     */
     abstract fun datas(): List<T>
 
-    abstract fun saveData(t: T?)
+    /**
+     * 保存数据
+     */
+    abstract fun saveData(entity: T?)
 
-    abstract fun editData(t: T?)
+    /**
+     * 编辑数据
+     */
+    abstract fun editData(entity: T?)
 
+    /**
+     * 删除数据
+     */
     abstract fun delData(primaryValue: Any?)
 
-    fun checkId(id: Any?) {
-        try {
-            if (id == null) {
-                throw RuntimeException("主键值不能为空!");
-            }
-            val blank = when (id) {
-                is String -> id.isBlank();
-                is Int -> id == 0;
-                is Long -> id == 0L;
-                else -> throw RuntimeException("不支持当前类型:" + id.javaClass);
-            };
-            if (blank) {
-                throw RuntimeException("主键值不能为空!");
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            platformRun {
-                Alert(Alert.AlertType.ERROR, e.message).show()
-            }
+    private fun checkPrimaryValue(id: Any?) {
+        if (id == null) {
+            throw RuntimeException("主键值不能为空!");
+        }
+        val blank = when (id) {
+            is String -> id.isBlank();
+            is Int -> id == 0;
+            is Long -> id == 0L;
+            else -> throw RuntimeException("不支持当前类型:" + id.javaClass);
+        };
+        if (blank) {
+            throw RuntimeException("主键值不能为空!");
         }
     }
 

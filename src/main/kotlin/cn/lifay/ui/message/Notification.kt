@@ -63,7 +63,7 @@ class Notification constructor() {
 
     companion object {
         private val notificationContainerMap: MutableMap<Pane, VBox> = HashMap()
-        const val DEFAULT_DELAY: Long = 4500
+        const val DEFAULT_DELAY: Long = 2500
 
         /**
          * 显示通知

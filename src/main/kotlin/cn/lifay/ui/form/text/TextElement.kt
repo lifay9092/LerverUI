@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.control.TextInputControl
 import javafx.scene.paint.Color
+import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
 /**
@@ -18,64 +19,53 @@ import kotlin.reflect.KMutableProperty1
  * @Date 2023/1/10 17:30
  */
 class TextElement<T : Any, R : Any> constructor(
+    t: KClass<T>,
     r: Class<R>,
     label: String,
+    property2: KMutableProperty1<T, R>?,
     property: KMutableProperty1<T, R?>?,
-    customProp: DelegateProp<T, R>? = null,
+    customProp: DelegateProp<T, R>?,
     primary: Boolean = false,
     required: Boolean = false,
-    private val isTextArea: Boolean = false
+    private var isTextArea: Boolean = false
 ) :
-    FormElement<T, R>(r, label, property, customProp, primary, required) {
+    FormElement<T, R>(r, label, primary, required) {
 
-    /*constructor(r: Class<R>,
-                label: String,
-                property: KMutableProperty1<T, R>?,
-                customProp: DelegateProp<T, R>? = null,
-                primary: Boolean = false,
-                required: Boolean = false,
-                isTextArea: Boolean = false
-    ):this(r,label, property, customProp, primary, required)*/
+    init {
+        super.property2 = property2
+        super.property = property
+        super.customProp = customProp
+        super.tc = t
+        init()
+    }
+
     companion object {
+        /*注入 property 返回值不为空 对应var 没有? */
+        inline operator fun <reified T : Any, reified R : Any> invoke(
+            label: String,
+            property: KMutableProperty1<T, R>,
+            primary: Boolean = false,
+            isTextArea: Boolean = false
+        ) = TextElement(T::class, R::class.java, label, property, null, null, primary, true, isTextArea)
+
+        /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
             primary: Boolean = false,
             required: Boolean = false,
             isTextArea: Boolean = false
-        ) = TextElement(R::class.java, label, property, null, primary, required, isTextArea){
+        ) = TextElement(T::class, R::class.java, label, null, property, null, primary, required, isTextArea)
 
-        }
-        inline operator fun <reified T : Any, reified R : Any> invoke(
-            label: String,
-            property: KMutableProperty1<T, R>,
-            primary: Boolean = false,
-            required: Boolean = false,
-            isTextArea: Boolean = false
-        ) = TextElement(R::class.java, label, property, null, primary, required, isTextArea)
-
+        /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
             primary: Boolean = false,
             required: Boolean = false,
             isTextArea: Boolean = false
-        ) = TextElement(R::class.java, label, null, customProp, primary, required, isTextArea)
+        ) = TextElement(T::class, R::class.java, label, null, null, customProp, primary, required, isTextArea)
 
-    }
-
-    constructor(
-        r: Class<R>,
-        label: String,
-        property: KMutableProperty1<T, R>,
-        customProp: Nothing?,
-        primary: Boolean,
-        required: Boolean,
-        isTextArea: Boolean
-    ) : this(r,label, property, customProp, primary, required)
-
-    init {
-        init()
     }
 
     override fun registerGraphic(): Node {
