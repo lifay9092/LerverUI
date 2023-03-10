@@ -1,15 +1,21 @@
 package cn.lifay.test
 
+import cn.lifay.ui.table.TableCell2
+import cn.lifay.ui.table.TableEditCell
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.geometry.Pos
+import javafx.scene.control.Label
+import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.AnchorPane
 import java.net.URL
 import java.util.*
@@ -29,27 +35,33 @@ class DemoView : Initializable {
     lateinit var rootPane: AnchorPane
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         tableView.apply {
+            isEditable = true
             columns.addAll(
-                TableColumn<TableTestVO, String>("文本").apply {
+                TableColumn<TableTestVO, String>("普通").apply {
                     this.cellValueFactory = PropertyValueFactory("text")
+                    setCellFactory { v ->
+                        val tableCell = object : TableEditCell<TableTestVO, String>() {
+                        }
+                        tableCell
+                    }
+                    prefWidth = 150.0
                 },
-                TableColumn<TableTestVO, String>("文本2").apply {
+                TableColumn<TableTestVO, String>("自定义Property").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
                         SimpleStringProperty(p.value.info)
                     }
                 },
-                TableColumn<TableTestVO, String>("消息").apply {
+                TableColumn<TableTestVO, String>("字段Property").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
                         p.value.msg
                     }
+                    isEditable = true
+                    cellFactory = TextFieldTableCell.forTableColumn()
+                    prefWidth = 150.0
                 },
                 TableColumn<TableTestVO, Double>("进度条").apply {
                     this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, Double> ->
-                        Bindings.createObjectBinding(object : Callable<Double> {
-                            override fun call(): Double {
-                                return p.value.processBar.value
-                            }
-                        }, p.value.processBar)
+                        Bindings.createObjectBinding({ p.value.processBar.value }, p.value.processBar)
 
                     }
                     this.cellFactory = ProgressBarTableCell.forTableColumn()
