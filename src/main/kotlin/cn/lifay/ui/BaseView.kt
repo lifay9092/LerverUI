@@ -1,62 +1,70 @@
 package cn.lifay.ui
 
-import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.asyncTask
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXReceiver
 import cn.lifay.ui.message.Message
 import cn.lifay.ui.message.Notification
-import cn.lifay.ui.tree.TreeViewHelp
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.ButtonType
-import javafx.scene.control.TreeItem
-import javafx.scene.control.TreeView
 import javafx.scene.layout.Pane
 import javafx.stage.StageStyle
 import javafx.stage.Window
 import java.net.URL
 import java.util.*
 import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KProperty1
 
 
 /**
  * BaseView 基础控制器视图
- * @sample
  *
- *          1. instance
- *              val indexPane = FXMLLoader.load<Pane>(ResourceUtil.getResource("index.fxml"))
- *          2. instance
- *             val VView = createView<VController,VBox>(ResourceUtil.getResource("V.fxml")){
- *             initForm(indexController, V.id)
- *         }
+ * 普通创建新的视图
+ * ```
+ * GlobeTheme.enableElement(true)
+ * val view = BaseView.createView<BaseViewDemoView, AnchorPane>(xxx.fxml)
+ * val scene = Scene(view.getRoot())
+ * primaryStage.title = "Hello World"
+ * primaryStage.scene = scene
+ * primaryStage.show()
+ * ```
+ * 从父视图内创建新的视图直接使用[BaseView.createView]
  * @author lifay
  * @date 2023/2/23 17:01
  **/
 abstract class BaseView<R : Pane>() : Initializable {
 
     companion object {
+        val ELEMENT_UI_CSS = this::class.java.getResource("/css/element-ui.css").toExternalForm()
 
+        /**
+         * 创建新的视图
+         * @param fxml fxml资源
+         */
         fun <T : BaseView<R>, R : Pane> createView(fxml: URL): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+                load.stylesheets.add(ELEMENT_UI_CSS)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
             }
         }
 
+        /**
+         * 创建新的视图
+         * @param fxml fxml资源
+         * @param initFunc 视图初始化后执行的方法
+         */
         fun <T : BaseView<R>, R : Pane> createView(fxml: URL, initFunc: T.() -> Unit): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+                load.stylesheets.add(ELEMENT_UI_CSS)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
@@ -82,7 +90,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     protected abstract fun rootPane(): KMutableProperty0<R>
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         if (GlobeTheme.ELEMENT_STYLE) {
-            getRoot().stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+            getRoot().stylesheets.add(ELEMENT_UI_CSS)
         }
     }
 
@@ -237,106 +245,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 
 
     /*树视图部分*/
-    val HELP_MAP = HashMap<String, TreeViewHelp<*, *>>()
-    val <T> TreeView<T>.treeId: String
-        get() {
-            return this.id ?: this.hashCode().toString()
-        }
 
-    fun <V, B> TreeView<V>.Register(
-        idProp: KProperty1<V, B>,
-        parentProp: KProperty1<V, B>
-    ) {
-        HELP_MAP[treeId] = TreeViewHelp(idProp, parentProp)
-    }
-
-    inline fun <reified V, B> TreeView<V>.InitTreeItems(datas: List<V>) {
-        if (!HELP_MAP.containsKey(treeId)) {
-            throw LerverUIException("TreeView未进行注册:${treeId}")
-        }
-        val help = HELP_MAP[treeId] as TreeViewHelp<V, B>
-        val prop = help.TREE_VIEW_PROP
-        AddChildren(this.root, prop, datas.toTypedArray())
-        //添加索引
-        InitIndexs(this.root, prop.first)
-        // println(findTreeItem("ee1feccca35a4645a3940bc51dd90836"))
-    }
-
-    fun <V, B> TreeView<V>.AddChildren(
-        panTreeItem: TreeItem<V>,
-        prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
-        datas: Array<V>
-    ) {
-        //获取子节点
-        val childtren = datas.filter { prop.first.get(panTreeItem.value!!) == prop.second.get(it) }.map {
-            val item = TreeItem(it)
-            AddChildren(item, prop, datas)
-            item
-        }
-        //添加子节点
-        if (childtren.isNotEmpty()) {
-            panTreeItem.children.addAll(childtren)
-        }
-    }
-
-    fun <V, B> TreeView<V>.AddChild(
-        panTreeItem: TreeItem<V>,
-        prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
-        data: V
-    ) {
-        //获取子节点
-        val child = TreeItem(data)
-        //添加子节点
-        panTreeItem.children.add(child)
-    }
-
-    fun <V, B> TreeView<V>.InitIndexs(treeItem: TreeItem<V>, idProp: KProperty1<V, B>, indexs: String = "") {
-        for ((i, child) in treeItem.children.withIndex()) {
-            //添加索引
-            val tempIndexs = if (indexs.isBlank()) i.toString() else "${indexs}-$i"
-            //TREE_ITEM_INDEX[idProp.get(child.value)] = tempIndexs
-            AddIndex(idProp.get(child.value), tempIndexs)
-            //子节点
-            if (child.children.isNotEmpty()) {
-                InitIndexs(child, idProp, tempIndexs)
-            }
-        }
-    }
-
-    fun <V, B> TreeView<V>.AddIndex(id: B, indexs: String) {
-        if (!HELP_MAP.containsKey(treeId)) {
-            throw LerverUIException("TreeView未进行注册:${treeId}")
-        }
-        val help = HELP_MAP[treeId]!! as TreeViewHelp<V, B>
-        help.TREE_VIEW_INDEX[id] = indexs
-    }
-
-    fun <V, B> TreeView<V>.FindTreeItem(id: B): TreeItem<V>? {
-        if (!HELP_MAP.containsKey(treeId)) {
-            throw LerverUIException("TreeView未进行注册:${treeId}")
-        }
-        val help = HELP_MAP[treeId]!! as TreeViewHelp<V, B>
-        val indexs = help.TREE_VIEW_INDEX[id]
-        var temp: TreeItem<V>? = null
-        for (index in indexs!!.split("-")) {
-            if (temp == null) {
-                temp = this.root
-            }
-            temp = GetChildByIndex(temp!!, index.toInt(), help.TREE_VIEW_PROP.first)
-            if (temp == null) {
-                return null;
-            }
-        }
-        return temp
-    }
-
-    fun <V, B> TreeView<V>.GetChildByIndex(node: TreeItem<V>, index: Int, idProp: KProperty1<V, B>): TreeItem<V>? {
-        if (index >= node.children.size) {
-            println("节点:${idProp.get(node.value)} 没有索引:${index}")
-            return null
-        }
-        return node.children[index]
-    }
 
 
 }

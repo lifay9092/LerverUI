@@ -1,25 +1,25 @@
 package cn.lifay.test
 
-import cn.lifay.ui.table.TableCell2
 import cn.lifay.ui.table.TableEditCell
+import cn.lifay.ui.tree.RegisterByList
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.collections.FXCollections
 import javafx.event.ActionEvent
+import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.geometry.Pos
-import javafx.scene.control.Label
-import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
+import javafx.scene.control.TreeItem
+import javafx.scene.control.TreeView
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.AnchorPane
 import java.net.URL
 import java.util.*
-import java.util.concurrent.Callable
 
 /**
  * @ClassName DemoView
@@ -29,20 +29,62 @@ import java.util.concurrent.Callable
  */
 class DemoView : Initializable {
     @FXML
-    var tableView = TableView<TableTestVO>()
+    lateinit var rootPane: AnchorPane
 
     @FXML
-    lateinit var rootPane: AnchorPane
+    var treeView = TreeView<TreeTestVO>()
+//    val rootItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
+    //  val testItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
+
+    lateinit var rootTreeItem: TreeItem<TreeTestVO>
+
+    @FXML
+    var tableView = TableView<TableTestVO>()
+
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        val observableArrayList = FXCollections.observableArrayList<TreeTestVO>()
+
+
+        val treeItem1 = TreeItem(TreeTestVO("3", "2", "4", SimpleStringProperty("3")))
+        val treeItem2 = TreeItem(TreeTestVO("2", "1", "2", SimpleStringProperty("2")))
+        val treeItem3 = TreeItem(TreeTestVO("4", "1", "4", SimpleStringProperty("4")))
+        treeItem2.children.add(treeItem3)
+
+        val test1 = TreeTestVO("3", "2", "4", SimpleStringProperty("3"))
+        val test2 = TreeTestVO("2", "1", "2", SimpleStringProperty("2"))
+        val test3 = TreeTestVO("4", "1", "4", SimpleStringProperty("4"))
+
+
+        rootTreeItem = TreeItem<TreeTestVO>().apply {
+            value = TreeTestVO("1", "", "4", SimpleStringProperty("1"))
+            this.isExpanded = true
+            addEventHandler(
+                TreeItem.valueChangedEvent(),
+                EventHandler<TreeItem.TreeModificationEvent<TreeTestVO>> {
+                    println(it.newValue)
+                }
+            )
+
+        }
+
+        // rootItemProperties.value = root
+        // testItemProperties.value = treeItem2
+        treeView.apply {
+            root = rootTreeItem
+            isShowRoot = true
+            RegisterByList(TreeTestVO::id, TreeTestVO::parentId, listOf(test1, test2, test3))
+//            rootProperty().bind(rootItemProperties)
+        }
         tableView.apply {
             isEditable = true
             columns.addAll(
                 TableColumn<TableTestVO, String>("普通").apply {
                     this.cellValueFactory = PropertyValueFactory("text")
-                    setCellFactory { v ->
-                        val tableCell = object : TableEditCell<TableTestVO, String>() {
-                        }
-                        tableCell
+                    setCellFactory {
+                        object : TableEditCell<TableTestVO, String>() {}
+                    }
+                    setOnEditCommit { t: TableColumn.CellEditEvent<TableTestVO, String> ->
+                        (t.tableView.items[t.tablePosition.row] as TableTestVO).text = t.newValue
                     }
                     prefWidth = 150.0
                 },
@@ -76,6 +118,22 @@ class DemoView : Initializable {
                 )
             }
         }
+    }
+
+    fun treeTest(actionEvent: ActionEvent) {
+        println("测试树")
+        rootTreeItem.value.name = "测试修改"
+        rootTreeItem.children[0].value = TreeTestVO("5", "1", "5", SimpleStringProperty("5"))
+        // rootItemProperties.value.apply {
+        //      value.name = "测试"
+        //      children[0].value.name = "修改了"
+//            children.add(
+//                TreeItem(TreeTestVO("5", "1","5", SimpleStringProperty("5")))
+//            )
+        //  }
+        // testItemProperties.value.apply {
+        //      value.name = "fffffffffff"
+        //    }
     }
 
     fun formTest(actionEvent: ActionEvent?) {

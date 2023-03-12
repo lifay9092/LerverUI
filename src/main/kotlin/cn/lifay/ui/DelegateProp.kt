@@ -9,8 +9,6 @@ import kotlin.reflect.KClass
  * @date 2023/3/2 21:00
  **/
 class DelegateProp<T : Any, R : Any>(
-//    getFunc:Consumer<R>,
-//    setFunc:Consumer<R>,
     val fieldName: String,
     val kClass: KClass<T>,
     val rClass: KClass<R>

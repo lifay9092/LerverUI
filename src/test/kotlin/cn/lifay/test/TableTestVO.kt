@@ -15,4 +15,6 @@ class TableTestVO(
     var msg: SimpleStringProperty,
     var processBar: SimpleDoubleProperty
 ) {
+
+
 }

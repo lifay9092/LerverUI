@@ -1,7 +1,6 @@
 package cn.lifay.ui.table
 
 import javafx.event.Event
-import javafx.event.EventHandler
 import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -9,6 +8,18 @@ import javafx.scene.input.KeyEvent
 
 /**
  * TableEditCell 自定义可编辑表格单元
+ *  ```
+ * 	 TableColumn<TableTestVO, String>("普通").apply {
+ *       this.cellValueFactory = PropertyValueFactory("text")
+ *       setCellFactory {
+ *           object : TableEditCell<TableTestVO, String>() {}
+ *       }
+ *       setOnEditCommit { t: TableColumn.CellEditEvent<TableTestVO, String> ->
+ *           (t.tableView.items[t.tablePosition.row] as TableTestVO).text = t.newValue
+ *       }
+ *        prefWidth = 150.0
+ *   }
+ * 	```
  * @author lifay
  * @date 2023/3/6 14:28
  **/

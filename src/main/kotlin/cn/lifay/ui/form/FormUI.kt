@@ -30,10 +30,28 @@ import kotlin.reflect.full.primaryConstructor
 
 
 /**
- *@ClassName FormUI
- *@Description
- *@Author lifay
- *@Date 2023/2/4 18:15
+ * Form类示例：
+ *
+ *```
+ * class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t)
+ * class AddrForm(t: HttpAddr? = null) : FormUI<HttpAddr>("地址管理", t)
+ *```
+ * 【元素类使用示例】
+ * dada class:
+ * ```
+ * val id = TextElement("ID:", UserData::id, true)
+ * val name = TextElement("名称:", UserData::name, isTextArea = true)
+ * val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
+ * val child = CheckElement("是否未成年:", UserData::child)
+ * val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+ * ```
+ * javaBean use [cn.lifay.ui.DelegateProp]:
+ * ```
+ * val id = TextElement<Person, Int>("ID：", DelegateProp("id"), primary = true)
+ * val name = TextElement<Person, String>("姓名：", DelegateProp("name"))
+ * val child = CheckElement<Person, Boolean>("成年：", DelegateProp("child"))
+ * ```
+ *@author lifay
  **/
 abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
 
@@ -58,15 +76,6 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
                 val tc = elements[0].tc
                 val args = getElementInitValue()
                 this.entity = tc!!.primaryConstructor!!.call(*args)
-                //            val type = javaClass.genericSuperclass as ParameterizedType
-                //            val clazz = type.actualTypeArguments[0] as Class<T>
-                //            for (constructor in clazz.constructors) {
-                //                println()
-                //                val args = getElementInitValue()
-                //                constructor.newInstance(args)
-                //                break
-                //            }
-                //            this.t = clazz.getConstructor().newInstance()
             } else {
                 refreshForm(t)
             }

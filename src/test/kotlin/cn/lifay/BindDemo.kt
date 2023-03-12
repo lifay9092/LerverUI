@@ -1,11 +1,10 @@
 package cn.lifay
 
-import cn.lifay.test.BaseViewDemoView
-import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
 import javafx.application.Application
+import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
-import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.Pane
 import javafx.stage.Stage
 
 /*
@@ -14,13 +13,14 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class BaseViewDemo : Application() {
+class BindDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobeTheme.enableElement(true)
-        val view =
-            BaseView.createView<BaseViewDemoView, AnchorPane>(BaseViewDemo::class.java.getResource("test/baseViewDemo.fxml"))
-        val scene = Scene(view.getRoot())
+
+        val fxmlLoader = FXMLLoader(BindDemo::class.java.getResource("bind.fxml"))
+        val root = fxmlLoader.load<Pane>()
+        val scene = Scene(root)
         primaryStage.title = "Hello World"
         primaryStage.scene = scene
         primaryStage.show()
