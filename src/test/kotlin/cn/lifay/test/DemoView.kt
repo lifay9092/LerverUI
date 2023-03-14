@@ -1,7 +1,7 @@
 package cn.lifay.test
 
 import cn.lifay.ui.table.TableEditCell
-import cn.lifay.ui.tree.RegisterByList
+import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -72,7 +72,7 @@ class DemoView : Initializable {
         treeView.apply {
             root = rootTreeItem
             isShowRoot = true
-            RegisterByList(TreeTestVO::id, TreeTestVO::parentId, listOf(test1, test2, test3))
+            Register(TreeTestVO::id, TreeTestVO::parentId, listOf(test1, test2, test3))
 //            rootProperty().bind(rootItemProperties)
         }
         tableView.apply {
@@ -159,6 +159,26 @@ class DemoView : Initializable {
         tableView.items[0].msg.value = "33333"
         tableView.items[0].processBar.value = 0.5
         tableView.items[1].msg.value = "4444444444"
+    }
+
+    fun treeTestAdd1(actionEvent: ActionEvent) {
+        rootTreeItem.children[0].AddChild(TreeTestVO("add1","5","add1", SimpleStringProperty("add1")))
+    }
+
+    fun treeTestAdd2(actionEvent: ActionEvent) {
+        rootTreeItem.children[0].AddChild(listOf(TreeTestVO("add2","6","add2", SimpleStringProperty("add2"))))
+    }
+
+    fun treeTestUpt(actionEvent: ActionEvent) {
+        rootTreeItem.children[0].UpdateItem(TreeTestVO("修改测试","5","修改测试", SimpleStringProperty("修改测试")))
+    }
+
+    fun treeTestDel1(actionEvent: ActionEvent) {
+        rootTreeItem.children[0].DeleteThis()
+    }
+    fun treeTestDel2(actionEvent: ActionEvent) {
+        rootTreeItem.DeleteChildItem { it.id == "4" }
+
     }
 
 

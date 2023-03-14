@@ -41,7 +41,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         val ELEMENT_UI_CSS = this::class.java.getResource("/css/element-ui.css").toExternalForm()
 
         /**
-         * 创建新的视图
+         * 创建新的视图fxml
          * @param fxml fxml资源
          */
         fun <T : BaseView<R>, R : Pane> createView(fxml: URL): T {
@@ -56,7 +56,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         }
 
         /**
-         * 创建新的视图
+         * 创建新的视图fxml
          * @param fxml fxml资源
          * @param initFunc 视图初始化后执行的方法
          */
@@ -120,7 +120,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         val element = stackTraceElements[2]
 //        println(element)
         if (FXReceiver.has(element.className, element.methodName)) {
-            throw FXEventBusException("@FXReceiver 函数不能循环：class=${element.className} method=${element.methodName}")
+            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
         }
         asyncTask {
             FXReceiver.invoke(id, args)

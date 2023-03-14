@@ -23,7 +23,7 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t) {
 
     override fun buildElements(): List<FormElement<UserData, *>> {
         val id = TextElement("ID:", UserData::id, true)
-        val name = TextElement("名称:", UserData::name, isTextArea = true)
+        val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false)
         val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
         val child = CheckElement("是否未成年:", UserData::child)
         val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
