@@ -123,6 +123,7 @@ class DemoView : Initializable {
     fun treeTest(actionEvent: ActionEvent) {
         println("测试树")
         rootTreeItem.value.name = "测试修改"
+        println(rootTreeItem.children[0].treeViewId)
         rootTreeItem.children[0].value = TreeTestVO("5", "1", "5", SimpleStringProperty("5"))
         // rootItemProperties.value.apply {
         //      value.name = "测试"
@@ -166,7 +167,7 @@ class DemoView : Initializable {
     }
 
     fun treeTestAdd2(actionEvent: ActionEvent) {
-        rootTreeItem.children[0].AddChild(listOf(TreeTestVO("add2","6","add2", SimpleStringProperty("add2"))))
+        rootTreeItem.children[0].AddChildrenList(listOf(TreeTestVO("add2","6","add2", SimpleStringProperty("add2"))))
     }
 
     fun treeTestUpt(actionEvent: ActionEvent) {

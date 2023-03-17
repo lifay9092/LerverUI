@@ -61,7 +61,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private val form = GridPane()
     private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected var saveBtn: Button = Button("保存").stylePrimary()
+    protected var saveBtn: Button = Button("新增").stylePrimary()
     protected var editBtn: Button = Button("修改").styleInfo()
     protected var delBtn: Button = Button("删除").styleDanger()
     protected var clearBtn: Button = Button("清空").styleWarn()

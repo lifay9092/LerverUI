@@ -22,8 +22,8 @@ import java.util.concurrent.FutureTask
  * @author lifay
  * @return
  */
-fun checkParam(name: String, value: Any): Boolean {
-    if (value.toString().isBlank()) {
+fun checkParam(name: String, value: Any?): Boolean {
+    if (value == null || value.toString().isBlank()) {
         platformRun { Alert(Alert.AlertType.ERROR, "${name}不能为空", ButtonType.CLOSE).show() }
         return false
     }

@@ -41,6 +41,7 @@ class TextElement<T : Any, R : Any> constructor(
 
     companion object {
         /*注入 property 返回值不为空 对应var 没有? */
+        @JvmName("TextElementNotNullKt")
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R>,
@@ -49,20 +50,24 @@ class TextElement<T : Any, R : Any> constructor(
         ) = TextElement(T::class, R::class.java, label, property, null, null, primary, true, isTextArea)
 
         /*注入 property 返回值不为空 对应var ? */
+        @JvmOverloads
+        @JvmName("TextElementNullKt")
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
-            primary: Boolean = false,
             required: Boolean = false,
+            primary: Boolean = false,
             isTextArea: Boolean = false
         ) = TextElement(T::class, R::class.java, label, null, property, null, primary, required, isTextArea)
 
         /*注入 customProp javabean */
+        @JvmOverloads
+        @JvmName("TextElementNullJava")
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
-            primary: Boolean = false,
             required: Boolean = false,
+            primary: Boolean = false,
             isTextArea: Boolean = false
         ) = TextElement(T::class, R::class.java, label, null, null, customProp, primary, required, isTextArea)
 
