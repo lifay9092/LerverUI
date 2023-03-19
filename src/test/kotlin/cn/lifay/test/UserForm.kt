@@ -1,6 +1,5 @@
 package cn.lifay.test
 
-import cn.lifay.ui.form.FormElement
 import cn.lifay.ui.form.FormUI
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
@@ -13,28 +12,20 @@ import cn.lifay.ui.form.text.TextElement
  *@Author lifay
  *@Date 2023/2/4 18:24
  **/
-class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t) {
+class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildElements = {
+    val id = TextElement("ID:", UserData::id, true)
+    val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
+    val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
+    val child = CheckElement("是否未成年:", UserData::child)
+    val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+    listOf(id, name, type, child, sex);
+}) {
     //    constructor(title: String,t: UserData?):this(title){
 //        if (t != null) {
 //            this.t = t
 //        }
 //    }
 
-
-    override fun buildElements(): List<FormElement<UserData, *>> {
-        val id = TextElement("ID:", UserData::id, true)
-        val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false)
-        val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
-        val child = CheckElement("是否未成年:", UserData::child)
-        val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
-
-        /*        val name = newTextElement("名称:", UserData::name, isTextArea = true, required = true)
-        val type = newSelectElement("类型:", UserData::type, SelectTypeEnum.values())
-        val child = newCheckElement("是否未成年:", UserData::child)
-        val sex = newRadioElement("性别:", UserData::sex, listOf("男","女"))
-*/
-        return listOf(id, name, type, child, sex);
-    }
 
     override fun saveData(data: UserData?) {
         if (data!!.name!!.isBlank()) {

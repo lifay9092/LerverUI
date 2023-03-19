@@ -26,15 +26,10 @@ abstract class FormElement<T : Any, R : Any>(
     val label: String,
     var primary: Boolean = false,
     var required: Boolean = false,
-    val defaultValue: R? = null
+    val initValue: R? = null
 ) : HBox() {
 
-    protected val graphic: Node? = registerGraphic()
-    /*
-        var property: KMutableProperty1<T, R>? = null
-
-        var isPrimary = false*/
-//    abstract var test :String
+    protected lateinit var node: Node
 
     private val predicate: Predicate<R>? = null
     var property: KMutableProperty1<T, R?>? = null
@@ -42,56 +37,35 @@ abstract class FormElement<T : Any, R : Any>(
     var customProp: DelegateProp<T, R>? = null
     var tc: KClass<T>? = null
 
-    /*    constructor( r: Class<R>,
-                     label: String,
-                    property: KMutableProperty1<T, R?>?,
-                    customProp: DelegateProp<T, R>?,
-                     primary: Boolean = false,
-                     required: Boolean = false,
-                     defaultValue: R? = null
-        ):this(r,label, primary, required, defaultValue){
-            this.property = property
-            this.customProp = customProp
-        }*/
-
-    /*    constructor( r: Class<R>,
-                     label: String,
-                    property: KMutableProperty1<T, R>?,
-                    customProp: DelegateProp<T, R>?,
-                     primary: Boolean = false,
-                     required: Boolean = false,
-                     defaultValue: R? = null
-        ):this(r,label, primary, required, defaultValue){
-            this.property2 = property
-            this.customProp = customProp
-        }*/
-
-    var elementValue: R?
-        get() {
-            val v = get()
-            if (v == null && defaultValue != null) {
-                return defaultValue
+    /*
+        var elementValue: R?
+            get() {
+                val v = get()
+                if (v == null && defaultValue != null) {
+                    return defaultValue
+                }
+                return v
             }
-            return v
-        }
-        set(value) {
-            set(value)
-        }
+            set(value) {
+                set(value)
+            }
+    */
 
     fun init() {
+        //  println("$label FormElement init")
         alignment = Pos.CENTER_LEFT
         val l = Label(label).textFillColor("#606266")
         l.padding = Insets(5.0, 10.0, 5.0, 10.0)
         children.add(l)
         padding = Insets(5.0, 10.0, 5.0, 10.0)
-//        this.elementValue = defaultValue()
-        children.add(graphic)
+        node = registerGraphic()
+        children.add(node)
     }
 
     /**
      *  注册输入值控件实例
      */
-    abstract fun registerGraphic(): Node?
+    abstract fun registerGraphic(): Node
 
     /**
      *  获取控件实例
@@ -101,12 +75,12 @@ abstract class FormElement<T : Any, R : Any>(
     /**
      *  获取控件值
      */
-    abstract fun get(): R?
+    abstract fun getElementValue(): R?
 
     /**
      *  设置控件值
      */
-    abstract fun set(v: R?)
+    abstract fun setElementValue(v: R?)
 
     /**
      *  置空
@@ -124,6 +98,15 @@ abstract class FormElement<T : Any, R : Any>(
     abstract fun defaultValue(): R?
 
     /**
+     *  如果有初始值，则设置
+     */
+    fun initValue() {
+        if (initValue != null) {
+            setElementValue(initValue)
+        }
+    }
+
+    /**
      *  检查必传
      */
     fun checkRequired(): Boolean {
@@ -137,7 +120,7 @@ abstract class FormElement<T : Any, R : Any>(
      *  获取控件值
      */
     private fun initControlValue(): Any? {
-        return when (graphic) {
+        return when (node) {
             is TextField, is TextArea -> {
                 ""
             }
@@ -156,7 +139,7 @@ abstract class FormElement<T : Any, R : Any>(
      *  控件不可编辑
      */
     fun disable() {
-        platformRun { graphic!!.isDisable = true }
+        platformRun { node!!.isDisable = true }
     }
 
     /**
@@ -192,9 +175,9 @@ abstract class FormElement<T : Any, R : Any>(
     /**
      *  对象属性值 转到 元素值
      */
-    fun setEle(t: T) {
+    fun propToEle(t: T) {
         platformRun {
-            this.elementValue = if (customProp == null) {
+            val elementValue = if (customProp == null) {
                 if (property2 != null) {
                     property2!!.get(t)
                 } else {
@@ -203,13 +186,15 @@ abstract class FormElement<T : Any, R : Any>(
             } else {
                 customProp!!.getValue(t)
             }
+            setElementValue(elementValue)
         }
     }
 
     /**
      *  元素值 转到 对象属性值
      */
-    fun setProp(t: T) {
+    fun eleToProp(t: T) {
+        val elementValue = getElementValue()
         if (customProp == null) {
             if (property2 != null) {
                 elementValue?.let { property2!!.set(t, it) }
@@ -224,34 +209,19 @@ abstract class FormElement<T : Any, R : Any>(
     /**
      *  获取元素在表格的表头
      */
-    fun getTableHead(): TableColumn<T, R> {
+    open fun getTableHead(): TableColumn<T, R> {
         val col = TableColumn<T, R>(label.replace(":", "").replace("：", ""))
-        /* col.style = "-fx-alignment: CENTER;"
-         col.setCellFactory { v ->
-             val tableCell: TableCell<T, R> = object : TableCell<T, R>() {
-                 override fun updateItem(item: R?, empty: Boolean) {
-                     if (!empty && "" != item) {
-                         val label = Label(item?.toString() ?: "")
-                         label.alignment = Pos.CENTER_LEFT
-                         graphic = label
-                     } else {
-                         graphic = null
-                     }
-                 }
-             }
-             tableCell.alignment = Pos.CENTER
-             tableCell
-         }*/
-//        col.prefWidth = 10.0
+
         when (r) {
             java.lang.Boolean::class.java -> {
                 col.setCellValueFactory { p: TableColumn.CellDataFeatures<T, R> ->
-                    val b = this.elementValue as Boolean
+                    val b = getElementValue() as Boolean
                     val v = if (b) "是" else "否"
                     val property = SimpleStringProperty(v) as ObservableValue<R>
                     property
                 }
             }
+
             else -> {
                 col.cellValueFactory = PropertyValueFactory(getPropName())
             }
@@ -259,7 +229,4 @@ abstract class FormElement<T : Any, R : Any>(
         return col
     }
 
-//    private fun getWidth(v:String,head:String):Double{
-//
-//    }
 }

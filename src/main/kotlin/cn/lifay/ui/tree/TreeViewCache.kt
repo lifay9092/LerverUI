@@ -1,9 +1,10 @@
 package cn.lifay.ui.tree
 
 import cn.lifay.ui.tree.TreeViewCache.DATA_TYPE
+import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.ui.tree.TreeViewCache.LIST_HELP_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_HELP_MAP
-import cn.lifay.ui.tree.TreeViewCache.TREE_ID_MAP
+import cn.lifay.ui.tree.TreeViewCache.TREE_TO_ITEM_MAP
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import kotlin.reflect.KProperty1
@@ -11,27 +12,37 @@ import kotlin.reflect.KProperty1
 object TreeViewCache {
 
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
-    val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>,KProperty1<*, List<*>>>>()
+    val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
     var DATA_TYPE = DataType.LIST
-    enum class DataType{
+
+    enum class DataType {
         LIST,
         TREE
     }
 
-    val TREE_ID_MAP = HashMap<Int,String>()
+    val ITEM_TO_TREE_MAP = HashMap<Int, String>()
+    val TREE_TO_ITEM_MAP = HashMap<String, ArrayList<Int>>()
 }
 /*树视图部分*/
 
 val <T> TreeView<T>.treeId: String
     get() {
-        return  this.hashCode().toString()
+        return this.hashCode().toString()
     }
 
 var <T> TreeItem<T>.treeViewId: String
     get() {
-        return TREE_ID_MAP[this.hashCode()]!!
+        return ITEM_TO_TREE_MAP[this.hashCode()]!!
     }
-    set(value) {TREE_ID_MAP[this.hashCode()] = value}
+    set(value) {
+        ITEM_TO_TREE_MAP[this.hashCode()] = value
+        var ints = TREE_TO_ITEM_MAP[value]
+        if (ints == null) {
+            ints = arrayListOf()
+        }
+        ints.add(this.hashCode())
+        TREE_TO_ITEM_MAP[value] = ints
+    }
 
 
 /**
@@ -60,8 +71,8 @@ inline fun <reified V : Any, B : Any> TreeView<V>.Register(
     datas: List<V>
 ) {
     DATA_TYPE = TreeViewCache.DataType.TREE
-    TREE_HELP_MAP[treeId] = Pair(idProp,childrenProp)
-    initTree(this.root, idProp,childrenProp, datas)
+    TREE_HELP_MAP[treeId] = Pair(idProp, childrenProp)
+    initTree(this.root, idProp, childrenProp, datas)
 }
 
 inline fun <reified V, B> TreeView<V>.ListProps(): Pair<KProperty1<V, B>, KProperty1<V, B>> {
@@ -92,9 +103,14 @@ fun <V, B> TreeView<V>.initList(
 /**
  * 刷新元素列表
  */
-inline fun <reified V,reified B> TreeView<V>.RefreshTree(
+inline fun <reified V, reified B> TreeView<V>.RefreshTree(
     datas: List<V>
 ) {
+    //println("RefreshTree")
+    //清除旧数据和缓存
+    this.root.children.clear()
+    clearTreeIdMap(treeId)
+    //重载
     if (DATA_TYPE == TreeViewCache.DataType.LIST) {
         val prop = ListProps<V, B>()
         //获取子节点
@@ -108,11 +124,11 @@ inline fun <reified V,reified B> TreeView<V>.RefreshTree(
             this.root.children.addAll(childtren)
         }
     } else {
-        val props = TreeProps<V,B>()
+        val props = TreeProps<V, B>()
         //获取子节点
         val childtren = datas.map {
             val item = TreeItem(it)
-            initTree(item,props.first, props.second, props.second.get(it))
+            initTree(item, props.first, props.second, props.second.get(it))
             item
         }
         //添加子节点
@@ -123,14 +139,21 @@ inline fun <reified V,reified B> TreeView<V>.RefreshTree(
 
 }
 
-inline fun <reified V,reified B> TreeView<V>.TreeProps(): Pair<KProperty1<V, B>,KProperty1<V, List<V>>> {
-    return TREE_HELP_MAP[treeId] as Pair<KProperty1<V, B>,KProperty1<V, List<V>>>
+fun clearTreeIdMap(treeId: String) {
+    TREE_TO_ITEM_MAP[treeId]?.forEach {
+        ITEM_TO_TREE_MAP.remove(it)
+    }
+    TREE_TO_ITEM_MAP.remove(treeId)
+}
+
+inline fun <reified V, reified B> TreeView<V>.TreeProps(): Pair<KProperty1<V, B>, KProperty1<V, List<V>>> {
+    return TREE_HELP_MAP[treeId] as Pair<KProperty1<V, B>, KProperty1<V, List<V>>>
 }
 
 /**
  * 将子元素列表添加到指定item下（递归）
  */
-fun <V,B> TreeView<V>.initTree(
+fun <V, B> TreeView<V>.initTree(
     panTreeItem: TreeItem<V>,
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
@@ -139,7 +162,7 @@ fun <V,B> TreeView<V>.initTree(
     //获取子节点
     val childtren = datas.map {
         val item = TreeItem(it)
-        initTree(item,idProp, childrenProp, childrenProp.get(it))
+        initTree(item, idProp, childrenProp, childrenProp.get(it))
         item
     }
     //添加子节点
@@ -155,6 +178,7 @@ fun <V> TreeView<V>.ClearCache() {
     TREE_HELP_MAP[treeId].let {
         TREE_HELP_MAP.remove(treeId)
     }
+    clearTreeIdMap(treeId)
 }
 
 /**

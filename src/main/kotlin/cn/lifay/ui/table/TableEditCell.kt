@@ -23,7 +23,7 @@ import javafx.scene.input.KeyEvent
  * @author lifay
  * @date 2023/3/6 14:28
  **/
-open class TableEditCell<T,R> : TableCell<T,R>() {
+open class TableEditCell<T, R> : TableCell<T, R>() {
 
 
     private var textField: TextField? = null

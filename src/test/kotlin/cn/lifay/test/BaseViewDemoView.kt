@@ -64,12 +64,12 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
 
         tabPane.tabs.add(tab1)
         println("ddddddddddddd")
-         //  showNotification("测试消息")
-         //  showNotification("测试消息2", Notification.Type.SUCCESS)
-          // showNotification("测试消息3",Notification.Type.ERROR,2000)
+        //  showNotification("测试消息")
+        //  showNotification("测试消息2", Notification.Type.SUCCESS)
+        // showNotification("测试消息3",Notification.Type.ERROR,2000)
 
 
-           showMessage("showMessage")
+        showMessage("showMessage")
     }
 
     fun msgTest() {
@@ -84,7 +84,7 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
         showNotification("测试消息3", Notification.Type.ERROR, 2000)
         showNotification("测试消息")
         showNotification("测试消息2", Notification.Type.SUCCESS)
-          showNotification("测试消息3",Notification.Type.ERROR,2000)
+        showNotification("测试消息3", Notification.Type.ERROR, 2000)
 
 
         showMessage("showMessage")

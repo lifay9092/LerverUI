@@ -20,16 +20,18 @@ class RadioElement<T : Any, R : Any>(
     property: KMutableProperty1<T, R?>?,
     customProp: DelegateProp<T, R>?,
     private var items: List<R>,
-    required: Boolean
-) : FormElement<T, R>(r, label, required = required) {
+    required: Boolean,
+    initValue: R? = null
+) : FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
     init {
         super.property2 = property2
         super.property = property
         super.customProp = customProp
         super.tc = t
-        graphic().addItems(items.map { it.toString() }.toList())
         init()
+        graphic().addItems(items.map { it.toString() }.toList())
+
     }
 
     companion object {
@@ -37,24 +39,27 @@ class RadioElement<T : Any, R : Any>(
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R>,
-            items: List<R>
-        ) = RadioElement(T::class, R::class.java, label, property, null, null, items, true)
+            items: List<R>,
+            initValue: R? = null
+        ) = RadioElement(T::class, R::class.java, label, property, null, null, items, true, initValue)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
             items: List<R>,
-            required: Boolean = false
-        ) = RadioElement(T::class, R::class.java, label, null, property, null, items, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = RadioElement(T::class, R::class.java, label, null, property, null, items, required, initValue)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
             items: List<R>,
-            required: Boolean = false
-        ) = RadioElement(T::class, R::class.java, label, null, null, customProp, items, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = RadioElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue)
     }
 
 
@@ -63,10 +68,11 @@ class RadioElement<T : Any, R : Any>(
     }
 
     override fun graphic(): RadioGroup {
-        return graphic as RadioGroup
+        //  println("node:$node")
+        return node as RadioGroup
     }
 
-    override fun get(): R? {
+    override fun getElementValue(): R? {
         val text = graphic().text
         if (text.isBlank()) {
             return null
@@ -74,7 +80,7 @@ class RadioElement<T : Any, R : Any>(
         return graphic().text as R
     }
 
-    override fun set(v: R?) {
+    override fun setElementValue(v: R?) {
         graphic().text = (v ?: defaultValue()).toString()
     }
 

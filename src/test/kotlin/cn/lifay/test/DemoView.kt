@@ -163,20 +163,21 @@ class DemoView : Initializable {
     }
 
     fun treeTestAdd1(actionEvent: ActionEvent) {
-        rootTreeItem.children[0].AddChild(TreeTestVO("add1","5","add1", SimpleStringProperty("add1")))
+        rootTreeItem.children[0].AddChild(TreeTestVO("add1", "5", "add1", SimpleStringProperty("add1")))
     }
 
     fun treeTestAdd2(actionEvent: ActionEvent) {
-        rootTreeItem.children[0].AddChildrenList(listOf(TreeTestVO("add2","6","add2", SimpleStringProperty("add2"))))
+        rootTreeItem.children[0].AddChildrenList(listOf(TreeTestVO("add2", "6", "add2", SimpleStringProperty("add2"))))
     }
 
     fun treeTestUpt(actionEvent: ActionEvent) {
-        rootTreeItem.children[0].UpdateItem(TreeTestVO("修改测试","5","修改测试", SimpleStringProperty("修改测试")))
+        rootTreeItem.children[0].UpdateItem(TreeTestVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
     }
 
     fun treeTestDel1(actionEvent: ActionEvent) {
         rootTreeItem.children[0].DeleteThis()
     }
+
     fun treeTestDel2(actionEvent: ActionEvent) {
         rootTreeItem.DeleteChildItem { it.id == "4" }
 

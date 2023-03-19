@@ -52,21 +52,25 @@ primaryStage.show()
 
 **二.表单视图**
 
->自动组合表单元素和基础操作功能
->>定义
+> 自动组合表单元素和基础操作功能
+>> 定义
+
 ```kotlin
 class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t) {}
 ```
 
->>构建元素 
+> > 构建元素
 
 buildElements()
+元素跟字段数量、顺序一致
+java.lang.IllegalArgumentException: argument type mismatch
 
->>所有数据业务操作  
+
+> > 所有数据业务操作
 
 datas()
 
->>保存数据业务操作  
+> > 保存数据业务操作
 
 saveData()
 
@@ -126,7 +130,7 @@ val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
 **四.样式按钮**
 >必须先开启ElementUI
 
-styleClass分别对应 `button button-pramary button-success button-info button-warning button-danger`![image-20201014164041215](doc/image-20201014164041215.png)
+styleClass分别对应 `button button-primary button-success button-info button-warning button-danger`![image-20201014164041215](doc/image-20201014164041215.png)
 
 ```xml
 <Button fx:id="viewBatchBtn" mnemonicParsing="false" onAction="#viewBatch" prefHeight="31.0"

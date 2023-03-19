@@ -1,4 +1,3 @@
-
 package cn.lifay;
 
 import javafx.application.Application;

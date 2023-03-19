@@ -20,9 +20,10 @@ class CheckElement<T : Any, R : Any>(
     property2: KMutableProperty1<T, R>?,
     property: KMutableProperty1<T, R?>?,
     customProp: DelegateProp<T, R>?,
-    required: Boolean
+    required: Boolean,
+    initValue: R? = null
 ) :
-    FormElement<T, R>(r, label, required = required) {
+    FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
     init {
         super.property2 = property2
@@ -37,22 +38,25 @@ class CheckElement<T : Any, R : Any>(
         /*注入 property 返回值不为空 对应var 没有? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
-            property: KMutableProperty1<T, R>
-        ) = CheckElement(T::class, R::class.java, label, property, null, null, true)
+            property: KMutableProperty1<T, R>,
+            initValue: R? = null
+        ) = CheckElement(T::class, R::class.java, label, property, null, null, true, initValue)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
-            required: Boolean = false
-        ) = CheckElement(T::class, R::class.java, label, null, property, null, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = CheckElement(T::class, R::class.java, label, null, property, null, required, initValue)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
-            required: Boolean = false
-        ) = CheckElement(T::class, R::class.java, label, null, null, customProp, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = CheckElement(T::class, R::class.java, label, null, null, customProp, required, initValue)
 
     }
 
@@ -61,14 +65,14 @@ class CheckElement<T : Any, R : Any>(
     }
 
     override fun graphic(): CheckBox {
-        return (graphic as CheckBox)
+        return (node as CheckBox)
     }
 
-    override fun get(): R {
+    override fun getElementValue(): R {
         return convert(graphic().isSelected)
     }
 
-    override fun set(v: R?) {
+    override fun setElementValue(v: R?) {
 
         graphic().isSelected = convert(v)
     }

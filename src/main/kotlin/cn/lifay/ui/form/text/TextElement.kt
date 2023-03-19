@@ -27,15 +27,23 @@ class TextElement<T : Any, R : Any> constructor(
     customProp: DelegateProp<T, R>?,
     primary: Boolean = false,
     required: Boolean = false,
-    private var isTextArea: Boolean = false
+    var isTextArea: Boolean = false,
+    var isTextDisable: Boolean = false,
+    initValue: R? = null
 ) :
-    FormElement<T, R>(r, label, primary, required) {
+    FormElement<T, R>(r, label, primary, required, initValue) {
+
+    var _isTextArea = isTextArea
+    var _isDisable = isTextDisable
 
     init {
+        //   println("TextElement init")
         super.property2 = property2
         super.property = property
         super.customProp = customProp
         super.tc = t
+        //  println("$label isTextArea:${_isTextArea}")
+        // this._isTextArea = isTextArea
         init()
     }
 
@@ -46,8 +54,22 @@ class TextElement<T : Any, R : Any> constructor(
             label: String,
             property: KMutableProperty1<T, R>,
             primary: Boolean = false,
-            isTextArea: Boolean = false
-        ) = TextElement(T::class, R::class.java, label, property, null, null, primary, true, isTextArea)
+            isTextArea: Boolean = false,
+            isDisable: Boolean = false,
+            initValue: R? = null
+        ) = TextElement(
+            T::class,
+            R::class.java,
+            label,
+            property,
+            null,
+            null,
+            primary,
+            true,
+            isTextArea,
+            isDisable,
+            initValue
+        )
 
         /*注入 property 返回值不为空 对应var ? */
         @JvmOverloads
@@ -57,8 +79,22 @@ class TextElement<T : Any, R : Any> constructor(
             property: KMutableProperty1<T, R?>,
             required: Boolean = false,
             primary: Boolean = false,
-            isTextArea: Boolean = false
-        ) = TextElement(T::class, R::class.java, label, null, property, null, primary, required, isTextArea)
+            isTextArea: Boolean = false,
+            isDisable: Boolean = false,
+            initValue: R? = null
+        ) = TextElement(
+            T::class,
+            R::class.java,
+            label,
+            null,
+            property,
+            null,
+            primary,
+            required,
+            isTextArea,
+            isDisable,
+            initValue
+        )
 
         /*注入 customProp javabean */
         @JvmOverloads
@@ -68,13 +104,28 @@ class TextElement<T : Any, R : Any> constructor(
             customProp: DelegateProp<T, R>,
             required: Boolean = false,
             primary: Boolean = false,
-            isTextArea: Boolean = false
-        ) = TextElement(T::class, R::class.java, label, null, null, customProp, primary, required, isTextArea)
+            isTextArea: Boolean = false,
+            isDisable: Boolean = false,
+            initValue: R? = null
+        ) = TextElement(
+            T::class,
+            R::class.java,
+            label,
+            null,
+            null,
+            customProp,
+            primary,
+            required,
+            isTextArea,
+            isDisable,
+            initValue
+        )
 
     }
 
     override fun registerGraphic(): Node {
-        return if (isTextArea) {
+        //  println("$label registerGraphic isTextArea:${_isTextArea}")
+        val node = if (_isTextArea) {
             val textArea = TextArea()
             textArea.isWrapText = false
             textArea
@@ -82,13 +133,16 @@ class TextElement<T : Any, R : Any> constructor(
             val textField = TextField()
             textField
         }
+        node.isDisable = _isDisable
+        return node
     }
 
     override fun graphic(): TextInputControl {
-        return graphic as TextInputControl
+        //  println("$label graphic isTextArea:${_isTextArea}")
+        return node as TextInputControl
     }
 
-    override fun get(): R? {
+    override fun getElementValue(): R? {
         val text = graphic().text
         if (text.isBlank()) {
             return null
@@ -120,9 +174,9 @@ class TextElement<T : Any, R : Any> constructor(
         } as R?
     }
 
-    override fun set(v: R?) {
+    override fun setElementValue(v: R?) {
         if (v == null) {
-            graphic().text = defaultValue?.toString() ?: defaultValue as String
+            graphic().text = defaultValue().toString()
         } else {
             graphic().text = v.toString()
         }
@@ -130,18 +184,18 @@ class TextElement<T : Any, R : Any> constructor(
 
     override fun clear() {
         platformRun {
-            when (graphic) {
+            when (node) {
                 is TextField -> {
-                    graphic.clear()
+                    (node as TextField).clear()
                     if (primary) {
-                        graphic.setDisable(false)
+                        node.setDisable(false)
                     }
                 }
 
                 is TextArea -> {
-                    graphic.clear()
+                    (node as TextArea).clear()
                     if (primary) {
-                        graphic.setDisable(false)
+                        node.setDisable(false)
                     }
                 }
 
@@ -154,10 +208,10 @@ class TextElement<T : Any, R : Any> constructor(
     override fun verify(): Boolean {
         if (graphic().text.isBlank()) {
 //            graphic!!.borderColor("red")
-            graphic!!.borderColor(Color.PINK)
+            node!!.borderColor(Color.PINK)
             return false
         }
-        graphic!!.style = null
+        node!!.style = null
         return true
     }
 

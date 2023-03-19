@@ -21,9 +21,10 @@ class SelectElement<T : Any, R : Any> constructor(
     property: KMutableProperty1<T, R?>?,
     customProp: DelegateProp<T, R>?,
     items: Collection<R?>,
-    required: Boolean = false
+    required: Boolean = false,
+    initValue: R? = null
 ) :
-    FormElement<T, R>(r, label, required = required) {
+    FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
     init {
         super.property2 = property2
@@ -41,23 +42,26 @@ class SelectElement<T : Any, R : Any> constructor(
             label: String,
             property: KMutableProperty1<T, R>,
             items: Collection<R?>,
-        ) = SelectElement(T::class, R::class.java, label, property, null, null, items, false)
+            initValue: R? = null
+        ) = SelectElement(T::class, R::class.java, label, property, null, null, items, false, initValue)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
             items: Collection<R?>,
-            required: Boolean = false
-        ) = SelectElement(T::class, R::class.java, label, null, property, null, items, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = SelectElement(T::class, R::class.java, label, null, property, null, items, required, initValue)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
             items: Collection<R?>,
-            required: Boolean = false
-        ) = SelectElement(T::class, R::class.java, label, null, null, customProp, items, required)
+            required: Boolean = false,
+            initValue: R? = null
+        ) = SelectElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue)
 
     }
 
@@ -69,14 +73,14 @@ class SelectElement<T : Any, R : Any> constructor(
     }
 
     override fun graphic(): ChoiceBox<*> {
-        return graphic as ChoiceBox<*>
+        return node as ChoiceBox<*>
     }
 
-    override fun get(): R? {
+    override fun getElementValue(): R? {
         return graphic().value as R?
     }
 
-    override fun set(v: R?) {
+    override fun setElementValue(v: R?) {
         graphic().value = v
     }
 
@@ -93,7 +97,7 @@ class SelectElement<T : Any, R : Any> constructor(
     }
 
     fun loadItems(items: Collection<R?>) {
-        val choiceBox = graphic as ChoiceBox<R>
+        val choiceBox = node as ChoiceBox<R>
         choiceBox.items.clear()
         choiceBox.items.addAll(items)
     }

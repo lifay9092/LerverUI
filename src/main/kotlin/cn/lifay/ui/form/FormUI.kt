@@ -12,10 +12,7 @@ import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.Button
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableRow
-import javafx.scene.control.TableView
+import javafx.scene.control.*
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -53,7 +50,7 @@ import kotlin.reflect.full.primaryConstructor
  * ```
  *@author lifay
  **/
-abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
+abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<FormElement<T, *>>) : BaseView<VBox>() {
 
     protected var entity: T? = null
     private val stage = Stage().bindEscKey()
@@ -66,10 +63,16 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     protected var delBtn: Button = Button("删除").styleDanger()
     protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
-
     private fun FormUI() {}
 
     init {
+        println("FormUI init")
+
+        val elementList: List<FormElement<T, *>> = buildElements()
+        if (elementList.isEmpty()) {
+            throw LerverUIException("未获取到有效表单元素!")
+        }
+        elements.addAll(elementList)
         try {
             uiInit(title)
             if (t == null) {
@@ -135,9 +138,13 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
             setRowFactory {
                 val row = TableRow<T>()
                 row.setOnMouseClicked { event ->
-                    if (event.clickCount == 2) {
-                        refreshForm(row.item)
+                    val item = row.item
+                    if (item != null) {
+                        if (event.clickCount == 2) {
+                            refreshForm(item)
+                        }
                     }
+
                 }
                 return@setRowFactory row
             }
@@ -173,15 +180,12 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
      */
     private fun initElements() {
         /*网格布局：元素*/
-        val elementList: List<FormElement<T, *>> = buildElements()
-        if (elementList.isEmpty()) {
-            throw LerverUIException("未获取到有效表单元素!")
-        }
-        elements.addAll(elementList)
+        //设置初始值
+        initValue()
         //网格布局 算法 前提：纵向数量<=横向数量
         var h = 0
         var v = 0
-        val size = elementList.size
+        val size = elements.size
         //System.out.println("元素数量:" + size);
         val s = Math.sqrt(size.toDouble()) //开根号
         if (s.toInt().toDouble() == s) {
@@ -194,33 +198,47 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         //System.out.println("横向数量="+h + " 竖向数量=" + v);
         //布局表单元素 0 0 ,1 0,01
         var elementIndex = 0
+//        var tx :Int? = null
+//        var ty :Int? = null
         for (x in 0 until h) {
             for (y in 0 until v) {
                 //System.out.println("x="+x + " y=" + y);
+//                if (tx != null && ty != null && tx == x && ty == y) {
+//                     tx = null
+//                     ty  = null
+//                    continue
+//                }
                 val element: FormElement<T, *> = elements[elementIndex]
                 GridPane.setHalignment(element, HPos.LEFT)
-                form.add(element, y, x)
+                if (element.graphic() is TextArea) {
+                    form.addRow(x, element)
+//                    tx = x
+//                    ty = y
+                } else {
+                    form.add(element, y, x)
+                }
                 elementIndex++
                 if (elementIndex == size) {
                     break
                 }
             }
         }
-        form.add(btnGroup, Math.round((h / 2).toFloat()), v)
+        //form.add(btnGroup, Math.round((h / 2).toFloat()), v)
+        form.add(btnGroup, v - 1, h)
         //布局按钮组
         btnGroup.alignment = Pos.BOTTOM_RIGHT
         btnGroup.spacing = 20.0
         btnGroup.padding = Insets(20.0)
         btnGroup.children.addAll(saveBtn, editBtn, delBtn, clearBtn)
         //pane.getChildren().add(btnGroup);
-        //保存
+        //新增
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
                 asyncTaskLoading(stage, "保存中") {
                     try {
                         saveBtn.isDisable = true
                         //检查
-                        if (!checkElementValue()) {
+                        if (!checkElementValue(true)) {
                             return@asyncTaskLoading
                         }
                         //从元素赋值到实例
@@ -311,8 +329,12 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         }
     }
 
-    private fun checkElementValue(): Boolean {
+    private fun checkElementValue(addFlag: Boolean = false): Boolean {
         for (element in elements) {
+            //如果是新增且为主键，则跳过
+            if (addFlag && element.primary) {
+                continue
+            }
             if (!element.checkRequired()) {
                 return false
             }
@@ -320,14 +342,26 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         return true
     }
 
+    protected fun initValue() {
+        elements.forEach { it.initValue() }
+    }
+
     private fun clear() {
-        elements.forEach(Consumer { obj: FormElement<T, *> -> platformRun { obj.clear() } })
+        elements.forEach(Consumer { obj: FormElement<T, *> ->
+            platformRun {
+                if (obj.initValue != null) {
+                    obj.initValue()
+                } else {
+                    obj.clear()
+                }
+            }
+        })
     }
 
     private fun getPrimaryValue(): Any? {
         for (element in elements) {
             if (element.primary) {
-                return element.elementValue
+                return element.getElementValue()
             }
         }
         return null
@@ -342,7 +376,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private fun elementToProp() {
         try {
             for (element in elements) {
-                element.setProp(entity!!)
+                element.eleToProp(entity!!)
             }
         } catch (e: NoSuchFieldException) {
             throw RuntimeException(e)
@@ -360,7 +394,7 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
     private fun propToElement() {
         try {
             for (element in elements) {
-                element.setEle(this.entity!!)
+                element.propToEle(this.entity!!)
                 if (element.primary) {
                     element.disable()
                 }
@@ -371,10 +405,11 @@ abstract class FormUI<T : Any>(title: String, t: T?) : BaseView<VBox>() {
         }
     }
 
+    /*    */
     /**
      * 构建表单元素
-     */
-    abstract fun buildElements(): List<FormElement<T, *>>
+     *//*
+    abstract fun buildElements(): List<FormElement<T, *>>*/
 
     /**
      * 构建表单元素
