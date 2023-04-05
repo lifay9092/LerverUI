@@ -37,20 +37,6 @@ abstract class FormElement<T : Any, R : Any>(
     var customProp: DelegateProp<T, R>? = null
     var tc: KClass<T>? = null
 
-    /*
-        var elementValue: R?
-            get() {
-                val v = get()
-                if (v == null && defaultValue != null) {
-                    return defaultValue
-                }
-                return v
-            }
-            set(value) {
-                set(value)
-            }
-    */
-
     fun init() {
         //  println("$label FormElement init")
         alignment = Pos.CENTER_LEFT

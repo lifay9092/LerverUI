@@ -4,6 +4,7 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
+import cn.lifay.ui.form.btn.CustomButton
 import cn.lifay.ui.message.Message
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
@@ -50,7 +51,12 @@ import kotlin.reflect.full.primaryConstructor
  * ```
  *@author lifay
  **/
-abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<FormElement<T, *>>) : BaseView<VBox>() {
+abstract class FormUI<T : Any>(
+    title: String,
+    initDefaultEntity: T? = null,
+    buildElements: () -> List<FormElement<T, *>>,
+    vararg customButtons: CustomButton<T>
+) : BaseView<VBox>() {
 
     protected var entity: T? = null
     private val stage = Stage().bindEscKey()
@@ -58,29 +64,32 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
     private val form = GridPane()
     private val table = TableView<T>()
     protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected var saveBtn: Button = Button("新增").stylePrimary()
-    protected var editBtn: Button = Button("修改").styleInfo()
+    protected var saveBtn: Button = Button("保存").stylePrimary()
+
+    //    protected var editBtn: Button = Button("修改").styleInfo()
     protected var delBtn: Button = Button("删除").styleDanger()
     protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
+    protected var customButtons: Array<out CustomButton<T>>? = null
     private fun FormUI() {}
 
     init {
-        println("FormUI init")
+        // println("FormUI init")
 
         val elementList: List<FormElement<T, *>> = buildElements()
         if (elementList.isEmpty()) {
             throw LerverUIException("未获取到有效表单元素!")
         }
+        this.customButtons = customButtons
         elements.addAll(elementList)
         try {
             uiInit(title)
-            if (t == null) {
+            if (initDefaultEntity == null) {
                 val tc = elements[0].tc
                 val args = getElementInitValue()
                 this.entity = tc!!.primaryConstructor!!.call(*args)
             } else {
-                refreshForm(t)
+                refreshForm(initDefaultEntity)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -229,16 +238,24 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
         btnGroup.alignment = Pos.BOTTOM_RIGHT
         btnGroup.spacing = 20.0
         btnGroup.padding = Insets(20.0)
-        btnGroup.children.addAll(saveBtn, editBtn, delBtn, clearBtn)
+        btnGroup.children.addAll(saveBtn, delBtn, clearBtn)
+        if (customButtons != null) {
+            customButtons!!.forEach { customButton ->
+                customButton.btn.setOnAction {
+                    entity?.let { it1 -> customButton.actionFunc(it1) }
+                }
+                btnGroup.children.addAll(customButton.btn)
+            }
+        }
         //pane.getChildren().add(btnGroup);
-        //新增
+        //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
                 asyncTaskLoading(stage, "保存中") {
                     try {
                         saveBtn.isDisable = true
                         //检查
-                        if (!checkElementValue(true)) {
+                        if (!checkElementValue()) {
                             return@asyncTaskLoading
                         }
                         //从元素赋值到实例
@@ -252,34 +269,6 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
                         showMessage("保存失败:" + e.message, Message.Type.ERROR)
                     } finally {
                         saveBtn.isDisable = false
-                    }
-                }
-            }
-        }
-        //编辑
-        editBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(stage) {
-                    try {
-                        editBtn.isDisable = true
-                        //检查
-                        if (!checkElementValue()) {
-                            return@asyncTaskLoading
-                        }
-                        //从元素赋值到实例
-                        elementToProp()
-                        //获取主键值
-                        val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
-                        checkPrimaryValue(idValue)
-                        //执行保存操作
-                        editData(entity)
-                        showMessage("编辑成功", Message.Type.SUCCESS)
-                        refreshTable()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showMessage("编辑失败:" + e.message, Message.Type.ERROR)
-                    } finally {
-                        editBtn.isDisable = false
                     }
                 }
             }
@@ -329,10 +318,9 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
         }
     }
 
-    private fun checkElementValue(addFlag: Boolean = false): Boolean {
+    private fun checkElementValue(): Boolean {
         for (element in elements) {
-            //如果是新增且为主键，则跳过
-            if (addFlag && element.primary) {
+            if (element.primary) {
                 continue
             }
             if (!element.checkRequired()) {
@@ -395,9 +383,9 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
         try {
             for (element in elements) {
                 element.propToEle(this.entity!!)
-                if (element.primary) {
+                /*if (element.primary) {
                     element.disable()
-                }
+                }*/
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -420,11 +408,6 @@ abstract class FormUI<T : Any>(title: String, t: T?, buildElements: () -> List<F
      * 保存数据
      */
     abstract fun saveData(entity: T?)
-
-    /**
-     * 编辑数据
-     */
-    abstract fun editData(entity: T?)
 
     /**
      * 删除数据

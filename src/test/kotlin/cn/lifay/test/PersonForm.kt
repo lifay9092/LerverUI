@@ -36,11 +36,6 @@ class PersonForm(t: Person? = null) : FormUI<Person>("人", t, {
 
     }
 
-    override fun editData(t: Person?) {
-        println(t)
-
-    }
-
     override fun saveData(t: Person?) {
         println(t)
     }

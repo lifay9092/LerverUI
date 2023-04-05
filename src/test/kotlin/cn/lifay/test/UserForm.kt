@@ -1,10 +1,13 @@
 package cn.lifay.test
 
+import cn.lifay.extension.styleWarn
 import cn.lifay.ui.form.FormUI
+import cn.lifay.ui.form.btn.CustomButton
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextElement
+import javafx.scene.control.Button
 
 /**
  *@ClassName UserNewForm
@@ -19,6 +22,8 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildE
     val child = CheckElement("是否未成年:", UserData::child)
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
     listOf(id, name, type, child, sex);
+}, CustomButton(Button("测试自定义按钮").styleWarn()) {
+    println(it)
 }) {
     //    constructor(title: String,t: UserData?):this(title){
 //        if (t != null) {
@@ -35,13 +40,6 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildE
         println("保存数据操作:$data")
 //        showMessage("保存数据操作:$data",1000)
         showNotification("保存数据操作:$data")
-    }
-
-    override fun editData(data: UserData?) {
-        if (data!!.id == null) {
-            throw RuntimeException("主键值不能为空!")
-        }
-        println("修改数据操作:$data")
     }
 
     override fun delData(primaryValue: Any?) {
