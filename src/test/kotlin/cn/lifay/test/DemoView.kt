@@ -10,10 +10,7 @@ import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableView
-import javafx.scene.control.TreeItem
-import javafx.scene.control.TreeView
+import javafx.scene.control.*
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
@@ -28,6 +25,9 @@ import java.util.*
  * @Date 2023/1/9 16:14
  */
 class DemoView : Initializable {
+    @FXML
+    var keywordText = TextField()
+
     @FXML
     lateinit var rootPane: AnchorPane
 
@@ -72,8 +72,16 @@ class DemoView : Initializable {
         treeView.apply {
             root = rootTreeItem
             isShowRoot = true
-            Register(TreeTestVO::id, TreeTestVO::parentId, listOf(test1, test2, test3))
+            Register(TreeTestVO::id, TreeTestVO::parentId,true){
+                listOf(test1, test2, test3)
+            }
 //            rootProperty().bind(rootItemProperties)
+        }
+        keywordText.textProperty().addListener { observableValue, s, s2 ->
+            if (s2.isNullOrBlank()) {
+                return@addListener
+            }
+            treeView.RefreshTree<TreeTestVO,String>(keyword = s2)
         }
         tableView.apply {
             isEditable = true
@@ -163,7 +171,7 @@ class DemoView : Initializable {
     }
 
     fun treeTestAdd1(actionEvent: ActionEvent) {
-        rootTreeItem.children[0].AddChild(TreeTestVO("add1", "5", "add1", SimpleStringProperty("add1")))
+        rootTreeItem.children[0].AddChildren(TreeTestVO("add1", "5", "add1", SimpleStringProperty("add1")))
     }
 
     fun treeTestAdd2(actionEvent: ActionEvent) {

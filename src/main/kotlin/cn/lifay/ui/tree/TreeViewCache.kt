@@ -1,9 +1,12 @@
 package cn.lifay.ui.tree
 
 import cn.lifay.ui.tree.TreeViewCache.DATA_TYPE
+import cn.lifay.ui.tree.TreeViewCache.ITEM_KEYWORD_MAP
 import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.ui.tree.TreeViewCache.LIST_HELP_MAP
+import cn.lifay.ui.tree.TreeViewCache.TREE_DATA_CALL_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_HELP_MAP
+import cn.lifay.ui.tree.TreeViewCache.TREE_IMG_CALL_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_TO_ITEM_MAP
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
@@ -11,6 +14,8 @@ import kotlin.reflect.KProperty1
 
 object TreeViewCache {
 
+    val TREE_DATA_CALL_MAP = HashMap<String,() -> List<*>>()
+    val TREE_IMG_CALL_MAP = HashMap<String,(TreeItem<*>) -> Unit>()
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
     val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
     var DATA_TYPE = DataType.LIST
@@ -22,14 +27,24 @@ object TreeViewCache {
 
     val ITEM_TO_TREE_MAP = HashMap<Int, String>()
     val TREE_TO_ITEM_MAP = HashMap<String, ArrayList<Int>>()
+
+    val ITEM_KEYWORD_MAP = HashMap<Int, String>()
+
 }
+
 /*树视图部分*/
 
+/**
+ * 获取 TreeView 的自定义树id
+ */
 val <T> TreeView<T>.treeId: String
     get() {
         return this.hashCode().toString()
     }
 
+/**
+ * 获取 TreeItem 的自定义树id
+ */
 var <T> TreeItem<T>.treeViewId: String
     get() {
         return ITEM_TO_TREE_MAP[this.hashCode()]!!
@@ -44,38 +59,113 @@ var <T> TreeItem<T>.treeViewId: String
         TREE_TO_ITEM_MAP[value] = ints
     }
 
+/**
+ * 获取 TreeItem 的自定义树id
+ */
+var <T> TreeItem<T>.keywordStr: String
+    get() {
+        return ITEM_KEYWORD_MAP[this.hashCode()]!!
+    }
+    set(value) {
+        println(this.hashCode())
+        ITEM_KEYWORD_MAP[this.hashCode()] = value
+    }
+
 
 /**
- * 通过集合类型的数据源，注册当前TreeView视图,初始化树结构
+ * 通过集合类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
  */
 @JvmName("RegisterByList")
-inline fun <reified V : Any, B : Any> TreeView<V>.Register(
+inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     parentProp: KProperty1<V, B>,
-    datas: List<V>
+    init : Boolean = false,
+    noinline imgCall :((TreeItem<V>) -> Unit)? = null,
+    noinline getInitDataCall: () -> List<V>
 ) {
     //添加到缓存
     this.root.treeViewId = treeId
     DATA_TYPE = TreeViewCache.DataType.LIST
     LIST_HELP_MAP[treeId] = Pair(idProp, parentProp)
-    initList<V, B>(this.root, ListProps(), datas)
+    TREE_DATA_CALL_MAP[treeId] = getInitDataCall
+    imgCall?.let {
+        TREE_IMG_CALL_MAP[treeId] = it as (TreeItem<*>) -> Unit
+    }
+    if (init) {
+        RefreshTree<V,B>()
+    }
 }
 
 /**
- * 通过树类型的数据源，注册当前TreeView视图,初始化树结构
+ * 通过树类型的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
  */
 @JvmName("RegisterByTree")
-inline fun <reified V : Any, B : Any> TreeView<V>.Register(
+inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
-    datas: List<V>
+    init : Boolean = false,
+    noinline getInitDataCall: () -> List<V>
 ) {
     DATA_TYPE = TreeViewCache.DataType.TREE
     TREE_HELP_MAP[treeId] = Pair(idProp, childrenProp)
-    initTree(this.root, idProp, childrenProp, datas)
+    TREE_DATA_CALL_MAP[treeId] = getInitDataCall
+
+    if (init) {
+        RefreshTree<V,B>()
+    }
 }
 
-inline fun <reified V, B> TreeView<V>.ListProps(): Pair<KProperty1<V, B>, KProperty1<V, B>> {
+/**
+ * 根据注册的[获取数据的函数],获取基础数据
+ */
+inline fun <reified V : Any> TreeView<V>.initDatas(): List<V> {
+    return TREE_DATA_CALL_MAP[treeId]!!.invoke() as List<V>
+}
+
+/**
+ * 刷新元素列表,可传入指定元素列表，默认为初始化元素列表
+ */
+inline fun <reified V: Any, reified B: Any> TreeView<V>.RefreshTree(
+    noinline getInitDataCall: (() -> List<V>)? = null,
+    keyword: String? = null
+) {
+    //println("RefreshTree")
+    if (getInitDataCall != null) {
+        TREE_DATA_CALL_MAP[treeId] = getInitDataCall
+    }
+    val datas = initDatas()
+    //清除旧item的数据和缓存
+    this.root.children.clear()
+    clearTreeItemMap(treeId)
+    val imgCall = TREE_IMG_CALL_MAP[treeId]
+    //重载
+    if (DATA_TYPE == TreeViewCache.DataType.LIST) {
+        val prop = listProps<V, B>()
+        initList(this.root, prop, datas,keyword,imgCall)
+    } else {
+        val props = treeProps<V, B>()
+        val childtren = datas.map {
+            val item = TreeItem(it)
+            item.treeViewId = treeId
+            initTree(item, props.first, props.second,keyword,imgCall)
+            item
+        }.filter {
+            if (keyword.isNullOrBlank()){
+                return@filter true
+            }
+            if (it.value.toString().contains(keyword)) {
+                return@filter true
+            }
+            it.children.isNotEmpty()
+        }
+        //添加子节点
+        if (childtren.isNotEmpty()) {
+            this.root.children.addAll(childtren)
+        }
+    }
+}
+
+inline fun <reified V, B> TreeView<V>.listProps(): Pair<KProperty1<V, B>, KProperty1<V, B>> {
     return LIST_HELP_MAP[treeId] as Pair<KProperty1<V, B>, KProperty1<V, B>>
 }
 
@@ -85,68 +175,43 @@ inline fun <reified V, B> TreeView<V>.ListProps(): Pair<KProperty1<V, B>, KPrope
 fun <V, B> TreeView<V>.initList(
     panTreeItem: TreeItem<V>,
     prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
-    datas: List<V>
+    datas: List<V>,
+    keyword: String?,
+    imgCall: ((TreeItem<*>) -> Unit)?
 ) {
     //获取子节点
-    val childtren = datas.filter { prop.first.get(panTreeItem.value!!) == prop.second.get(it) }.map {
-        val item = TreeItem(it)
-        item.treeViewId = treeId
-        initList(item, prop, datas)
-        item
-    }
+    val childtren = datas
+        .filter { prop.first.get(panTreeItem.value!!) == prop.second.get(it) }
+        .map {
+            val item = TreeItem(it)
+            item.treeViewId = treeId
+            if (imgCall != null) {
+                imgCall(item)
+            }
+            initList(item, prop, datas, keyword, imgCall)
+            item
+    }.filter {
+            if (keyword.isNullOrBlank()){
+                return@filter true
+            }
+            if (it.value.toString().contains(keyword)) {
+                return@filter true
+            }
+             it.children.isNotEmpty()
+        }
     //添加子节点
     if (childtren.isNotEmpty()) {
         panTreeItem.children.addAll(childtren)
-    }
-}
-
-/**
- * 刷新元素列表
- */
-inline fun <reified V, reified B> TreeView<V>.RefreshTree(
-    datas: List<V>
-) {
-    //println("RefreshTree")
-    //清除旧数据和缓存
-    this.root.children.clear()
-    clearTreeIdMap(treeId)
-    //重载
-    if (DATA_TYPE == TreeViewCache.DataType.LIST) {
-        val prop = ListProps<V, B>()
-        //获取子节点
-        val childtren = datas.filter { prop.first.get(this.root.value!!) == prop.second.get(it) }.map {
-            val item = TreeItem(it)
-            initList(item, prop, datas)
-            item
-        }
-        //添加子节点
-        if (childtren.isNotEmpty()) {
-            this.root.children.addAll(childtren)
-        }
+//        //添加到关键字缓存
+//        panTreeItem.keywordStr =
+//            panTreeItem.value.toString() + "[" + childtren.map { it.value.toString() }.joinToString(",") + "]"
     } else {
-        val props = TreeProps<V, B>()
-        //获取子节点
-        val childtren = datas.map {
-            val item = TreeItem(it)
-            initTree(item, props.first, props.second, props.second.get(it))
-            item
-        }
-        //添加子节点
-        if (childtren.isNotEmpty()) {
-            this.root.children.addAll(childtren)
-        }
+        //添加到关键字缓存
+       // panTreeItem.keywordStr = panTreeItem.value.toString()
     }
-
 }
 
-fun clearTreeIdMap(treeId: String) {
-    TREE_TO_ITEM_MAP[treeId]?.forEach {
-        ITEM_TO_TREE_MAP.remove(it)
-    }
-    TREE_TO_ITEM_MAP.remove(treeId)
-}
-
-inline fun <reified V, reified B> TreeView<V>.TreeProps(): Pair<KProperty1<V, B>, KProperty1<V, List<V>>> {
+inline fun <reified V, reified B> TreeView<V>.treeProps(): Pair<KProperty1<V, B>, KProperty1<V, List<V>>> {
     return TREE_HELP_MAP[treeId] as Pair<KProperty1<V, B>, KProperty1<V, List<V>>>
 }
 
@@ -157,13 +222,27 @@ fun <V, B> TreeView<V>.initTree(
     panTreeItem: TreeItem<V>,
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
-    datas: List<V>
+    keyword: String?,
+    imgCall: ((TreeItem<*>) -> Unit)?
 ) {
     //获取子节点
+    val datas = childrenProp.get(panTreeItem.value)
     val childtren = datas.map {
         val item = TreeItem(it)
-        initTree(item, idProp, childrenProp, childrenProp.get(it))
+        item.treeViewId = panTreeItem.treeViewId
+        if (imgCall != null) {
+            imgCall(item)
+        }
+        initTree(item, idProp, childrenProp, keyword, imgCall)
         item
+    }.filter {
+        if (keyword.isNullOrBlank()){
+            return@filter true
+        }
+        if (it.value.toString().contains(keyword)) {
+            return@filter true
+        }
+        it.children.isNotEmpty()
     }
     //添加子节点
     if (childtren.isNotEmpty()) {
@@ -171,32 +250,35 @@ fun <V, B> TreeView<V>.initTree(
     }
 }
 
+/**
+ * 清理TreeView的缓存数据，窗口关闭的时候回调此方法
+ */
 fun <V> TreeView<V>.ClearCache() {
+    clearTreeViewMap(treeId)
+    clearTreeItemMap(treeId)
+}
+
+fun clearTreeViewMap(treeId: String) {
     LIST_HELP_MAP[treeId].let {
         LIST_HELP_MAP.remove(treeId)
     }
     TREE_HELP_MAP[treeId].let {
         TREE_HELP_MAP.remove(treeId)
     }
-    clearTreeIdMap(treeId)
+    TREE_DATA_CALL_MAP.remove(treeId)
+    TREE_IMG_CALL_MAP.remove(treeId)
+}
+
+fun clearTreeItemMap(treeId: String) {
+    TREE_TO_ITEM_MAP[treeId]?.forEach {
+        ITEM_TO_TREE_MAP.remove(it)
+        ITEM_KEYWORD_MAP.remove(it)
+    }
+    TREE_TO_ITEM_MAP.remove(treeId)
 }
 
 /**
- * item添加子元素
- */
-fun <V> TreeItem<V>.AddChild(
-    data: V
-) {
-    //获取子节点
-    val child = TreeItem(data)
-    //添加子节点
-    children.add(child)
-
-    this.isExpanded = true
-}
-
-/**
- * item添加子元素
+ * 更新item下的子元素
  */
 fun <V : Any> TreeItem<V>.UpdateChild(
     data: V
@@ -222,7 +304,7 @@ fun <V : Any> TreeItem<V>.UpdateChild(
 }
 
 /**
- * item添加子元素
+ * 为item添加子元素
  */
 fun <V> TreeItem<V>.AddChildren(
     vararg datas: V
@@ -252,7 +334,7 @@ fun <V> TreeItem<V>.AddChildrenList(
 }
 
 /**
- * item添加子元素
+ * 更新当前item元素
  */
 fun <V> TreeItem<V>.UpdateItem(
     data: V
@@ -262,7 +344,7 @@ fun <V> TreeItem<V>.UpdateItem(
 
 
 /**
- * item添加子元素
+ * 删除当前item元素
  */
 fun <V> TreeItem<V>.DeleteThis() {
     this.parent.children?.remove(this)
@@ -270,13 +352,27 @@ fun <V> TreeItem<V>.DeleteThis() {
 
 
 /**
- * item添加子元素
+ * 根据过滤条件删除当前item下的子元素
  */
 fun <V> TreeItem<V>.DeleteChildItem(
     block: (V) -> Boolean
 ) {
     this.children?.removeIf {
         block(it.value)
+    }
+}
+
+fun <V> TreeItem<V>.GetTreePath():String {
+    val treePath = StringBuffer()
+    getParentPath(this,treePath)
+    treePath.append("/${this.value.toString()}")
+    return treePath.toString()
+}
+
+fun <V> getParentPath(treeItem: TreeItem<V>, treePath: StringBuffer) {
+    treeItem.parent?.let {
+        getParentPath(it,treePath)
+        treePath.append("/${it.value.toString()}")
     }
 }
 
