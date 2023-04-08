@@ -2,6 +2,7 @@ package cn.lifay.ui
 
 import cn.lifay.extension.asyncTask
 import cn.lifay.mq.FXEventBusException
+import cn.lifay.mq.FXEventBusOpt
 import cn.lifay.mq.FXReceiver
 import cn.lifay.ui.message.Message
 import cn.lifay.ui.message.Notification
@@ -79,7 +80,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         for (method in clazz.declaredMethods) {
             val fxReceiver = method.getAnnotation(FXReceiver::class.java)
             if (fxReceiver != null) {
-                FXReceiver.add(fxReceiver.id, this, method::invoke)
+                FXEventBusOpt.add(fxReceiver.id, this, method::invoke)
             }
         }
     }
@@ -119,11 +120,11 @@ abstract class BaseView<R : Pane>() : Initializable {
 //        stackTraceElements.forEach { println(it) }
         val element = stackTraceElements[2]
 //        println(element)
-        if (FXReceiver.has(element.className, element.methodName)) {
+        if (FXEventBusOpt.has(element.className, element.methodName)) {
             throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
         }
         asyncTask {
-            FXReceiver.invoke(id, args)
+            FXEventBusOpt.invoke(id, args)
         }
     }
 
