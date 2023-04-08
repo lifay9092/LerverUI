@@ -5,7 +5,23 @@
 部分功能(模态窗口提示、弹出通知、样式)引用和借鉴了[easyfx](https://github.com/xizi110/easyfx)。
 
 ---
+### 引入
 
+```
+<dependency>
+    <groupId>cn.lifay</groupId>
+    <artifactId>LerverUI</artifactId>
+    <version>1.12-SNAPSHOT</version>
+</dependency>
+
+<repositories>
+    <repository>
+        <id>gitee-repo</id>
+        <name>The Maven Repository on Gitee</name>
+         <url>https://lifay.gitee.io/lerverui/repodir/</url>
+     </repository>
+</repositories>
+```
 **一.基础视图**
 
 >封装便捷功能
