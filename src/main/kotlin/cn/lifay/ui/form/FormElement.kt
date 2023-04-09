@@ -181,14 +181,33 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun eleToProp(t: T) {
         val elementValue = getElementValue()
+
         if (customProp == null) {
             if (property2 != null) {
-                elementValue?.let { property2!!.set(t, it) }
+                if (elementValue != null) {
+                    //如果控制有值 直接赋予控件值
+                    property2!!.set(t, elementValue)
+                } else {
+                    //如果控制无值,实体属性有值 则赋予控件默认值
+                    property2!!.set(t, defaultValue()!!)
+                }
             } else {
-                elementValue?.let { property!!.set(t, it) }
+                if (elementValue != null) {
+                    //如果控制有值 直接赋予控件值
+                    property!!.set(t, elementValue)
+                } else if (property!!.get(t) != null) {
+                    //如果控制无值,实体属性有值 则赋予控件默认值
+                    property!!.set(t, defaultValue()!!)
+                }
             }
         } else {
-            customProp!!.setValue(t, elementValue)
+            if (elementValue != null) {
+                //如果控制有值 直接赋予控件值
+                customProp!!.setValue(t, elementValue)
+            } else if (customProp!!.getValue(t) != null) {
+                //如果控制无值,实体属性有值 则赋予控件默认值
+                customProp!!.setValue(t, defaultValue())
+            }
         }
     }
 
