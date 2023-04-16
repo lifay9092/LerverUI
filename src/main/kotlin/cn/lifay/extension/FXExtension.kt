@@ -1,18 +1,24 @@
 package cn.lifay.extension
 
+import cn.lifay.ui.GlobeTheme
 import cn.lifay.ui.LoadingUI
 import javafx.application.Platform
+import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.Alert
 import javafx.scene.control.Button
 import javafx.scene.control.ButtonType
+import javafx.scene.control.TextArea
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import javafx.stage.StageStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.FutureTask
 
 /**
@@ -159,10 +165,6 @@ fun Button.styleDanger(): Button {
     return this
 }
 
-/*
-inline fun <T : Any> formUI(block: FormUI<T>.() -> FormUI<T>) {
-//    block(FormUI<T>())
-}*/
 fun Stage.bindEscKey(): Stage {
     addEventHandler(KeyEvent.KEY_PRESSED) {
         if (it.code == KeyCode.ESCAPE) {
@@ -170,4 +172,104 @@ fun Stage.bindEscKey(): Stage {
         }
     }
     return this
+}
+
+/**
+ * 弹窗提示
+ *
+ * @param message 弹窗展示信息
+ * @return 接收用户点击按钮类型
+ */
+inline fun alertInfo(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
+    return alert(message, Alert.AlertType.INFORMATION, *buttonTypes)
+}
+
+/**
+ * 弹窗提示
+ *
+ * @param message 弹窗确认
+ * @return 接收用户确认结果
+ */
+inline fun alertConfirmation(message: String): Boolean {
+    val buttonType = alert(message, Alert.AlertType.CONFIRMATION)
+    return buttonType.isPresent && buttonType.get() == ButtonType.OK
+}
+
+/**
+ * 弹窗警告
+ *
+ * @param message 弹窗展示信息
+ * @return 接收用户点击按钮类型
+ */
+inline fun alertWarn(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
+    return alert(message, Alert.AlertType.WARNING, *buttonTypes)
+}
+
+/**
+ * 弹窗报错
+ *
+ * @param head 弹窗展示信息
+ * @param message 弹窗展示信息
+ * @return 接收用户点击按钮类型
+ */
+inline fun alertError(head: String, message: String = head, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
+    return alertDetail(head, message, Alert.AlertType.ERROR, false, *buttonTypes)
+}
+
+/**
+ * 弹窗，指定弹窗类型
+ *
+ * @param message   弹窗提示信息
+ * @param alertType 弹窗类型
+ * @return 接收用户点击按钮类型
+ */
+inline fun alert(
+    message: String,
+    alertType: Alert.AlertType?,
+    vararg buttonTypes: ButtonType?
+): Optional<ButtonType> {
+    val alert = Alert(alertType, message, *buttonTypes).apply {
+        initStyle(StageStyle.TRANSPARENT)
+    }
+    if (GlobeTheme.ELEMENT_STYLE) {
+        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+    }
+    return alert.showAndWait()
+}
+
+/**
+ * 弹窗-详细-多行文本，指定弹窗类型
+ *
+ * @param message   弹窗提示信息
+ * @param alertType 弹窗类型
+ * @return 接收用户点击按钮类型
+ */
+inline fun alertDetail(
+    head: String,
+    text: String = head,
+    alertType: Alert.AlertType?,
+    isExpanded: Boolean = false,
+    vararg buttonTypes: ButtonType?
+): Optional<ButtonType> {
+
+    val alert = Alert(alertType, head, *buttonTypes).apply {
+        initStyle(StageStyle.TRANSPARENT)
+        dialogPane.expandableContent = VBox().apply {
+            alignment = Pos.CENTER
+            children.add(TextArea(text).apply {
+                isEditable = false
+                isWrapText = true
+                prefWidth = 800.0
+                prefHeight = 800.0
+                maxWidth = Double.MAX_VALUE
+                maxHeight = Double.MAX_VALUE
+            })
+        }
+        dialogPane.prefWidth = 750.0
+        dialogPane.isExpanded = isExpanded
+    }
+    if (GlobeTheme.ELEMENT_STYLE) {
+        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+    }
+    return alert.showAndWait()
 }
