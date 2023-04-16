@@ -12,6 +12,7 @@ import javafx.application.Application
 object GlobeTheme {
 
     var ELEMENT_STYLE = false
+    val CSS_RESOURCE = this.javaClass.getResource("/css/element-ui.css")?.toExternalForm()
 
     fun enableElement(b: Boolean) {
         ELEMENT_STYLE = b

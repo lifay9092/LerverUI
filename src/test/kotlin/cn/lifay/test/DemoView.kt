@@ -1,5 +1,8 @@
 package cn.lifay.test
 
+import cn.lifay.extension.alertDetail
+import cn.lifay.extension.alertInfo
+import cn.lifay.extension.alertWarn
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -153,13 +156,38 @@ class DemoView : Initializable {
     }
 
     fun info(actionEvent: ActionEvent?) {
-
+        alertInfo("信息打印")
     }
 
     fun warn(actionEvent: ActionEvent?) {
+        alertWarn("警告打印")
     }
 
     fun error(actionEvent: ActionEvent?) {
+        alertDetail(
+            "错误打印", "异常详细信息fun tableText(actionEvent: ActionEvent) {\n" +
+                    "        tableView.items[0].text = \"33333\"\n" +
+                    "        tableView.items[0].info = \"777777777\"\n" +
+                    "        tableView.items[0].msg.value = \"33333\"\n" +
+                    "        tableView.items[0].processBar.value = 0.5\n" +
+                    "        tableView.items[1].msg.value = \"4444444444\"\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    fun treeTestAdd1(actionEvent: ActionEvent) {\n" +
+                    "        rootTreeItem.children[0].AddChildren(TreeTestVO(\"add1\", \"5\", \"add1\", SimpleStringProperty(\"add1\")))\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    fun treeTestAdd2(actionEvent: ActionEvent) {\n" +
+                    "        rootTreeItem.children[0].AddChildrenList(listOf(TreeTestVO(\"add2\", \"6\", \"add2\", SimpleStringProperty(\"add2\"))))\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    fun treeTestUpt(actionEvent: ActionEvent) {\n" +
+                    "        rootTreeItem.children[0].UpdateItem(TreeTestVO(\"修改测试\", \"5\", \"修改测试\", SimpleStringProperty(\"修改测试\")))\n" +
+                    "    }\n" +
+                    "\n" +
+                    "    fun treeTestDel1(actionEvent: ActionEvent) {\n" +
+                    "        rootTreeItem.children[0].DeleteThis()", Alert.AlertType.ERROR, isExpanded = true
+        )
     }
 
     fun tableText(actionEvent: ActionEvent) {

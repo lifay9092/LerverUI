@@ -21,9 +21,11 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildE
     val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
     val child = CheckElement("是否未成年:", UserData::child)
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
-    listOf(id, name, type, child, sex);
-}, CustomButton(Button("测试自定义按钮").styleWarn()) {
-    println(it)
+    addElement(id, name, type, child, sex)
+
+    addCustomBtn(CustomButton(Button("测试自定义按钮").styleWarn()) {
+        println(it)
+    })
 }) {
     //    constructor(title: String,t: UserData?):this(title){
 //        if (t != null) {

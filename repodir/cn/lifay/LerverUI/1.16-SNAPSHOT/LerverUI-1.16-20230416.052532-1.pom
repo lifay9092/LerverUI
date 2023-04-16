@@ -68,7 +68,7 @@
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-                <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
@@ -84,9 +84,9 @@
                             <jvmTarget>17</jvmTarget>
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-<!--
-                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
--->
+                                <!--
+                                                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                -->
                             </sourceDirs>
                         </configuration>
                     </execution>

@@ -1,5 +1,6 @@
 package cn.lifay.ui
 
+import cn.lifay.extension.alertError
 import cn.lifay.extension.asyncTask
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXEventBusOpt
@@ -9,11 +10,7 @@ import cn.lifay.ui.message.Notification
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
-import javafx.scene.control.Alert
-import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.ButtonType
 import javafx.scene.layout.Pane
-import javafx.stage.StageStyle
 import javafx.stage.Window
 import java.net.URL
 import java.util.*
@@ -39,7 +36,6 @@ import kotlin.reflect.KMutableProperty0
 abstract class BaseView<R : Pane>() : Initializable {
 
     companion object {
-        val ELEMENT_UI_CSS = this::class.java.getResource("/css/element-ui.css").toExternalForm()
 
         /**
          * 创建新的视图fxml
@@ -49,7 +45,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(ELEMENT_UI_CSS)
+                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
@@ -65,7 +61,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(ELEMENT_UI_CSS)
+                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
@@ -88,10 +84,10 @@ abstract class BaseView<R : Pane>() : Initializable {
     /**
      * 注册根容器
      */
-    protected abstract fun rootPane(): KMutableProperty0<R>
+    abstract fun rootPane(): KMutableProperty0<R>
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         if (GlobeTheme.ELEMENT_STYLE) {
-            getRoot().stylesheets.add(ELEMENT_UI_CSS)
+            getRoot().stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
     }
 
@@ -104,7 +100,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 
     }
 
-    protected open fun getWindow(): Window? {
+    open fun getWindow(): Window? {
         return rootPane().get().scene.window
     }
 
@@ -115,7 +111,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @author lifay
      * @return
      */
-    protected open fun send(id: String, vararg args: Any) {
+    open fun send(id: String, vararg args: Any) {
         val stackTraceElements = Thread.currentThread().stackTrace
 //        stackTraceElements.forEach { println(it) }
         val element = stackTraceElements[2]
@@ -128,79 +124,13 @@ abstract class BaseView<R : Pane>() : Initializable {
         }
     }
 
-    /**
-     * 弹窗提示
-     *
-     * @param message 弹窗展示信息
-     * @return 接收用户点击按钮类型
-     */
-    protected open fun alertInfo(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
-        return alert(message, AlertType.INFORMATION, *buttonTypes)
-    }
-
-    /**
-     * 弹窗提示
-     *
-     * @param message 弹窗确认
-     * @return 接收用户确认结果
-     */
-    protected open fun alertConfirmation(message: String): Boolean {
-        val buttonType = alert(message, AlertType.CONFIRMATION)
-        return buttonType.isPresent && buttonType.get() == ButtonType.OK
-    }
-
-    /**
-     * 弹窗警告
-     *
-     * @param message 弹窗展示信息
-     * @return 接收用户点击按钮类型
-     */
-    protected open fun alertWarn(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
-        return alert(message, AlertType.WARNING, *buttonTypes)
-    }
-
-    /**
-     * 弹窗报错
-     *
-     * @param message 弹窗展示信息
-     * @return 接收用户点击按钮类型
-     */
-    protected open fun alertError(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
-        return alert(message, AlertType.ERROR, *buttonTypes)
-    }
-
-    /**
-     * 弹窗，指定弹窗类型
-     *
-     * @param message   弹窗提示信息
-     * @param alertType 弹窗类型
-     * @return 接收用户点击按钮类型
-     */
-    protected open fun alert(
-        message: String,
-        alertType: AlertType,
-        vararg buttonTypes: ButtonType?
-    ): Optional<ButtonType> {
-        val alert = Alert(alertType, message, *buttonTypes).apply {
-            initStyle(StageStyle.TRANSPARENT)
-            dialogPane.scene.fill = null
-            initOwner(getWindow())
-            contentText = message
-        }
-        if (GlobeTheme.ELEMENT_STYLE) {
-            val s = javaClass.getResource("/css/element-ui.css").toExternalForm()
-            alert.dialogPane.stylesheets.add(s)
-        }
-        return alert.showAndWait()
-    }
-
 
     /**
      * 显示一则指定类型默认延迟的消息
      *
      * @param message 通知信息
      */
-    protected open fun showMessage(message: String, delay: Long = 2500) {
+    open fun showMessage(message: String, delay: Long = 2500) {
         showMessage(message, Message.Type.INFO, delay)
     }
 
@@ -210,7 +140,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @param message 通知信息
      */
     @JvmOverloads
-    protected open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
+    open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
         val root = getRoot()
         if (root !is Pane) {
             alertError("root 必须是 Pane 或其子类 : ${root}")
@@ -219,7 +149,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         Message.show(root, message, type, delay)
     }
 
-    protected open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
+    open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
         showNotification(message, Notification.Type.INFO, milliseconds)
     }
 
@@ -231,7 +161,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @param milliseconds 延迟时间 毫秒
      */
     @JvmOverloads
-    protected open fun showNotification(
+    open fun showNotification(
         message: String,
         type: Notification.Type,
         milliseconds: Long = Notification.DEFAULT_DELAY

@@ -54,8 +54,7 @@ import kotlin.reflect.full.primaryConstructor
 abstract class FormUI<T : Any>(
     title: String,
     initDefaultEntity: T? = null,
-    buildElements: () -> List<FormElement<T, *>>,
-    vararg customButtons: CustomButton<T>
+    buildElements: FormUI<T>.() -> Unit,
 ) : BaseView<VBox>() {
 
     protected var entity: T? = null
@@ -63,27 +62,21 @@ abstract class FormUI<T : Any>(
     private var root = VBox(10.0)
     private val form = GridPane()
     private val table = TableView<T>()
-    protected var elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected var saveBtn: Button = Button("保存").stylePrimary()
 
-    //    protected var editBtn: Button = Button("修改").styleInfo()
-    protected var delBtn: Button = Button("删除").styleDanger()
-    protected var clearBtn: Button = Button("清空").styleWarn()
     protected var btnGroup = HBox(20.0)
-    protected var customButtons: Array<out CustomButton<T>>? = null
+
+    protected val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
+    protected val saveBtn: Button = Button("保存").stylePrimary()
+    protected val delBtn: Button = Button("删除").styleDanger()
+    protected val clearBtn: Button = Button("清空").styleWarn()
+    protected val customButtons: ObservableList<CustomButton<FormUI<T>>> = FXCollections.observableArrayList()
+
     private fun FormUI() {}
 
     init {
         // println("FormUI init")
-
-        val elementList: List<FormElement<T, *>> = buildElements()
-        if (elementList.isEmpty()) {
-            throw LerverUIException("未获取到有效表单元素!")
-        }
-        this.customButtons = customButtons
-        elements.addAll(elementList)
         try {
-            uiInit(title)
+            uiInit(title, buildElements)
             if (initDefaultEntity == null) {
                 val tc = elements[0].tc
                 val args = getElementInitValue()
@@ -124,9 +117,9 @@ abstract class FormUI<T : Any>(
     /*
         界面初始化
      */
-    private fun uiInit(title: String) {
+    private fun uiInit(title: String, buildElements: (FormUI<T>) -> Unit) {
         if (GlobeTheme.ELEMENT_STYLE) {
-            root.stylesheets.add(this::class.java.getResource("/css/element-ui.css").toExternalForm())
+            root.stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
         stage.initModality(Modality.APPLICATION_MODAL)
         root.children.addAll(form, table)
@@ -136,6 +129,11 @@ abstract class FormUI<T : Any>(
         form.hgap = 10.0
         form.vgap = 10.0
         form.padding = Insets(25.0, 25.0, 25.0, 25.0)
+
+        buildElements(this)
+        if (elements.isEmpty()) {
+            throw LerverUIException("未获取到有效表单元素!")
+        }
         initElements()
 
         //表格布局
@@ -179,6 +177,14 @@ abstract class FormUI<T : Any>(
      */
     private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
         return elements.map { it.getTableHead() }.toList()
+    }
+
+    fun addElement(vararg element: FormElement<T, *>) {
+        elements.addAll(*element)
+    }
+
+    fun addCustomBtn(vararg customButton: CustomButton<FormUI<T>>) {
+        customButtons.addAll(*customButton)
     }
 
     /**
@@ -239,14 +245,14 @@ abstract class FormUI<T : Any>(
         btnGroup.spacing = 20.0
         btnGroup.padding = Insets(20.0)
         btnGroup.children.addAll(saveBtn, delBtn, clearBtn)
-        if (customButtons != null) {
-            customButtons!!.forEach { customButton ->
-                customButton.btn.setOnAction {
-                    entity?.let { it1 -> customButton.actionFunc(it1) }
-                }
-                btnGroup.children.addAll(customButton.btn)
+
+        customButtons.forEach { customButton ->
+            customButton.btn.setOnAction {
+                customButton.actionFunc(this)
             }
+            btnGroup.children.addAll(customButton.btn)
         }
+
         //pane.getChildren().add(btnGroup);
         //保存
         saveBtn.setOnMouseClicked { mouseEvent ->
@@ -392,12 +398,6 @@ abstract class FormUI<T : Any>(
             throw RuntimeException(e)
         }
     }
-
-    /*    */
-    /**
-     * 构建表单元素
-     *//*
-    abstract fun buildElements(): List<FormElement<T, *>>*/
 
     /**
      * 构建表单元素

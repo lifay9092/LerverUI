@@ -14,8 +14,8 @@ import kotlin.reflect.KProperty1
 
 object TreeViewCache {
 
-    val TREE_DATA_CALL_MAP = HashMap<String,() -> List<*>>()
-    val TREE_IMG_CALL_MAP = HashMap<String,(TreeItem<*>) -> Unit>()
+    val TREE_DATA_CALL_MAP = HashMap<String, () -> List<*>>()
+    val TREE_IMG_CALL_MAP = HashMap<String, (TreeItem<*>) -> Unit>()
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
     val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
     var DATA_TYPE = DataType.LIST
@@ -76,11 +76,11 @@ var <T> TreeItem<T>.keywordStr: String
  * 通过集合类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
  */
 @JvmName("RegisterByList")
-inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
+inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     parentProp: KProperty1<V, B>,
-    init : Boolean = false,
-    noinline imgCall :((TreeItem<V>) -> Unit)? = null,
+    init: Boolean = false,
+    noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
     noinline getInitDataCall: () -> List<V>
 ) {
     //添加到缓存
@@ -92,7 +92,7 @@ inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
         TREE_IMG_CALL_MAP[treeId] = it as (TreeItem<*>) -> Unit
     }
     if (init) {
-        RefreshTree<V,B>()
+        RefreshTree<V, B>()
     }
 }
 
@@ -100,10 +100,10 @@ inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
  * 通过树类型的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
  */
 @JvmName("RegisterByTree")
-inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
+inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
-    init : Boolean = false,
+    init: Boolean = false,
     noinline getInitDataCall: () -> List<V>
 ) {
     DATA_TYPE = TreeViewCache.DataType.TREE
@@ -111,7 +111,7 @@ inline fun <reified V : Any,reified B : Any> TreeView<V>.Register(
     TREE_DATA_CALL_MAP[treeId] = getInitDataCall
 
     if (init) {
-        RefreshTree<V,B>()
+        RefreshTree<V, B>()
     }
 }
 
@@ -125,7 +125,7 @@ inline fun <reified V : Any> TreeView<V>.initDatas(): List<V> {
 /**
  * 刷新元素列表,可传入指定元素列表，默认为初始化元素列表
  */
-inline fun <reified V: Any, reified B: Any> TreeView<V>.RefreshTree(
+inline fun <reified V : Any, reified B : Any> TreeView<V>.RefreshTree(
     noinline getInitDataCall: (() -> List<V>)? = null,
     keyword: String? = null
 ) {
@@ -141,16 +141,16 @@ inline fun <reified V: Any, reified B: Any> TreeView<V>.RefreshTree(
     //重载
     if (DATA_TYPE == TreeViewCache.DataType.LIST) {
         val prop = listProps<V, B>()
-        initList(this.root, prop, datas,keyword,imgCall)
+        initList(this.root, prop, datas, keyword, imgCall)
     } else {
         val props = treeProps<V, B>()
         val childtren = datas.map {
             val item = TreeItem(it)
             item.treeViewId = treeId
-            initTree(item, props.first, props.second,keyword,imgCall)
+            initTree(item, props.first, props.second, keyword, imgCall)
             item
         }.filter {
-            if (keyword.isNullOrBlank()){
+            if (keyword.isNullOrBlank()) {
                 return@filter true
             }
             if (it.value.toString().contains(keyword)) {
@@ -190,14 +190,14 @@ fun <V, B> TreeView<V>.initList(
             }
             initList(item, prop, datas, keyword, imgCall)
             item
-    }.filter {
-            if (keyword.isNullOrBlank()){
+        }.filter {
+            if (keyword.isNullOrBlank()) {
                 return@filter true
             }
             if (it.value.toString().contains(keyword)) {
                 return@filter true
             }
-             it.children.isNotEmpty()
+            it.children.isNotEmpty()
         }
     //添加子节点
     if (childtren.isNotEmpty()) {
@@ -207,7 +207,7 @@ fun <V, B> TreeView<V>.initList(
 //            panTreeItem.value.toString() + "[" + childtren.map { it.value.toString() }.joinToString(",") + "]"
     } else {
         //添加到关键字缓存
-       // panTreeItem.keywordStr = panTreeItem.value.toString()
+        // panTreeItem.keywordStr = panTreeItem.value.toString()
     }
 }
 
@@ -236,7 +236,7 @@ fun <V, B> TreeView<V>.initTree(
         initTree(item, idProp, childrenProp, keyword, imgCall)
         item
     }.filter {
-        if (keyword.isNullOrBlank()){
+        if (keyword.isNullOrBlank()) {
             return@filter true
         }
         if (it.value.toString().contains(keyword)) {
@@ -362,16 +362,16 @@ fun <V> TreeItem<V>.DeleteChildItem(
     }
 }
 
-fun <V> TreeItem<V>.GetTreePath():String {
+fun <V> TreeItem<V>.GetTreePath(): String {
     val treePath = StringBuffer()
-    getParentPath(this,treePath)
+    getParentPath(this, treePath)
     treePath.append("/${this.value.toString()}")
     return treePath.toString()
 }
 
 fun <V> getParentPath(treeItem: TreeItem<V>, treePath: StringBuffer) {
     treeItem.parent?.let {
-        getParentPath(it,treePath)
+        getParentPath(it, treePath)
         treePath.append("/${it.value.toString()}")
     }
 }
