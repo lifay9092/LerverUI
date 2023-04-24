@@ -309,9 +309,12 @@ fun <V : Any> TreeItem<V>.UpdateChild(
 fun <V> TreeItem<V>.AddChildren(
     vararg datas: V
 ) {
+    val imgCall = TREE_IMG_CALL_MAP[this.treeViewId]
     for (data in datas) {
         //获取子节点
         val child = TreeItem(data)
+        imgCall?.let { it(child) }
+        child.treeViewId = this.treeViewId
         //添加子节点
         children.add(child)
     }
@@ -324,9 +327,12 @@ fun <V> TreeItem<V>.AddChildren(
 fun <V> TreeItem<V>.AddChildrenList(
     datas: List<V>
 ) {
+    val imgCall = TREE_IMG_CALL_MAP[this.treeViewId]
     for (data in datas) {
         //获取子节点
         val child = TreeItem(data)
+        imgCall?.let { it(child) }
+        child.treeViewId = this.treeViewId
         //添加子节点
         children.add(child)
     }
@@ -340,6 +346,8 @@ fun <V> TreeItem<V>.UpdateItem(
     data: V
 ) {
     this.value = data
+    val imgCall = TREE_IMG_CALL_MAP[this.treeViewId]
+    imgCall?.let { it(this) }
 }
 
 
