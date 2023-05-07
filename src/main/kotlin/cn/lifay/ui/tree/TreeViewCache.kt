@@ -62,6 +62,7 @@ var <T> TreeItem<T>.treeViewId: String
 /**
  * 获取 TreeItem 的自定义树id
  */
+/*
 var <T> TreeItem<T>.keywordStr: String
     get() {
         return ITEM_KEYWORD_MAP[this.hashCode()]!!
@@ -70,6 +71,7 @@ var <T> TreeItem<T>.keywordStr: String
         println(this.hashCode())
         ITEM_KEYWORD_MAP[this.hashCode()] = value
     }
+*/
 
 
 /**
@@ -81,7 +83,7 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     parentProp: KProperty1<V, B>,
     init: Boolean = false,
     noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
-    noinline getInitDataCall: () -> List<V>
+    noinline getInitDataCall: () -> List<V>,
 ) {
     //添加到缓存
     this.root.treeViewId = treeId
@@ -104,12 +106,15 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
     init: Boolean = false,
+    noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
     noinline getInitDataCall: () -> List<V>
 ) {
     DATA_TYPE = TreeViewCache.DataType.TREE
     TREE_HELP_MAP[treeId] = Pair(idProp, childrenProp)
     TREE_DATA_CALL_MAP[treeId] = getInitDataCall
-
+    imgCall?.let {
+        TREE_IMG_CALL_MAP[treeId] = it as (TreeItem<*>) -> Unit
+    }
     if (init) {
         RefreshTree<V, B>()
     }
@@ -127,7 +132,7 @@ inline fun <reified V : Any> TreeView<V>.initDatas(): List<V> {
  */
 inline fun <reified V : Any, reified B : Any> TreeView<V>.RefreshTree(
     noinline getInitDataCall: (() -> List<V>)? = null,
-    keyword: String? = null
+    noinline filterFunc: ((V) -> Boolean)? = null
 ) {
     //println("RefreshTree")
     if (getInitDataCall != null) {
@@ -141,19 +146,16 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.RefreshTree(
     //重载
     if (DATA_TYPE == TreeViewCache.DataType.LIST) {
         val prop = listProps<V, B>()
-        initList(this.root, prop, datas, keyword, imgCall)
+        initList(this.root, prop, datas, filterFunc, imgCall)
     } else {
         val props = treeProps<V, B>()
         val childtren = datas.map {
             val item = TreeItem(it)
             item.treeViewId = treeId
-            initTree(item, props.first, props.second, keyword, imgCall)
+            initTree(item, props.first, props.second, filterFunc, imgCall)
             item
         }.filter {
-            if (keyword.isNullOrBlank()) {
-                return@filter true
-            }
-            if (it.value.toString().contains(keyword)) {
+            if (filterFunc == null || filterFunc(it.value)) {
                 return@filter true
             }
             it.children.isNotEmpty()
@@ -176,7 +178,7 @@ fun <V, B> TreeView<V>.initList(
     panTreeItem: TreeItem<V>,
     prop: Pair<KProperty1<V, B>, KProperty1<V, B>>,
     datas: List<V>,
-    keyword: String?,
+    filterFunc: ((V) -> Boolean)? = null,
     imgCall: ((TreeItem<*>) -> Unit)?
 ) {
     //获取子节点
@@ -188,13 +190,10 @@ fun <V, B> TreeView<V>.initList(
             if (imgCall != null) {
                 imgCall(item)
             }
-            initList(item, prop, datas, keyword, imgCall)
+            initList(item, prop, datas, filterFunc, imgCall)
             item
         }.filter {
-            if (keyword.isNullOrBlank()) {
-                return@filter true
-            }
-            if (it.value.toString().contains(keyword)) {
+            if (filterFunc == null || filterFunc(it.value)) {
                 return@filter true
             }
             it.children.isNotEmpty()
@@ -222,7 +221,7 @@ fun <V, B> TreeView<V>.initTree(
     panTreeItem: TreeItem<V>,
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>>,
-    keyword: String?,
+    filterFunc: ((V) -> Boolean)? = null,
     imgCall: ((TreeItem<*>) -> Unit)?
 ) {
     //获取子节点
@@ -233,13 +232,10 @@ fun <V, B> TreeView<V>.initTree(
         if (imgCall != null) {
             imgCall(item)
         }
-        initTree(item, idProp, childrenProp, keyword, imgCall)
+        initTree(item, idProp, childrenProp, filterFunc, imgCall)
         item
     }.filter {
-        if (keyword.isNullOrBlank()) {
-            return@filter true
-        }
-        if (it.value.toString().contains(keyword)) {
+        if (filterFunc == null || filterFunc(it.value)) {
             return@filter true
         }
         it.children.isNotEmpty()

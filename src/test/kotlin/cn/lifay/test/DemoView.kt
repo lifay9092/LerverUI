@@ -84,7 +84,9 @@ class DemoView : Initializable {
             if (s2.isNullOrBlank()) {
                 return@addListener
             }
-            treeView.RefreshTree<TreeTestVO,String>(keyword = s2)
+            treeView.RefreshTree<TreeTestVO, String>(filterFunc = {
+                it.name.contains(s2)
+            })
         }
         tableView.apply {
             isEditable = true
