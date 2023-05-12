@@ -79,7 +79,10 @@ abstract class FormUI<T : Any>(
             uiInit(title, buildElements)
             if (initDefaultEntity == null) {
                 val tc = elements[0].tc
+                println("tc:$tc")
                 val args = getElementInitValue()
+                println("args:${args.contentToString()}")
+                args.forEach { println(it) }
                 this.entity = tc!!.primaryConstructor!!.call(*args)
             } else {
                 refreshForm(initDefaultEntity)
