@@ -23,19 +23,13 @@
         <!--稳定版本的仓库地址,必须是允许上传的私服地址-->
         <repository>
             <id>lifay-host</id>
-            <url>http://192.168.1.40:8081/repository/lifay-repo/</url>
-            <!--
-                        <url>http://www.lifay.cn:28081/repository/lifay-repo/</url>
-            -->
+            <url>http://www.lifay.cn:8081/repository/lifay-repo/</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>lifay-public</id>
-            <url>http://192.168.1.40:8081/repository/maven-public/</url>
-            <!--
-                  <url>http://www.lifay.cn:28081/repository/maven-public/</url>
-      -->
+            <url>http://www.lifay.cn:8081/repository/maven-public/</url>
         </repository>
     </repositories>
     <dependencies>
