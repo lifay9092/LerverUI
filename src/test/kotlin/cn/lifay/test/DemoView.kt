@@ -1,8 +1,7 @@
 package cn.lifay.test
 
-import cn.lifay.extension.alertDetail
-import cn.lifay.extension.alertInfo
-import cn.lifay.extension.alertWarn
+import cn.lifay.db.DbManage
+import cn.lifay.extension.*
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -17,6 +16,7 @@ import javafx.scene.control.*
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
+import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
 import java.net.URL
 import java.util.*
@@ -77,6 +77,21 @@ class DemoView : Initializable {
             isShowRoot = true
             Register(TreeTestVO::id, TreeTestVO::parentId,true){
                 listOf(test1, test2, test3)
+            }
+            setOnMouseClicked {
+                if (it.button == MouseButton.SECONDARY) {
+                    //右键
+                    contextMenu = ContextMenu().apply {
+                        items.add(MenuItem("根节点下添加").apply {
+                            setOnAction {
+                                val selectedItem = treeView.selectionModel.selectedItem
+                                selectedItem.AddChildren(TreeTestVO("根节点下节点1", "6", "根节点下节点1", SimpleStringProperty("根节点下节点1")))
+                                selectedItem.AddChildrenList(listOf(TreeTestVO("根节点下节点2", "6", "根节点下节点2", SimpleStringProperty("根节点下节点2"))))
+                            }
+                        })
+                    }
+                }
+
             }
 //            rootProperty().bind(rootItemProperties)
         }
@@ -207,6 +222,7 @@ class DemoView : Initializable {
     fun treeTestAdd2(actionEvent: ActionEvent) {
         rootTreeItem.children[0].AddChildrenList(listOf(TreeTestVO("add2", "6", "add2", SimpleStringProperty("add2"))))
     }
+
 
     fun treeTestUpt(actionEvent: ActionEvent) {
         rootTreeItem.children[0].UpdateItem(TreeTestVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))

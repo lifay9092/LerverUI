@@ -13,8 +13,9 @@ import javafx.scene.control.TreeView
 import kotlin.reflect.KProperty1
 
 object TreeViewCache {
-
+    /* treeViewId=获取数据的函数 */
     val TREE_DATA_CALL_MAP = HashMap<String, () -> List<*>>()
+    /* treeViewId=获取图标的函数 */
     val TREE_IMG_CALL_MAP = HashMap<String, (TreeItem<*>) -> Unit>()
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
     val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
@@ -142,6 +143,7 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.RefreshTree(
     //清除旧item的数据和缓存
     this.root.children.clear()
     clearTreeItemMap(treeId)
+    this.root.treeViewId = treeId
     val imgCall = TREE_IMG_CALL_MAP[treeId]
     //重载
     if (DATA_TYPE == TreeViewCache.DataType.LIST) {
