@@ -80,14 +80,12 @@ inline fun asyncTaskLoading(
     }
 }
 
-inline fun platformRun(crossinline f: () -> Unit) {
-    Platform.runLater { f() }
+fun platformRun(f: Runnable) {
+    Platform.runLater(f)
 }
 
-inline fun <R> platformGet(crossinline f: () -> R): R {
-    val task = FutureTask { f() }
-    Platform.runLater { task }
-    return task.get()
+inline fun platformRun(crossinline f: () -> Unit) {
+    Platform.runLater { f() }
 }
 
 fun <T : Node> T.appendStyle(styleStr: String): T {

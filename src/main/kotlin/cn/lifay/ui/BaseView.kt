@@ -40,11 +40,12 @@ abstract class BaseView<R : Pane>() : Initializable {
         /**
          * 创建新的视图fxml
          * @param fxml fxml资源
+         * @param isGlobeTheme 是否跟随GlobeTheme样式
          */
-        fun <T : BaseView<R>, R : Pane> createView(fxml: URL): T {
+        fun <T : BaseView<R>, R : Pane> createView(fxml: URL,isGlobeTheme : Boolean = true): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
-            if (GlobeTheme.ELEMENT_STYLE) {
+            if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
                 load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
@@ -55,12 +56,13 @@ abstract class BaseView<R : Pane>() : Initializable {
         /**
          * 创建新的视图fxml
          * @param fxml fxml资源
+         * @param isGlobeTheme 是否跟随GlobeTheme样式
          * @param initFunc 视图初始化后执行的方法
          */
-        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, initFunc: T.() -> Unit): T {
+        fun <T : BaseView<R>, R : Pane> createView(fxml: URL,isGlobeTheme : Boolean = true, initFunc: T.() -> Unit): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
-            if (GlobeTheme.ELEMENT_STYLE) {
+            if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
                 load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {

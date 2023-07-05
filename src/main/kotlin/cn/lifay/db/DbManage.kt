@@ -40,7 +40,7 @@ object DbManage {
                           """
     lateinit var database: Database
 
-    fun Init(DB_NAME: String = "db1.db") {
+    fun Init(DB_NAME: String = "db.db") {
         //获取db配置文件
         val userDir = System.getProperty("user.dir")
         val dbConfigPath = "${userDir + File.separator}db.config"
