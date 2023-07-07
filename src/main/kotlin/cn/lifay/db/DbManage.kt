@@ -24,7 +24,6 @@ import java.util.*
  **/
 object DbManage {
 
-    private lateinit var DB_NAME :String
     val GET_LAST_VERSION = """
                                 SELECT MAX(VERSION_NO) FROM APP_VERSION
                           """
@@ -65,6 +64,7 @@ object DbManage {
             dbConfigFile.writeText(text, Charset.forName("utf-8"))
             InitDataBase(jdbcUrl, "", "")
         } else {
+            println("db.config 已存在...")
             dbConfigFile.inputStream().use {
                 val properties = Properties()
                 properties.load(it)
@@ -93,6 +93,9 @@ object DbManage {
             password = password,
             logger = logger
         )
+        println("dbUrl:${url}")
+        println()
+        println()
         /*更新版本脚本*/
         //db最后一次版本
         val lastVersion = GetLastVersion(true)
@@ -113,6 +116,7 @@ object DbManage {
                 }
                 //执行脚本
                 println(sqlFile.name)
+                println()
                 // val result = ExecuteSql(*sqlFile.readText().split(";").filter { it.trim().isNotBlank() }.map { "$it;" }.toTypedArray())
                 val result = ExecuteSql(sqlFile.readText())
                 if (!result) {
@@ -121,11 +125,14 @@ object DbManage {
                     println("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
                 }
+                println()
+                println()
             }
             if (lastVersion != newLasVersion) {
                 //版本号不一致,更新版本
                 ExecuteSql(INSERT_NEW_VERSION_SQL.format(newLasVersion))
                 GetLastVersion()
+                println("更新完成")
             }
         }
     }
@@ -172,6 +179,7 @@ object DbManage {
         } catch (e: Exception) {
             //新建库表
             if (init && e.message?.contains("no such table: APP_VERSION") == true) {
+                println("新建版本表[APP_VERSION]")
                 val createVersionTb = database.useConnection { connection ->
                     try {
                         return@useConnection ExecuteSql(CREATE_VERSION_TB_SQL + "\n" + INSERT_NEW_VERSION_SQL.format("0"))
