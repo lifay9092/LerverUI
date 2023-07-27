@@ -1,5 +1,6 @@
 package cn.lifay;
 
+import atlantafx.base.theme.PrimerLight;
 import cn.lifay.ui.GlobeTheme;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 public class FormUITest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
+        setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         GlobeTheme.INSTANCE.enableElement(true);
         FXMLLoader fxmlLoader = new FXMLLoader(FormUITest.class.getResource("formTest.fxml"));
         Parent load = fxmlLoader.load();

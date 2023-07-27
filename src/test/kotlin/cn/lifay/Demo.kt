@@ -1,5 +1,6 @@
 package cn.lifay
 
+import atlantafx.base.theme.PrimerLight
 import cn.lifay.ui.GlobeTheme
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -17,6 +18,7 @@ class Demo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobeTheme.enableElement(true)
+        setUserAgentStylesheet(PrimerLight().userAgentStylesheet)
 
         val fxmlLoader = FXMLLoader(Demo::class.java.getResource("demo.fxml"))
         val root = fxmlLoader.load<Pane>()

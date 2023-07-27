@@ -46,7 +46,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
@@ -63,7 +63,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
-                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
@@ -89,7 +89,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     abstract fun rootPane(): KMutableProperty0<R>
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         if (GlobeTheme.ELEMENT_STYLE) {
-            getRoot().stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//            getRoot().stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
     }
 

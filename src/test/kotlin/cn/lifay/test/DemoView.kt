@@ -29,6 +29,9 @@ import java.util.*
  */
 class DemoView : Initializable {
     @FXML
+    var splitMenuBtn = SplitMenuButton()
+
+    @FXML
     var keywordText = TextField()
 
     @FXML
@@ -46,8 +49,22 @@ class DemoView : Initializable {
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         val observableArrayList = FXCollections.observableArrayList<TreeTestVO>()
-
-
+        splitMenuBtn.items.addAll(
+            MenuItem("1111").apply {
+                setOnAction {
+                println("11111")
+            }
+            },
+            MenuItem("2222").apply {
+                setOnAction {
+                    println("22222")
+                }
+            }
+        )
+        splitMenuBtn.text = "ddddddddd"
+        splitMenuBtn.setOnAction {
+            println("点击了")
+        }
         val treeItem1 = TreeItem(TreeTestVO("3", "2", "4", SimpleStringProperty("3")))
         val treeItem2 = TreeItem(TreeTestVO("2", "1", "2", SimpleStringProperty("2")))
         val treeItem3 = TreeItem(TreeTestVO("4", "1", "4", SimpleStringProperty("4")))
@@ -67,6 +84,7 @@ class DemoView : Initializable {
                     println(it.newValue)
                 }
             )
+
 
         }
 

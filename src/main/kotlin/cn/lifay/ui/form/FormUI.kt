@@ -1,5 +1,6 @@
 package cn.lifay.ui.form
 
+import atlantafx.base.theme.Styles
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
@@ -20,6 +21,7 @@ import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
+import org.kordamp.ikonli.feather.Feather
 import java.net.URL
 import java.util.*
 import java.util.function.Consumer
@@ -66,9 +68,9 @@ abstract class FormUI<T : Any>(
     protected var btnGroup = HBox(20.0)
 
     protected val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected val saveBtn: Button = Button("保存").stylePrimary()
-    protected val delBtn: Button = Button("删除").styleDanger()
-    protected val clearBtn: Button = Button("清空").styleWarn()
+    protected val saveBtn: Button = Button("保存").stylePrimary().icon(Feather.CHECK)
+    protected val delBtn: Button = Button("删除").styleDanger().icon(Feather.TRASH)
+    protected val clearBtn: Button = Button("清空").styleWarn().icon(Feather.X)
     protected val customButtons: ObservableList<CustomButton<FormUI<T>>> = FXCollections.observableArrayList()
 
     private fun FormUI() {}
@@ -122,7 +124,7 @@ abstract class FormUI<T : Any>(
      */
     private fun uiInit(title: String, buildElements: (FormUI<T>) -> Unit) {
         if (GlobeTheme.ELEMENT_STYLE) {
-            root.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//            root.stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
         stage.initModality(Modality.APPLICATION_MODAL)
         root.children.addAll(form, table)
@@ -143,6 +145,7 @@ abstract class FormUI<T : Any>(
         this.table.apply {
             padding = Insets(1.0, 2.0, 10.0, 2.0)
             columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
+            Styles.toggleStyleClass(table,Styles.STRIPED)
             columns.addAll(tableHeadColumns())
             refreshTable()
             setRowFactory {

@@ -1,5 +1,7 @@
 package cn.lifay.ui
 
+import atlantafx.base.theme.PrimerDark
+import atlantafx.base.theme.PrimerLight
 import cn.lifay.exception.LerverUIException
 import cn.lifay.util.StaticUtil
 import javafx.application.Application
@@ -23,9 +25,11 @@ object GlobeTheme {
      * @author lifay
      */
     fun setWhite() {
-        val resource = GlobeTheme::class.java.getResource(StaticUtil.whiteTheme())
-            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.whiteTheme())
-        Application.setUserAgentStylesheet(resource.toExternalForm())
+//        val resource = GlobeTheme::class.java.getResource(StaticUtil.whiteTheme())
+//            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.whiteTheme())
+//        Application.setUserAgentStylesheet(resource.toExternalForm())
+        Application.setUserAgentStylesheet(PrimerLight().userAgentStylesheet)
+
     }
 
     /**
@@ -33,8 +37,10 @@ object GlobeTheme {
      * @author lifay
      */
     fun setDark() {
-        val resource = GlobeTheme::class.java.getResource(StaticUtil.darkTheme())
-            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
-        Application.setUserAgentStylesheet(resource.toExternalForm())
+//        val resource = GlobeTheme::class.java.getResource(StaticUtil.darkTheme())
+//            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
+//        Application.setUserAgentStylesheet(resource.toExternalForm())
+        Application.setUserAgentStylesheet(PrimerDark().userAgentStylesheet)
+
     }
 }
