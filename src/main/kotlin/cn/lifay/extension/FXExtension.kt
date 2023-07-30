@@ -15,6 +15,7 @@ import javafx.scene.paint.Color
 import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.javafx.FontIcon
@@ -46,6 +47,26 @@ inline fun asyncTask(
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
+            //执行任务
+            block()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+/**
+ * 异步延迟执行耗时操作 时间：毫秒
+ * @author lifay
+ * @return
+ */
+inline fun asyncDelayTask(
+    time: Long,
+    crossinline block: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        try {
+            delay(time)
             //执行任务
             block()
         } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package cn.lifay
 
+import atlantafx.base.theme.PrimerLight
 import cn.lifay.test.BaseViewDemoView
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
@@ -18,6 +19,8 @@ class BaseViewDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobeTheme.enableElement(true)
+        setUserAgentStylesheet(PrimerLight().userAgentStylesheet)
+
         val view =
             BaseView.createView<BaseViewDemoView, AnchorPane>(BaseViewDemo::class.java.getResource("test/baseViewDemo.fxml"))
         val scene = Scene(view.getRoot())

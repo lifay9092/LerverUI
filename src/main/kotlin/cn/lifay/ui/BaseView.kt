@@ -1,17 +1,23 @@
 package cn.lifay.ui
 
-import cn.lifay.extension.alertError
+import atlantafx.base.theme.Styles
+import atlantafx.base.util.Animations
+import cn.lifay.extension.asyncDelayTask
 import cn.lifay.extension.asyncTask
+import cn.lifay.extension.platformRun
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXEventBusOpt
 import cn.lifay.mq.FXReceiver
-import cn.lifay.ui.message.Message
-import cn.lifay.ui.message.Notification
+import cn.lifay.ui.message.NotificationType
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
 import javafx.scene.layout.Pane
+import javafx.scene.layout.VBox
 import javafx.stage.Window
+import javafx.util.Duration
+import org.kordamp.ikonli.javafx.FontIcon
+import org.kordamp.ikonli.material2.Material2OutlinedAL
 import java.net.URL
 import java.util.*
 import kotlin.reflect.KMutableProperty0
@@ -35,6 +41,12 @@ import kotlin.reflect.KMutableProperty0
  **/
 abstract class BaseView<R : Pane>() : Initializable {
 
+    val NOTIFICATION_PANE = VBox(5.0).apply {
+        isManaged = false
+        spacing = 15.0
+        layoutY = 15.0
+    }
+
     companion object {
 
         /**
@@ -42,7 +54,7 @@ abstract class BaseView<R : Pane>() : Initializable {
          * @param fxml fxml资源
          * @param isGlobeTheme 是否跟随GlobeTheme样式
          */
-        fun <T : BaseView<R>, R : Pane> createView(fxml: URL,isGlobeTheme : Boolean = true): T {
+        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, isGlobeTheme: Boolean = true): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
@@ -50,6 +62,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             }
             return loader.getController<T?>().apply {
                 rootPane().set(load)
+                initNotificationPane()
             }
         }
 
@@ -68,6 +81,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             return loader.getController<T?>().apply {
                 rootPane().set(load)
                 initFunc()
+                initNotificationPane()
             }
         }
     }
@@ -91,6 +105,10 @@ abstract class BaseView<R : Pane>() : Initializable {
         if (GlobeTheme.ELEMENT_STYLE) {
 //            getRoot().stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
+    }
+
+    private fun initNotificationPane() {
+        NOTIFICATION_PANE.layoutXProperty().bind(rootPane().get().widthProperty().subtract(400.0).subtract(17))
     }
 
     open fun InitElemntStyle() {
@@ -125,57 +143,129 @@ abstract class BaseView<R : Pane>() : Initializable {
             FXEventBusOpt.invoke(id, args)
         }
     }
+//
+//
+//    /**
+//     * 显示一则指定类型默认延迟的消息
+//     *
+//     * @param message 通知信息
+//     */
+//    open fun showMessage(message: String, delay: Long = 2500) {
+//        showMessage(message, Message.Type.INFO, delay)
+//    }
+//
+//    /**
+//     * 显示一则指定类型指定延迟的消息
+//     *
+//     * @param message 通知信息
+//     */
+//    @JvmOverloads
+//    open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
+//        val root = getRoot()
+//        if (root !is Pane) {
+//            alertError("root 必须是 Pane 或其子类 : ${root}")
+//            return
+//        }
+//        Message.show(root, message, type, delay)
+//    }
+//
+//    open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
+//        showNotification(message, Notification.Type.INFO, milliseconds)
+//    }
+//
+//    /**
+//     * 显示一则指定类型的通知，自动关闭，指定显示时间
+//     *
+//     * @param message      通知信息
+//     * @param type         通知类型
+//     * @param milliseconds 延迟时间 毫秒
+//     */
+//    @JvmOverloads
+//    open fun showNotification(
+//        message: String,
+//        type: Notification.Type,
+//        milliseconds: Long = Notification.DEFAULT_DELAY
+//    ) {
+//        val root = getRoot()
+//        if (root !is Pane) {
+//            alertError("root 必须是 Pane 或其子类 : ${root}")
+//            return
+//        }
+//        Notification.showAutoClose(root, message, type, milliseconds)
+//    }
+//
 
-
-    /**
-     * 显示一则指定类型默认延迟的消息
-     *
-     * @param message 通知信息
-     */
-    open fun showMessage(message: String, delay: Long = 2500) {
-        showMessage(message, Message.Type.INFO, delay)
+    open fun showNotification(message: String, autoClose: Boolean = true) {
+        showNotification(NotificationType.ACCENT, message, autoClose)
     }
 
-    /**
-     * 显示一则指定类型指定延迟的消息
-     *
-     * @param message 通知信息
-     */
-    @JvmOverloads
-    open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
-        val root = getRoot()
-        if (root !is Pane) {
-            alertError("root 必须是 Pane 或其子类 : ${root}")
-            return
-        }
-        Message.show(root, message, type, delay)
-    }
-
-    open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
-        showNotification(message, Notification.Type.INFO, milliseconds)
-    }
-
-    /**
-     * 显示一则指定类型的通知，自动关闭，指定显示时间
-     *
-     * @param message      通知信息
-     * @param type         通知类型
-     * @param milliseconds 延迟时间 毫秒
-     */
-    @JvmOverloads
     open fun showNotification(
+        notificationType: NotificationType = NotificationType.ACCENT,
         message: String,
-        type: Notification.Type,
-        milliseconds: Long = Notification.DEFAULT_DELAY
+        autoClose: Boolean = true
     ) {
-        val root = getRoot()
-        if (root !is Pane) {
-            alertError("root 必须是 Pane 或其子类 : ${root}")
-            return
-        }
-        Notification.showAutoClose(root, message, type, milliseconds)
-    }
+        val msg = atlantafx.base.controls.Notification(
+            message,
+            FontIcon(Material2OutlinedAL.HELP_OUTLINE)
+        )
+        when (notificationType) {
+            NotificationType.ACCENT -> {
+                msg.styleClass.addAll(
+                    Styles.ACCENT, Styles.ELEVATED_1
+                )
+            }
 
+            NotificationType.WARNING -> {
+                msg.styleClass.addAll(
+                    Styles.WARNING, Styles.ELEVATED_1
+                )
+            }
+
+            NotificationType.DANGER -> {
+                msg.styleClass.addAll(
+                    Styles.DANGER, Styles.ELEVATED_1
+                )
+            }
+
+            NotificationType.SUCCESS -> {
+                msg.styleClass.addAll(
+                    Styles.SUCCESS, Styles.ELEVATED_1
+                )
+            }
+        }
+        val rootPane = rootPane().get()
+
+        val closeFunc = {
+            NOTIFICATION_PANE.children.remove(msg)
+            if (NOTIFICATION_PANE.children.size == 0) {
+                rootPane.children.remove(NOTIFICATION_PANE)
+            }
+        }
+        msg.setOnClose {
+            val closePlay = Animations.slideOutUp(msg, Duration.millis(250.0))
+            closePlay.setOnFinished {
+                closeFunc()
+            }
+            closePlay.playFromStart()
+        }
+        msg.maxWidth = 400.0
+        msg.minWidth = 400.0
+
+        if (!NOTIFICATION_PANE.children.contains(msg)) {
+            NOTIFICATION_PANE.children.add(msg)
+            if (!rootPane.children.contains(NOTIFICATION_PANE)) {
+                rootPane.children.add(NOTIFICATION_PANE)
+            }
+        }
+        val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
+
+        openPlay.playFromStart()
+        if (autoClose) {
+            asyncDelayTask(3000) {
+                platformRun { closeFunc() }
+            }
+        }
+    }
 
     /*树视图部分*/
 

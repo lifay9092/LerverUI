@@ -1,7 +1,6 @@
 package cn.lifay.test
 
 import cn.lifay.ui.BaseView
-import cn.lifay.ui.message.Notification
 import javafx.fxml.FXML
 import javafx.scene.control.Button
 import javafx.scene.control.Label
@@ -69,7 +68,6 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
         // showNotification("测试消息3",Notification.Type.ERROR,2000)
 
 
-        showMessage("showMessage")
     }
 
     fun msgTest() {
@@ -81,13 +79,43 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
         println(tabPane.tabs.size)
         println("ddddddddddddd")
 
-        showNotification("测试消息3", Notification.Type.ERROR, 2000)
-        showNotification("测试消息")
-        showNotification("测试消息2", Notification.Type.SUCCESS)
-        showNotification("测试消息3", Notification.Type.ERROR, 2000)
 
+    }
 
-        showMessage("showMessage")
-
+    fun msgTestNew() {
+        showNotification("DASDASDASD")
+//        val vBox = VBox()
+//        val msg = atlantafx.base.controls.Notification(
+//            "消息sda打萨达萨达撒旦",
+//            FontIcon(Material2OutlinedAL.HELP_OUTLINE)
+//        )
+//        msg.getStyleClass().addAll(
+//            Styles.ACCENT, Styles.ELEVATED_1
+//        )
+//        msg.setOnClose {
+//            val closePlay = Animations.slideOutUp(msg, Duration.millis(250.0))
+//            closePlay.setOnFinished { rootPane.children.remove(vBox) }
+//            closePlay.playFromStart()
+//        }
+//        msg.maxWidth = 400.0
+//        msg.minWidth = 400.0
+////        msg.setMaxHeight(Region.USE_PREF_SIZE)
+//        vBox.children.add(msg)
+//        vBox.isManaged = false
+//        vBox.spacing = 15.0
+////        stackPane.padding = 15.0
+//        vBox.layoutY = 15.0
+//      //  vBox.layoutX = rootPane.prefWidth - msg.prefWidth - 17
+////        rootPane.widthProperty().addListener { value, old, new ->
+////            println("root:${new}")
+////            println("msg:${msg.width} ${msg.prefWidth}")
+////        }
+//        vBox.layoutXProperty().bind(rootPane.widthProperty().subtract(msg.widthProperty()).subtract(17))
+//
+//        val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
+//        if (!rootPane.children.contains(msg)) {
+//            rootPane.children.add(vBox)
+//        }
+//        openPlay.playFromStart()
     }
 }
