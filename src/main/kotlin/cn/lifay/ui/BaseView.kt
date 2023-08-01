@@ -205,18 +205,18 @@ abstract class BaseView<R : Pane>() : Initializable {
      * 弹出系统通知
      * @author lifay
      */
-    open fun showNotification(message: String, autoClose: Boolean = true) {
-        showNotification(MsgType.ACCENT, message, autoClose)
-    }
+//    open fun showNotification(message: String) {
+//        showNotification(message)
+//    }
 
     /**
      * 弹出系统通知
      * @author lifay
      */
     open fun showNotification(
-        msgType: MsgType = MsgType.ACCENT,
         message: String,
-        autoClose: Boolean = true
+        msgType: MsgType = MsgType.ACCENT,
+        millis: Long = 3000
     ) {
         val msg = atlantafx.base.controls.Notification(
             message,
@@ -274,27 +274,20 @@ abstract class BaseView<R : Pane>() : Initializable {
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
 
         openPlay.playFromStart()
-        if (autoClose) {
-            asyncDelayTask(3000) {
+        if (millis != 0L) {
+            asyncDelayTask(millis) {
                 platformRun { closeFunc() }
             }
         }
     }
 
-    /**
-     * 弹出提示
-     * @author lifay
-     */
-    open fun showMessage(message: String) {
-        showMessage(MsgType.ACCENT, message)
-    }
 
     /**
      * 弹出错误提示
      * @author lifay
      */
     open fun showErrMessage(message: String) {
-        showMessage(MsgType.DANGER, message)
+        showMessage(message, MsgType.DANGER)
     }
 
     /**
@@ -302,9 +295,9 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @author lifay
      */
     open fun showMessage(
-        msgType: MsgType,
         message: String,
-        autoClose: Boolean = true
+        msgType: MsgType = MsgType.ACCENT,
+        millis: Long = 3000
     ) {
         val msg = atlantafx.base.controls.Message(
             "提示",
@@ -363,8 +356,8 @@ abstract class BaseView<R : Pane>() : Initializable {
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
 
         openPlay.playFromStart()
-        if (autoClose) {
-            asyncDelayTask(3000) {
+        if (millis != 0L) {
+            asyncDelayTask(millis) {
                 platformRun { closeFunc() }
             }
         }
