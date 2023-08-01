@@ -2,7 +2,6 @@ package cn.lifay.test
 
 import cn.lifay.extension.alertConfirmation
 import cn.lifay.extension.alertWarn
-import cn.lifay.ui.message.Message.Companion.show
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.Alert

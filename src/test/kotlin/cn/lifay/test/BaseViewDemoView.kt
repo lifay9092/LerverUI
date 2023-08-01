@@ -118,4 +118,9 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
 //        }
 //        openPlay.playFromStart()
     }
-}
+
+    fun showMessage() {
+        showMessage("测试")
+        showErrMessage("测试")
+    }
+    }

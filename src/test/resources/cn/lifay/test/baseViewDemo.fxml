@@ -8,6 +8,7 @@
         <Button layoutX="60.0" layoutY="25.0" mnemonicParsing="false" onAction="#test" text="动态表单"/>
         <Button layoutX="229.0" layoutY="25.0" mnemonicParsing="false" onAction="#msgTest" text="信息提示"/>
         <Button layoutX="229.0" layoutY="55.0" mnemonicParsing="false" onAction="#msgTestNew" text="信息提示-新"/>
+        <Button layoutX="299.0" layoutY="55.0" mnemonicParsing="false" onAction="#showMessage" text="展示消息"/>
         <TabPane fx:id="tabPane" layoutX="63.0" layoutY="95.0" prefHeight="749.0" prefWidth="397.0"
                  tabClosingPolicy="UNAVAILABLE">
 
