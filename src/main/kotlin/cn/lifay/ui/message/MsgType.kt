@@ -6,7 +6,7 @@ package cn.lifay.ui.message
  *@Author lifay
  *@Date 2023/7/30 23:08
  **/
-enum class NotificationType {
+enum class MsgType {
 
     /**
      * 信息展示

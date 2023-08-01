@@ -353,7 +353,7 @@ inline fun alertDetail(
         dialogPane.isExpanded = isExpanded
     }
     if (GlobeTheme.ELEMENT_STYLE) {
-        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
     }
     return alert.showAndWait()
 }
@@ -391,7 +391,7 @@ inline fun alertDetail(
         dialogPane.isExpanded = isExpanded
     }
     if (GlobeTheme.ELEMENT_STYLE) {
-        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+//        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
     }
     return alert.showAndWait()
 }

@@ -6,7 +6,6 @@ import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.GlobeTheme
 import cn.lifay.ui.form.btn.CustomButton
-import cn.lifay.ui.message.Message
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
@@ -274,11 +273,11 @@ abstract class FormUI<T : Any>(
                         elementToProp()
                         //执行保存操作
                         saveData(entity)
-                        showMessage("保存成功", Message.Type.SUCCESS)
+                        showMessage("保存成功")
                         refreshTable()
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        showMessage("保存失败:" + e.message, Message.Type.ERROR)
+                        showMessage("保存失败:" + e.message)
                     } finally {
                         saveBtn.isDisable = false
                     }
@@ -300,13 +299,13 @@ abstract class FormUI<T : Any>(
                             //执行保存操作
                             checkPrimaryValue(idValue)
                             delData(idValue)
-                            showMessage("删除成功", Message.Type.SUCCESS)
+                            showMessage("删除成功")
                             clear()
                             refreshTable()
 
                         } catch (e: Exception) {
                             e.printStackTrace()
-                            showMessage("删除失败:" + e.message, Message.Type.ERROR)
+                            showMessage("删除失败:" + e.message)
                         } finally {
                             delBtn.isDisable = false
                         }
@@ -322,7 +321,7 @@ abstract class FormUI<T : Any>(
                     clear()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    showMessage("操作失败:" + e.message, Message.Type.ERROR)
+                    showMessage("操作失败:" + e.message)
                 } finally {
                     clearBtn.isDisable = false
                 }
