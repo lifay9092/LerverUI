@@ -15,6 +15,7 @@ import kotlin.reflect.KProperty1
 object TreeViewCache {
     /* treeViewId=获取数据的函数 */
     val TREE_DATA_CALL_MAP = HashMap<String, () -> List<*>>()
+
     /* treeViewId=获取图标的函数 */
     val TREE_IMG_CALL_MAP = HashMap<String, (TreeItem<*>) -> Unit>()
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()

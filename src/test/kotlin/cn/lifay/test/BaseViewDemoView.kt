@@ -123,4 +123,4 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
         showMessage("测试")
         showErrMessage("测试")
     }
-    }
+}

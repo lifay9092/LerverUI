@@ -88,6 +88,7 @@ abstract class FormUI<T : Any>(
             } else {
                 refreshForm(initDefaultEntity)
             }
+            initNotificationPane()
         } catch (e: Exception) {
             e.printStackTrace()
             throw LerverUIException("表单初始化失败:${e.message}")
@@ -126,6 +127,8 @@ abstract class FormUI<T : Any>(
 //            root.stylesheets.add(GlobeTheme.CSS_RESOURCE)
         }
         stage.initModality(Modality.APPLICATION_MODAL)
+        GlobeTheme.loadIcon(stage)
+
         root.children.addAll(form, table)
 
         //表单布局
@@ -144,7 +147,7 @@ abstract class FormUI<T : Any>(
         this.table.apply {
             padding = Insets(1.0, 2.0, 10.0, 2.0)
             columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
-            Styles.toggleStyleClass(table,Styles.STRIPED)
+            Styles.toggleStyleClass(table, Styles.STRIPED)
             columns.addAll(tableHeadColumns())
             refreshTable()
             setRowFactory {

@@ -2,9 +2,9 @@ package cn.lifay.ui
 
 import atlantafx.base.theme.PrimerDark
 import atlantafx.base.theme.PrimerLight
-import cn.lifay.exception.LerverUIException
-import cn.lifay.util.StaticUtil
 import javafx.application.Application
+import javafx.scene.image.Image
+import javafx.stage.Stage
 
 /**
  * GlobeTheme 主题全局类
@@ -14,7 +14,10 @@ import javafx.application.Application
 object GlobeTheme {
 
     var ELEMENT_STYLE = false
-//    val CSS_RESOURCE = this.javaClass.getResource("/css/element-ui.css")?.toExternalForm()
+
+    //    val CSS_RESOURCE = this.javaClass.getResource("/css/element-ui.css")?.toExternalForm()
+    val ICON = GlobeTheme.javaClass.getResource("/icon.png")?.toExternalForm()
+    lateinit var ICON_IMG: Image
 
     fun enableElement(b: Boolean) {
         ELEMENT_STYLE = b
@@ -41,6 +44,19 @@ object GlobeTheme {
 //            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
 //        Application.setUserAgentStylesheet(resource.toExternalForm())
         Application.setUserAgentStylesheet(PrimerDark().userAgentStylesheet)
+    }
 
+    /**
+     * 为窗体加载图标,默认：/icon.png
+     */
+    fun loadIcon(stage: Stage) {
+        if (!this::ICON_IMG.isInitialized) {
+            ICON?.let {
+                ICON_IMG = Image(it)
+                stage.icons.add(ICON_IMG)
+            }
+        } else {
+            stage.icons.add(ICON_IMG)
+        }
     }
 }

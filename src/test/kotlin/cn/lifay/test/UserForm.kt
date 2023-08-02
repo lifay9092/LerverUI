@@ -41,11 +41,11 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildE
         Thread.sleep(1000)
         println("保存数据操作:$data")
 //        showMessage("保存数据操作:$data",1000)
-        showNotification("保存数据操作:$data")
     }
 
     override fun delData(primaryValue: Any?) {
         println("删除数据操作:$primaryValue")
+        showNotification("保存数据操作:$primaryValue")
     }
 
 

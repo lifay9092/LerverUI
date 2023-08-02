@@ -1,13 +1,10 @@
 package cn.lifay.test
 
 import cn.lifay.extension.alertConfirmation
-import cn.lifay.extension.alertWarn
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.ButtonBar.ButtonData
-import javafx.scene.control.ButtonType
 import javafx.scene.layout.AnchorPane
 
 
@@ -38,9 +35,10 @@ class FormUIView {
     fun confirmationOld(actionEvent: ActionEvent) {
         alertConfirmation("将要执行删除操作,是否继续?")
     }
+
     fun confirmation(actionEvent: ActionEvent) {
         val alert = Alert(AlertType.CONFIRMATION)
-       // alert.title = "Confirmation Dialog"
+        // alert.title = "Confirmation Dialog"
         //alert.headerText = "header"
         alert.contentText = "text"
 //

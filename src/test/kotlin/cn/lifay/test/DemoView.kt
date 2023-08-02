@@ -1,7 +1,8 @@
 package cn.lifay.test
 
-import cn.lifay.db.DbManage
-import cn.lifay.extension.*
+import cn.lifay.extension.alertDetail
+import cn.lifay.extension.alertInfo
+import cn.lifay.extension.alertWarn
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -52,8 +53,8 @@ class DemoView : Initializable {
         splitMenuBtn.items.addAll(
             MenuItem("1111").apply {
                 setOnAction {
-                println("11111")
-            }
+                    println("11111")
+                }
             },
             MenuItem("2222").apply {
                 setOnAction {
@@ -93,7 +94,7 @@ class DemoView : Initializable {
         treeView.apply {
             root = rootTreeItem
             isShowRoot = true
-            Register(TreeTestVO::id, TreeTestVO::parentId,true){
+            Register(TreeTestVO::id, TreeTestVO::parentId, true) {
                 listOf(test1, test2, test3)
             }
             setOnMouseClicked {
@@ -103,8 +104,24 @@ class DemoView : Initializable {
                         items.add(MenuItem("根节点下添加").apply {
                             setOnAction {
                                 val selectedItem = treeView.selectionModel.selectedItem
-                                selectedItem.AddChildren(TreeTestVO("根节点下节点1", "6", "根节点下节点1", SimpleStringProperty("根节点下节点1")))
-                                selectedItem.AddChildrenList(listOf(TreeTestVO("根节点下节点2", "6", "根节点下节点2", SimpleStringProperty("根节点下节点2"))))
+                                selectedItem.AddChildren(
+                                    TreeTestVO(
+                                        "根节点下节点1",
+                                        "6",
+                                        "根节点下节点1",
+                                        SimpleStringProperty("根节点下节点1")
+                                    )
+                                )
+                                selectedItem.AddChildrenList(
+                                    listOf(
+                                        TreeTestVO(
+                                            "根节点下节点2",
+                                            "6",
+                                            "根节点下节点2",
+                                            SimpleStringProperty("根节点下节点2")
+                                        )
+                                    )
+                                )
                             }
                         })
                     }

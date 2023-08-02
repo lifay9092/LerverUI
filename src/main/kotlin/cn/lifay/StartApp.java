@@ -4,6 +4,7 @@ import javafx.application.Application;
 
 /**
  * StartApp TODO
+ *
  * @author lifay
  * @date 2023/6/15 16:04
  **/

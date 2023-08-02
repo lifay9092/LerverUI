@@ -113,7 +113,12 @@ abstract class BaseView<R : Pane>() : Initializable {
         }
     }
 
-    private fun initNotificationPane() {
+    protected fun initNotificationPane() {
+//        getRoot().scene.widthProperty().addListener { observableValue, old, new ->
+//            println("root:$new")
+//            println("msg w: ${MESSAGE_PANE.prefWidth}")
+//
+//        }
         NOTIFICATION_PANE.layoutXProperty().bind(rootPane().get().widthProperty().subtract(400.0).subtract(17))
         MESSAGE_PANE.layoutXProperty().bind(rootPane().get().widthProperty().divide(2).subtract(200))
     }
@@ -252,7 +257,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         val closeFunc = {
             NOTIFICATION_PANE.children.remove(msg)
             if (NOTIFICATION_PANE.children.size == 0) {
-                rootPane.children.remove(NOTIFICATION_PANE)
+                platformRun { rootPane.children.remove(NOTIFICATION_PANE) }
             }
         }
         msg.setOnClose {
@@ -268,7 +273,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         if (!NOTIFICATION_PANE.children.contains(msg)) {
             NOTIFICATION_PANE.children.add(msg)
             if (!rootPane.children.contains(NOTIFICATION_PANE)) {
-                rootPane.children.add(NOTIFICATION_PANE)
+                platformRun { rootPane.children.add(NOTIFICATION_PANE) }
             }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
@@ -334,7 +339,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         val closeFunc = {
             MESSAGE_PANE.children.remove(msg)
             if (MESSAGE_PANE.children.size == 0) {
-                rootPane.children.remove(MESSAGE_PANE)
+                platformRun { rootPane.children.remove(MESSAGE_PANE) }
             }
         }
         msg.setOnClose {
@@ -350,7 +355,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         if (!MESSAGE_PANE.children.contains(msg)) {
             MESSAGE_PANE.children.add(msg)
             if (!rootPane.children.contains(MESSAGE_PANE)) {
-                rootPane.children.add(MESSAGE_PANE)
+                platformRun { rootPane.children.add(MESSAGE_PANE) }
             }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
