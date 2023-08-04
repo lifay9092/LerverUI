@@ -12,8 +12,10 @@ import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
+import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
+import javafx.stage.Stage
 import javafx.stage.Window
 import javafx.util.Duration
 import org.kordamp.ikonli.javafx.FontIcon
@@ -90,7 +92,42 @@ abstract class BaseView<R : Pane>() : Initializable {
                 initNotificationPane()
             }
         }
+
+
+        /**
+         * 创建新的视图fxml、Stage窗口 并返回Stage
+         * @param fxml fxml资源
+         * @param isGlobeTheme 是否跟随GlobeTheme样式
+         * @param closeFunc 窗口关闭后回调函数，默认null
+         * @param initFunc 视图初始化后执行的方法
+         */
+        fun <T : BaseView<R>, R : Pane> createViewStage(
+            title: String,
+            fxml: URL, isGlobeTheme: Boolean = true,
+            closeFunc: (() -> Unit)? = null,
+            initFunc: T.() -> Unit
+        ): Stage {
+            val loader = FXMLLoader(fxml)
+            val load = loader.load<R>()
+            if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
+//                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
+            }
+            val view = loader.getController<T?>().apply {
+                rootPane().set(load)
+                initFunc()
+                initNotificationPane()
+            }
+            val scene = Scene(view.getRoot())
+            return Stage().apply {
+                this.title = title
+                this.isResizable = false
+                this.scene = scene
+                this.setOnCloseRequest { closeFunc?.let { it() } }
+            }
+        }
+
     }
+
 
     init {
         //注册方法
