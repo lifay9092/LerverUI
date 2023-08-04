@@ -14,6 +14,7 @@ import javafx.scene.text.Font
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import javafx.stage.Window
 
 /**
  * LoadingUI 加载中组件
@@ -21,7 +22,7 @@ import javafx.stage.StageStyle
  * @date 2022/10/9 20:26
  */
 class LoadingUI(
-    val owner: Stage,
+    val owner: Window,
     val animation: Boolean = false,
     val msg: String = "请耐心等待..."
 ) {
@@ -47,7 +48,7 @@ class LoadingUI(
         stage.initOwner(owner)
         stage.initStyle(StageStyle.TRANSPARENT)
         stage.initModality(Modality.APPLICATION_MODAL)
-        stage.icons.addAll(owner.icons)
+       // stage.icons.addAll(owner.icons)
         stage.x = owner.x
         stage.y = owner.y
         stage.height = owner.height

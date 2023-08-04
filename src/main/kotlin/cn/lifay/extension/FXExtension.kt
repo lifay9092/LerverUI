@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import javafx.stage.Window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -81,7 +82,7 @@ inline fun asyncDelayTask(
  * @return
  */
 inline fun asyncTaskLoading(
-    owner: Stage,
+    owner: Window,
     msg: String = "请耐心等待...",
     animation: Boolean = false,
     crossinline block: () -> Unit
