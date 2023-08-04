@@ -14,13 +14,13 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class Demo : Application() {
+class CommonDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobeTheme.enableElement(true)
         setUserAgentStylesheet(PrimerLight().userAgentStylesheet)
 
-        val fxmlLoader = FXMLLoader(Demo::class.java.getResource("demo.fxml"))
+        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
         val root = fxmlLoader.load<Pane>()
         val scene = Scene(root)
         primaryStage.title = "Hello World"

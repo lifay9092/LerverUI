@@ -14,6 +14,6 @@ import javafx.application.Application;
 public class Startup {
 
     public static void main(String[] args) {
-        Application.launch(Demo.class);
+        Application.launch(CommonDemo.class);
     }
 }
