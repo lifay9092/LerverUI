@@ -10,7 +10,6 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.HBox
 import java.net.URL
 import java.util.*
-import kotlin.reflect.KMutableProperty0
 
 
 /*
@@ -25,8 +24,8 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var tabPane = TabPane()
-    override fun rootPane(): KMutableProperty0<AnchorPane> {
-        return this::rootPane
+    override fun rootPane(): AnchorPane {
+        return this.rootPane
     }
 
     fun aaa(): String {

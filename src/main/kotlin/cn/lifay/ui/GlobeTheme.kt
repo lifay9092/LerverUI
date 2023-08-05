@@ -16,7 +16,7 @@ object GlobeTheme {
     var ELEMENT_STYLE = false
 
     //    val CSS_RESOURCE = this.javaClass.getResource("/css/element-ui.css")?.toExternalForm()
-    val ICON = GlobeTheme.javaClass.getResource("/icon.png")?.toExternalForm()
+    var ICON = GlobeTheme.javaClass.getResource("/icon.png")?.toExternalForm()
     lateinit var ICON_IMG: Image
 
     fun enableElement(b: Boolean) {
@@ -44,6 +44,16 @@ object GlobeTheme {
 //            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
 //        Application.setUserAgentStylesheet(resource.toExternalForm())
         Application.setUserAgentStylesheet(PrimerDark().userAgentStylesheet)
+    }
+
+    /**
+     * 为窗体设置图标,否则默认：/icon.png
+     */
+    fun setIconImage(imgClassPath: String) {
+        GlobeTheme.javaClass.getResource("/icon.png")?.let {
+            ICON = it.toExternalForm()
+            ICON_IMG = Image(ICON)
+        }
     }
 
     /**

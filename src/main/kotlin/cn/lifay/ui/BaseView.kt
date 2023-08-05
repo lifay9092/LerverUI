@@ -4,10 +4,12 @@ import atlantafx.base.theme.Styles
 import atlantafx.base.util.Animations
 import cn.lifay.extension.asyncDelayTask
 import cn.lifay.extension.asyncTask
+import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
 import cn.lifay.mq.FXEventBusException
 import cn.lifay.mq.FXEventBusOpt
-import cn.lifay.mq.FXReceiver
+import cn.lifay.mq.Receiver
+import cn.lifay.mq.event.Event
 import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -22,7 +24,6 @@ import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2OutlinedAL
 import java.net.URL
 import java.util.*
-import kotlin.reflect.KMutableProperty0
 
 
 /**
@@ -43,6 +44,9 @@ import kotlin.reflect.KMutableProperty0
  **/
 abstract class BaseView<R : Pane>() : Initializable {
 
+    var ROOT_PANE: R
+
+
     val NOTIFICATION_PANE = VBox(5.0).apply {
         isManaged = false
         spacing = 15.0
@@ -58,7 +62,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     companion object {
 
         /**
-         * 创建新的视图fxml
+         * 创建新的视图-fxml
          * @param fxml fxml资源
          * @param isGlobeTheme 是否跟随GlobeTheme样式
          */
@@ -69,28 +73,51 @@ abstract class BaseView<R : Pane>() : Initializable {
 //                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
-                rootPane().set(load)
+                ROOT_PANE = load
                 initNotificationPane()
             }
         }
 
         /**
-         * 创建新的视图fxml
+         * 创建新的视图-fxml
          * @param fxml fxml资源
          * @param isGlobeTheme 是否跟随GlobeTheme样式
          * @param initFunc 视图初始化后执行的方法
          */
-        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, isGlobeTheme: Boolean = true, initFunc: T.() -> Unit): T {
+        fun <T : BaseView<R>, R : Pane> createView(
+            fxml: URL,
+            isGlobeTheme: Boolean = true,
+            initFunc: (T.() -> Unit)? = null
+        ): T {
             val loader = FXMLLoader(fxml)
             var load = loader.load<R>()
             if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
 //                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
             }
             return loader.getController<T?>().apply {
-                rootPane().set(load)
-                initFunc()
+                ROOT_PANE = load
+                initFunc?.let { it() }
                 initNotificationPane()
             }
+        }
+
+        /**
+         * 创建新的视图-rootPane
+         * @param fxml fxml资源
+         * @param isGlobeTheme 是否跟随GlobeTheme样式
+         * @param initFunc 视图初始化后执行的方法
+         */
+        fun <R : Pane> createView(rootPane: R): BaseView<R> {
+            val baseView = object : BaseView<R>() {
+                /**
+                 * 注册根容器
+                 */
+                override fun rootPane(): R {
+                    return rootPane
+                }
+            }
+            baseView.initNotificationPane()
+            return baseView
         }
 
 
@@ -105,24 +132,17 @@ abstract class BaseView<R : Pane>() : Initializable {
             title: String,
             fxml: URL, isGlobeTheme: Boolean = true,
             closeFunc: (() -> Unit)? = null,
-            initFunc: T.() -> Unit
+            initFunc: (T.() -> Unit)? = null
         ): Stage {
-            val loader = FXMLLoader(fxml)
-            val load = loader.load<R>()
-            if (isGlobeTheme && GlobeTheme.ELEMENT_STYLE) {
-//                load.stylesheets.add(GlobeTheme.CSS_RESOURCE)
-            }
-            val view = loader.getController<T?>().apply {
-                rootPane().set(load)
-                initFunc()
-                initNotificationPane()
-            }
+            val view = createView(fxml, isGlobeTheme, initFunc)
             val scene = Scene(view.getRoot())
             return Stage().apply {
                 this.title = title
                 this.isResizable = false
                 this.scene = scene
                 this.setOnCloseRequest { closeFunc?.let { it() } }
+                this.bindEscKey()
+                GlobeTheme.loadIcon(this)
             }
         }
 
@@ -130,12 +150,14 @@ abstract class BaseView<R : Pane>() : Initializable {
 
 
     init {
+        ROOT_PANE = rootPane()
+
         //注册方法
         val clazz = this.javaClass
         for (method in clazz.declaredMethods) {
-            val fxReceiver = method.getAnnotation(FXReceiver::class.java)
-            if (fxReceiver != null) {
-                FXEventBusOpt.add(fxReceiver.id, this, method::invoke)
+            val receiver = method.getAnnotation(Receiver::class.java)
+            if (receiver != null) {
+                FXEventBusOpt.add(receiver.id, this, method::invoke)
             }
         }
     }
@@ -143,7 +165,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     /**
      * 注册根容器
      */
-    abstract fun rootPane(): KMutableProperty0<R>
+    abstract fun rootPane(): R
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         if (GlobeTheme.ELEMENT_STYLE) {
 //            getRoot().stylesheets.add(GlobeTheme.CSS_RESOURCE)
@@ -156,8 +178,8 @@ abstract class BaseView<R : Pane>() : Initializable {
 //            println("msg w: ${MESSAGE_PANE.prefWidth}")
 //
 //        }
-        NOTIFICATION_PANE.layoutXProperty().bind(rootPane().get().widthProperty().subtract(400.0).subtract(17))
-        MESSAGE_PANE.layoutXProperty().bind(rootPane().get().widthProperty().divide(2).subtract(200))
+        NOTIFICATION_PANE.layoutXProperty().bind(rootPane().widthProperty().subtract(400.0).subtract(17))
+        MESSAGE_PANE.layoutXProperty().bind(rootPane().widthProperty().divide(2).subtract(200))
     }
 
     open fun InitElemntStyle() {
@@ -165,22 +187,22 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
     open fun getRoot(): Parent {
-        return rootPane().get()
+        return rootPane()
 
     }
 
     open fun getWindow(): Window? {
-        return rootPane().get().scene.window
+        return rootPane().scene.window
     }
 
     /**
      * 发送消息
      * @param id 接受者ID
-     * @param args 参数值
+     * @param body 参数值
      * @author lifay
      * @return
      */
-    open fun send(id: String, vararg args: Any) {
+    open fun <T : Event> send(id: String, body: T) {
         val stackTraceElements = Thread.currentThread().stackTrace
 //        stackTraceElements.forEach { println(it) }
         val element = stackTraceElements[2]
@@ -189,7 +211,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
         }
         asyncTask {
-            FXEventBusOpt.invoke(id, args)
+            FXEventBusOpt.invoke(id, body)
         }
     }
 //
@@ -289,7 +311,7 @@ abstract class BaseView<R : Pane>() : Initializable {
                 )
             }
         }
-        val rootPane = rootPane().get()
+        val rootPane = rootPane()
 
         val closeFunc = {
             NOTIFICATION_PANE.children.remove(msg)
@@ -371,7 +393,7 @@ abstract class BaseView<R : Pane>() : Initializable {
                 )
             }
         }
-        val rootPane = rootPane().get()
+        val rootPane = rootPane()
 
         val closeFunc = {
             MESSAGE_PANE.children.remove(msg)

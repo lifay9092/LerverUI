@@ -11,7 +11,7 @@ import javafx.application.Application;
  */
 
 
-public class Startup {
+public class CommomStartup {
 
     public static void main(String[] args) {
         Application.launch(CommonDemo.class);

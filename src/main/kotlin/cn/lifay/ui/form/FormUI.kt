@@ -24,7 +24,6 @@ import org.kordamp.ikonli.feather.Feather
 import java.net.URL
 import java.util.*
 import java.util.function.Consumer
-import kotlin.reflect.KMutableProperty0
 import kotlin.reflect.full.primaryConstructor
 
 
@@ -115,8 +114,8 @@ abstract class FormUI<T : Any>(
      * @author lifay
      * @return
      */
-    override fun rootPane(): KMutableProperty0<VBox> {
-        return this::root
+    override fun rootPane(): VBox {
+        return this.root
     }
 
     /*
