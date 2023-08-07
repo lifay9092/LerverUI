@@ -354,7 +354,7 @@ fun <V> TreeItem<V>.UpdateItem(
  * 删除当前item元素
  */
 fun <V> TreeItem<V>.DeleteThis() {
-    this.parent.children?.remove(this)
+    this.parent?.children?.remove(this)
 }
 
 

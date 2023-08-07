@@ -20,6 +20,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.javafx.FontIcon
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.util.*
 
 /**
@@ -395,4 +397,17 @@ inline fun alertDetail(
 //        alert.dialogPane.stylesheets.add(GlobeTheme.CSS_RESOURCE)
     }
     return alert.showAndWait()
+}
+
+/**
+ * 把文本内容设置到系统剪贴板
+ * @param text 文本内容
+ * @author lifay
+ */
+fun copyToClipboard(text: String) {
+    // 获取系统剪贴板
+    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+    // 封装文本内容
+    val trans = StringSelection(text)
+    clipboard.setContents(trans, null)
 }

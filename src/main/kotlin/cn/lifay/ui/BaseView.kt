@@ -3,12 +3,8 @@ package cn.lifay.ui
 import atlantafx.base.theme.Styles
 import atlantafx.base.util.Animations
 import cn.lifay.extension.asyncDelayTask
-import cn.lifay.extension.asyncTask
 import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
-import cn.lifay.mq.FXEventBusException
-import cn.lifay.mq.FXEventBusOpt
-import cn.lifay.mq.Receiver
 import cn.lifay.mq.event.Event
 import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
@@ -152,14 +148,14 @@ abstract class BaseView<R : Pane>() : Initializable {
     init {
         ROOT_PANE = rootPane()
 
-        //注册方法
-        val clazz = this.javaClass
-        for (method in clazz.declaredMethods) {
-            val receiver = method.getAnnotation(Receiver::class.java)
-            if (receiver != null) {
-                FXEventBusOpt.add(receiver.id, this, method::invoke)
-            }
-        }
+//        //注册方法
+//        val clazz = this.javaClass
+//        for (method in clazz.declaredMethods) {
+//            val receiver = method.getAnnotation(Receiver::class.java)
+//            if (receiver != null) {
+//                EventBus.add(receiver.id, this, method::invoke)
+//            }
+//        }
     }
 
     /**
@@ -203,16 +199,16 @@ abstract class BaseView<R : Pane>() : Initializable {
      * @return
      */
     open fun <T : Event> send(id: String, body: T) {
-        val stackTraceElements = Thread.currentThread().stackTrace
-//        stackTraceElements.forEach { println(it) }
-        val element = stackTraceElements[2]
-//        println(element)
-        if (FXEventBusOpt.has(element.className, element.methodName)) {
-            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
-        }
-        asyncTask {
-            FXEventBusOpt.invoke(id, body)
-        }
+//        val stackTraceElements = Thread.currentThread().stackTrace
+////        stackTraceElements.forEach { println(it) }
+//        val element = stackTraceElements[2]
+////        println(element)
+//        if (EventBus.has(element.className, element.methodName)) {
+//            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
+//        }
+//        asyncTask {
+//            EventBus.invoke(id, body)
+//        }
     }
 //
 //

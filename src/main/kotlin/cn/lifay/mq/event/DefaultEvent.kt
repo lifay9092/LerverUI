@@ -6,6 +6,6 @@ package cn.lifay.mq.event
  *@Author lifay
  *@Date 2023/8/5 16:14
  **/
-class TextEvent(id: String, val text: String) : Event(id) {
+class DefaultEvent(id: String) : Event(id) {
 
 }

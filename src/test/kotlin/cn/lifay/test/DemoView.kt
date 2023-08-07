@@ -4,7 +4,7 @@ import cn.lifay.extension.alertDetail
 import cn.lifay.extension.alertInfo
 import cn.lifay.extension.alertWarn
 import cn.lifay.extension.platformRun
-import cn.lifay.mq.FXEventBusOpt
+import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.table.TableEditCell
@@ -290,13 +290,14 @@ class DemoView : Initializable {
             )
         }
         val baseView = BaseView.createView(hBox)
-        FXEventBusOpt.subscribe("接受通知", TextEvent::class) {
+        EventBus.subscribe("接受通知", TextEvent::class) {
             platformRun {
                 textArea.appendText("${it.text}\n")
             }
         }
         val stage = Stage(StageStyle.DECORATED)
         stage.scene = Scene(baseView.getRoot())
+        println("class:${stage.hashCode()}")
         stage.show()
 
     }
@@ -312,7 +313,7 @@ class DemoView : Initializable {
         }
         val baseView = BaseView.createView(hBox)
         button.setOnAction {
-            FXEventBusOpt.publish(TextEvent("接受通知", textArea.text))
+            EventBus.publish(TextEvent("接受通知", textArea.text))
         }
 
         val stage = Stage(StageStyle.DECORATED)
