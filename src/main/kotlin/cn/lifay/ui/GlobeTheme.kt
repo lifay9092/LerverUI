@@ -2,6 +2,8 @@ package cn.lifay.ui
 
 import atlantafx.base.theme.PrimerDark
 import atlantafx.base.theme.PrimerLight
+import cn.lifay.mq.EventBus
+import cn.lifay.mq.event.TextEvent
 import javafx.application.Application
 import javafx.scene.image.Image
 import javafx.stage.Stage
@@ -14,6 +16,7 @@ import javafx.stage.Stage
 object GlobeTheme {
 
     var ELEMENT_STYLE = false
+    var THEME_STYLE = "White"
 
     //    val CSS_RESOURCE = this.javaClass.getResource("/css/element-ui.css")?.toExternalForm()
     var ICON = GlobeTheme.javaClass.getResource("/icon.png")?.toExternalForm()
@@ -32,7 +35,7 @@ object GlobeTheme {
 //            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.whiteTheme())
 //        Application.setUserAgentStylesheet(resource.toExternalForm())
         Application.setUserAgentStylesheet(PrimerLight().userAgentStylesheet)
-
+        THEME_STYLE = "White"
     }
 
     /**
@@ -44,8 +47,9 @@ object GlobeTheme {
 //            ?: throw LerverUIException("获取不到css文件:" + StaticUtil.darkTheme())
 //        Application.setUserAgentStylesheet(resource.toExternalForm())
         Application.setUserAgentStylesheet(PrimerDark().userAgentStylesheet)
+        THEME_STYLE = "Dark"
     }
-
+    fun isWhite() = "White" == THEME_STYLE
     /**
      * 为窗体设置图标,否则默认：/icon.png
      */

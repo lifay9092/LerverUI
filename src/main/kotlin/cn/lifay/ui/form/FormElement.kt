@@ -220,7 +220,16 @@ abstract class FormElement<T : Any, R : Any>(
         when (r) {
             java.lang.Boolean::class.java -> {
                 col.setCellValueFactory { p: TableColumn.CellDataFeatures<T, R> ->
-                    val b = getElementValue() as Boolean
+                    val entityValue = if (customProp == null) {
+                        if (property2 != null) {
+                            property2!!.get(p.value)
+                        } else {
+                            property!!.get(p.value)
+                        }
+                    } else {
+                        customProp!!.getValue(p.value)
+                    }
+                    val b = convertToBool(entityValue)
                     val v = if (b) "是" else "否"
                     val property = SimpleStringProperty(v) as ObservableValue<R>
                     property
@@ -232,6 +241,58 @@ abstract class FormElement<T : Any, R : Any>(
             }
         }
         return col
+    }
+
+    /**
+     * 转换参数值为布尔类型
+     * @param v 参数值
+     * @author lifay
+     * @return 布尔类型的值
+     */
+    protected fun convertToBool(v: R?): Boolean {
+        if (v == null) {
+            return false
+        }
+        if (v is Boolean) {
+            return v
+        }
+        return when (v) {
+            "1", 1, 1.0 -> {
+                true
+            }
+
+            else -> {
+                false
+            }
+        }
+    }
+
+    /**
+     * 转换布尔类型值为R泛型类型
+     * @param b 布尔类型值
+     * @author lifay
+     * @return R泛型类型的值
+     */
+    protected fun convertBoolToR(b: Boolean): R {
+        return when (r) {
+            java.lang.Boolean::class.java -> {
+                b
+            }
+            java.lang.String::class.java -> {
+                if (b) "1" else "0"
+            }
+
+            java.lang.Integer::class.java, java.lang.Long::class.java -> {
+                if (b) 1 else 0
+            }
+
+            java.lang.Double::class.java, java.lang.Float::class.java -> {
+                if (b) 1.0 else 0.0
+            }
+            else -> {
+                throw Exception("not surport ${b} ${r}")
+            }
+        } as R
     }
 
 }

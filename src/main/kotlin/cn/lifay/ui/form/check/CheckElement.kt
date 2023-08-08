@@ -69,12 +69,12 @@ class CheckElement<T : Any, R : Any>(
     }
 
     override fun getElementValue(): R {
-        return convert(graphic().isSelected)
+        return convertBoolToR(graphic().isSelected)
     }
 
     override fun setElementValue(v: R?) {
 
-        graphic().isSelected = convert(v)
+        graphic().isSelected = convertToBool(v)
     }
 
     override fun clear() {
@@ -86,7 +86,7 @@ class CheckElement<T : Any, R : Any>(
     }
 
     override fun defaultValue(): R {
-        return convert(graphic().isSelected)
+        return convertBoolToR(graphic().isSelected)
 
     }
 
@@ -98,45 +98,6 @@ class CheckElement<T : Any, R : Any>(
         fun setValue(r: Any) {
             control.setValue(r as R)
         }*/
-    private fun convert(b: Boolean): R {
-        return when (r) {
-            java.lang.Boolean::class.java -> {
-                b
-            }
 
-            java.lang.String::class.java -> {
-                if (b) "1" else "0"
-            }
 
-            java.lang.Integer::class.java, java.lang.Long::class.java -> {
-                if (b) 1 else 0
-            }
-
-            java.lang.Double::class.java, java.lang.Float::class.java -> {
-                if (b) 1.0 else 0.0
-            }
-
-            else -> {
-                println("not surport ${b} ${r}")
-            }
-        } as R
-    }
-
-    private fun convert(v: R?): Boolean {
-        if (v == null) {
-            return false
-        }
-        if (v is Boolean) {
-            return v
-        }
-        return when (v) {
-            "1", 1, 1.0 -> {
-                true
-            }
-
-            else -> {
-                false
-            }
-        }
-    }
 }
