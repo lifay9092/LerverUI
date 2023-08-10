@@ -32,7 +32,7 @@
 >外部类创建
 
 ```kotlin
-GlobeTheme.enableElement(true)
+GlobalResource.enableElement(true)
 val view = BaseView.createView<BaseViewDemoView, AnchorPane>(xxx.fxml)
 val scene = Scene(view.getRoot())
 primaryStage.title = "Hello World"
@@ -41,7 +41,7 @@ primaryStage.show()
 ```
 >BaseView子视图内创建
 ```kotlin
-GlobeTheme.enableElement(true)
+GlobalResource.enableElement(true)
 
 //...
 

@@ -4,10 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.lifay</groupId>
-    <artifactId>LerverUI</artifactId>
-    <version>3.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <groupId>cn.lifay.LerverUI</groupId>
+    <artifactId>Parent</artifactId>
+    <version>1.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>Core</module>
+        <module>Sample</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -33,6 +37,7 @@
             <url>http://www.lifay.cn:8081/repository/maven-public/</url>
         </repository>
     </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -85,7 +90,7 @@
         <dependency>
             <groupId>io.github.mkpaz</groupId>
             <artifactId>atlantafx-base</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
@@ -123,24 +128,10 @@
                             <jvmTarget>17</jvmTarget>
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                                <!--
-                                                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                                -->
                             </sourceDirs>
                         </configuration>
                     </execution>
-                    <!--  <execution>
-                          <id>test-compile</id>
-                          <goals> <goal>test-compile</goal> </goals>
-                          <configuration>
-                              <sourceDirs>
-                                  <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-  &lt;!&ndash;
-                                  <sourceDir>${project.basedir}/src/test/java</sourceDir>
-  &ndash;&gt;
-                              </sourceDirs>
-                          </configuration>
-                      </execution>-->
+
                 </executions>
                 <configuration>
                     <compilerPlugins>
