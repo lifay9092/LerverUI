@@ -1,3 +1,0 @@
-package cn.lifay.extension
-
-

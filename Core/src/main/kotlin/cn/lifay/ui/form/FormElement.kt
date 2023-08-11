@@ -1,5 +1,6 @@
 package cn.lifay.ui.form
 
+import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.platformRun
 import cn.lifay.extension.textFillColor
 import cn.lifay.ui.DelegateProp
@@ -290,7 +291,7 @@ abstract class FormElement<T : Any, R : Any>(
                 if (b) 1.0 else 0.0
             }
             else -> {
-                throw Exception("not surport ${b} ${r}")
+                throw LerverUIException("not surport ${b} ${r}")
             }
         } as R
     }

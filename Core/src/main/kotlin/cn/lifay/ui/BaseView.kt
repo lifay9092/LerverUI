@@ -103,7 +103,7 @@ abstract class BaseView<R : Pane>() : Initializable {
                 /**
                  * 注册根容器
                  */
-                override fun rootPane(): R {
+                override fun ROOT_PANE(): R {
                     return rootPane
                 }
             }
@@ -141,7 +141,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 
 
     init {
-        ROOT_PANE = rootPane()
+        ROOT_PANE = ROOT_PANE()
 
 //        //注册方法
 //        val clazz = this.javaClass
@@ -156,7 +156,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     /**
      * 注册根容器
      */
-    abstract fun rootPane(): R
+    abstract fun ROOT_PANE(): R
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
 
     }
@@ -167,8 +167,14 @@ abstract class BaseView<R : Pane>() : Initializable {
 //            println("msg w: ${MESSAGE_PANE.prefWidth}")
 //
 //        }
-        NOTIFICATION_PANE.layoutXProperty().bind(rootPane().widthProperty().subtract(400.0).subtract(17))
-        MESSAGE_PANE.layoutXProperty().bind(rootPane().widthProperty().divide(2).subtract(200))
+//        println(GlobalResource.SCREEN_WIDTH)
+//        println(GlobalResource.MSG_WIDTH)
+
+        NOTIFICATION_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
+        MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH/2))
+
+        ROOT_PANE.children.add(NOTIFICATION_PANE)
+        ROOT_PANE.children.add(MESSAGE_PANE)
     }
 
     open fun InitElemntStyle() {
@@ -176,12 +182,11 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
     open fun getRoot(): Parent {
-        return rootPane()
-
+        return ROOT_PANE()
     }
 
     open fun getWindow(): Window? {
-        return rootPane().scene.window
+        return ROOT_PANE().scene.window
     }
 
     /**
@@ -203,65 +208,24 @@ abstract class BaseView<R : Pane>() : Initializable {
 //            EventBus.invoke(id, body)
 //        }
     }
-//
-//
-//    /**
-//     * 显示一则指定类型默认延迟的消息
-//     *
-//     * @param message 通知信息
-//     */
-//    open fun showMessage(message: String, delay: Long = 2500) {
-//        showMessage(message, Message.Type.INFO, delay)
-//    }
-//
-//    /**
-//     * 显示一则指定类型指定延迟的消息
-//     *
-//     * @param message 通知信息
-//     */
-//    @JvmOverloads
-//    open fun showMessage(message: String, type: Message.Type = Message.Type.INFO, delay: Long = 2500) {
-//        val root = getRoot()
-//        if (root !is Pane) {
-//            alertError("root 必须是 Pane 或其子类 : ${root}")
-//            return
-//        }
-//        Message.show(root, message, type, delay)
-//    }
-//
-//    open fun showNotification(message: String, milliseconds: Long = Notification.DEFAULT_DELAY) {
-//        showNotification(message, Notification.Type.INFO, milliseconds)
-//    }
-//
-//    /**
-//     * 显示一则指定类型的通知，自动关闭，指定显示时间
-//     *
-//     * @param message      通知信息
-//     * @param type         通知类型
-//     * @param milliseconds 延迟时间 毫秒
-//     */
-//    @JvmOverloads
-//    open fun showNotification(
-//        message: String,
-//        type: Notification.Type,
-//        milliseconds: Long = Notification.DEFAULT_DELAY
-//    ) {
-//        val root = getRoot()
-//        if (root !is Pane) {
-//            alertError("root 必须是 Pane 或其子类 : ${root}")
-//            return
-//        }
-//        Notification.showAutoClose(root, message, type, milliseconds)
-//    }
-//
-    /**
-     * 弹出系统通知
-     * @author lifay
-     */
-//    open fun showNotification(message: String) {
-//        showNotification(message)
-//    }
 
+
+    fun getMsgStyle(msgType: MsgType):String{
+        return when (msgType) {
+            MsgType.ACCENT -> {
+                    Styles.ACCENT
+            }
+            MsgType.WARNING -> {
+                    Styles.WARNING
+            }
+            MsgType.DANGER -> {
+                    Styles.DANGER
+            }
+            MsgType.SUCCESS -> {
+                    Styles.SUCCESS
+            }
+        }
+    }
     /**
      * 弹出系统通知
      * @author lifay
@@ -273,40 +237,12 @@ abstract class BaseView<R : Pane>() : Initializable {
     ) {
         val msg = atlantafx.base.controls.Notification(
             message,
-            FontIcon(Material2OutlinedAL.HELP_OUTLINE)
+            FontIcon(Material2OutlinedAL.INFO)
         )
-        when (msgType) {
-            MsgType.ACCENT -> {
-                msg.styleClass.addAll(
-                    Styles.ACCENT, Styles.ELEVATED_1
-                )
-            }
-
-            MsgType.WARNING -> {
-                msg.styleClass.addAll(
-                    Styles.WARNING, Styles.ELEVATED_1
-                )
-            }
-
-            MsgType.DANGER -> {
-                msg.styleClass.addAll(
-                    Styles.DANGER, Styles.ELEVATED_1
-                )
-            }
-
-            MsgType.SUCCESS -> {
-                msg.styleClass.addAll(
-                    Styles.SUCCESS, Styles.ELEVATED_1
-                )
-            }
-        }
-        val rootPane = rootPane()
+        msg.styleClass.addAll(getMsgStyle(msgType),Styles.ELEVATED_1)
 
         val closeFunc = {
             NOTIFICATION_PANE.children.remove(msg)
-            if (NOTIFICATION_PANE.children.size == 0) {
-                platformRun { rootPane.children.remove(NOTIFICATION_PANE) }
-            }
         }
         msg.setOnClose {
             val closePlay = Animations.slideOutUp(msg, Duration.millis(250.0))
@@ -315,14 +251,14 @@ abstract class BaseView<R : Pane>() : Initializable {
             }
             closePlay.playFromStart()
         }
-        msg.maxWidth = 400.0
-        msg.minWidth = 400.0
+        msg.maxWidth = GlobalResource.MSG_WIDTH
+        msg.minWidth = GlobalResource.MSG_WIDTH
 
         if (!NOTIFICATION_PANE.children.contains(msg)) {
-            NOTIFICATION_PANE.children.add(msg)
-            if (!rootPane.children.contains(NOTIFICATION_PANE)) {
-                platformRun { rootPane.children.add(NOTIFICATION_PANE) }
-            }
+            platformRun { NOTIFICATION_PANE.children.add(msg) }
+//            if (!rootPane.children.contains(NOTIFICATION_PANE)) {
+//                platformRun { rootPane.children.add(NOTIFICATION_PANE) }
+//            }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
 
@@ -347,6 +283,7 @@ abstract class BaseView<R : Pane>() : Initializable {
      * 弹出提示
      * @author lifay
      */
+    @Synchronized
     open fun showMessage(
         message: String,
         msgType: MsgType = MsgType.ACCENT,
@@ -355,40 +292,15 @@ abstract class BaseView<R : Pane>() : Initializable {
         val msg = atlantafx.base.controls.Message(
             "提示",
             message,
-            FontIcon(Material2OutlinedAL.HELP_OUTLINE)
+            FontIcon(Material2OutlinedAL.INFO)
         )
-        when (msgType) {
-            MsgType.ACCENT -> {
-                msg.styleClass.addAll(
-                    Styles.ACCENT, Styles.ELEVATED_1
-                )
-            }
+        msg.styleClass.addAll(getMsgStyle(msgType),Styles.ELEVATED_1)
 
-            MsgType.WARNING -> {
-                msg.styleClass.addAll(
-                    Styles.WARNING, Styles.ELEVATED_1
-                )
-            }
-
-            MsgType.DANGER -> {
-                msg.styleClass.addAll(
-                    Styles.DANGER, Styles.ELEVATED_1
-                )
-            }
-
-            MsgType.SUCCESS -> {
-                msg.styleClass.addAll(
-                    Styles.SUCCESS, Styles.ELEVATED_1
-                )
-            }
-        }
-        val rootPane = rootPane()
-
+//        if (!ROOT_PANE.children.contains(MESSAGE_PANE)) {
+//            platformRun { ROOT_PANE.children.add(MESSAGE_PANE) }
+//        }
         val closeFunc = {
-            MESSAGE_PANE.children.remove(msg)
-            if (MESSAGE_PANE.children.size == 0) {
-                platformRun { rootPane.children.remove(MESSAGE_PANE) }
-            }
+            platformRun { MESSAGE_PANE.children.remove(msg) }
         }
         msg.setOnClose {
             val closePlay = Animations.slideOutUp(msg, Duration.millis(250.0))
@@ -397,14 +309,11 @@ abstract class BaseView<R : Pane>() : Initializable {
             }
             closePlay.playFromStart()
         }
-        msg.maxWidth = 400.0
-        msg.minWidth = 400.0
+        msg.maxWidth = GlobalResource.MSG_WIDTH
+        msg.minWidth = GlobalResource.MSG_WIDTH
 
         if (!MESSAGE_PANE.children.contains(msg)) {
-            MESSAGE_PANE.children.add(msg)
-            if (!rootPane.children.contains(MESSAGE_PANE)) {
-                platformRun { rootPane.children.add(MESSAGE_PANE) }
-            }
+            platformRun { MESSAGE_PANE.children.add(msg) }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
 

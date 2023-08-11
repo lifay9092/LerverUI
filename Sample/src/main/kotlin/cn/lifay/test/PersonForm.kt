@@ -17,7 +17,7 @@ class PersonForm(t: Person? = null) : FormUI<Person>("人", t, {
     val id = TextElement<Person, Int>("ID：", DelegateProp("id"), primary = true)
     val name = TextElement<Person, String>("姓名：", DelegateProp("name"))
     val child = CheckElement<Person, Boolean>("成年：", DelegateProp("child"))
-    listOf(id, name, child)
+    addElement(id, name, child)
 }) {
 
     override fun datas(): List<Person> {

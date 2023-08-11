@@ -36,7 +36,7 @@ import java.util.*
  * @Author 李方宇
  * @Date 2023/1/9 16:14
  */
-class DemoView : Initializable {
+class CommonDemoView : Initializable {
     @FXML
     var splitMenuBtn = SplitMenuButton()
 

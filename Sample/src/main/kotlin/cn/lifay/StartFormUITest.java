@@ -1,5 +1,6 @@
 package cn.lifay;
 
+import cn.lifay.test.FormUITest;
 import javafx.application.Application;
 
 /**

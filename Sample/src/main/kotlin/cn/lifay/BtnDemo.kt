@@ -17,7 +17,7 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class Demo : Application() {
+class BtnDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         DbManage.Init()

@@ -1,6 +1,7 @@
 package cn.lifay.ui.form
 
 import atlantafx.base.theme.Styles
+import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
@@ -58,7 +59,7 @@ abstract class FormUI<T : Any>(
 
     protected var entity: T? = null
     private val stage = Stage().bindEscKey()
-    private var root = VBox(10.0)
+    private lateinit var root : VBox
     private val form = GridPane()
     private val table = TableView<T>()
 
@@ -89,7 +90,7 @@ abstract class FormUI<T : Any>(
             initNotificationPane()
         } catch (e: Exception) {
             e.printStackTrace()
-            throw cn.lifay.exception.LerverUIException("表单初始化失败:${e.message}")
+            throw LerverUIException("表单初始化失败:${e.message}")
         }
     }
 
@@ -113,7 +114,8 @@ abstract class FormUI<T : Any>(
      * @author lifay
      * @return
      */
-    override fun rootPane(): VBox {
+    override fun ROOT_PANE(): VBox {
+        this.root = VBox(10.0)
         return this.root
     }
 
@@ -134,7 +136,7 @@ abstract class FormUI<T : Any>(
 
         buildElements(this)
         if (elements.isEmpty()) {
-            throw cn.lifay.exception.LerverUIException("未获取到有效表单元素!")
+            throw LerverUIException("未获取到有效表单元素!")
         }
         initElements()
 
@@ -293,7 +295,7 @@ abstract class FormUI<T : Any>(
                             //从元素赋值到实例
                             elementToProp()
                             //获取主键值
-                            val idValue = getPrimaryValue() ?: throw Exception("未获取到主键属性!")
+                            val idValue = getPrimaryValue() ?: throw LerverUIException("未获取到主键属性!")
                             //执行保存操作
                             checkPrimaryValue(idValue)
                             delData(idValue)

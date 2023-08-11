@@ -1,5 +1,6 @@
 package cn.lifay.test
 
+import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.styleWarn
 import cn.lifay.ui.form.FormUI
 import cn.lifay.ui.form.btn.CustomButton
@@ -36,7 +37,7 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t, buildE
 
     override fun saveData(data: UserData?) {
         if (data!!.name!!.isBlank()) {
-            throw RuntimeException("名称不能为空!")
+            throw LerverUIException("名称不能为空!")
         }
         Thread.sleep(1000)
         println("保存数据操作:$data")

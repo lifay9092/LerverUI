@@ -19,6 +19,7 @@ object GlobalResource {
      */
     val SCREEN_WIDTH = Screen.getPrimary().bounds.width
     val SCREEN_HEIGHT = Screen.getPrimary().bounds.height
+    val MSG_WIDTH = Screen.getPrimary().bounds.width * 0.15
 
     /**
      * 资源文件

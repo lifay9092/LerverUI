@@ -8,6 +8,6 @@ package cn.lifay.exception;
  **/
 public class LerverUIException extends RuntimeException {
     public LerverUIException(String message) {
-        super("LerverUI error: " + message);
+        super("UI error: " + message);
     }
 }

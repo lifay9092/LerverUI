@@ -8,9 +8,9 @@ import javafx.application.Application;
  * @author lifay
  * @date 2023/6/15 16:04
  **/
-public class StartApp {
+public class BtnStartApp {
     public static void main(String[] args) {
-        Application.launch(Demo.class);
+        Application.launch(BtnDemo.class);
 
     }
 }

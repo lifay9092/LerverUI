@@ -1,6 +1,7 @@
 package cn.lifay.extension
 
 import atlantafx.base.theme.Styles
+import cn.lifay.exception.LerverUIException
 import cn.lifay.ui.LoadingUI
 import javafx.application.Platform
 import javafx.css.PseudoClass
@@ -51,7 +52,7 @@ inline fun asyncTask(
         try {
             //执行任务
             block()
-        } catch (e: Exception) {
+        } catch (e: LerverUIException) {
             e.printStackTrace()
         }
     }
@@ -71,7 +72,7 @@ inline fun asyncDelayTask(
             delay(time)
             //执行任务
             block()
-        } catch (e: Exception) {
+        } catch (e: LerverUIException) {
             e.printStackTrace()
         }
     }
@@ -94,7 +95,7 @@ inline fun asyncTaskLoading(
             platformRun { loadingUI.show() }
             //执行任务
             block()
-        } catch (e: Exception) {
+        } catch (e: LerverUIException) {
             e.printStackTrace()
         } finally {
             platformRun { loadingUI.closeStage() }

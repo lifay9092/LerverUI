@@ -1,5 +1,6 @@
 package cn.lifay.db
 
+import cn.lifay.exception.LerverUIException
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.logging.ConsoleLogger
@@ -48,7 +49,7 @@ object DbManage {
             //拷贝db.db
             val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
             if (resourceAsStream == null) {
-                throw Exception("失败")
+                throw LerverUIException("失败")
             }
             val dbPath = userDir + File.separator + DB_NAME
             resourceAsStream.use {
@@ -100,7 +101,7 @@ object DbManage {
         //db最后一次版本
         val lastVersion = cn.lifay.db.DbManage.GetLastVersion(true)
         if (lastVersion.isBlank()) {
-            throw Exception("初始化db失败")
+            throw LerverUIException("初始化db失败")
         }
         val lastVersionNo = lastVersion.toInt()
         //脚本目录
@@ -120,7 +121,7 @@ object DbManage {
                 // val result = ExecuteSql(*sqlFile.readText().split(";").filter { it.trim().isNotBlank() }.map { "$it;" }.toTypedArray())
                 val result = cn.lifay.db.DbManage.ExecuteSql(sqlFile.readText())
                 if (!result) {
-                    throw Exception("升级版本失败:${sqlFile.name}")
+                    throw LerverUIException("升级版本失败:${sqlFile.name}")
                 } else {
                     println("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
@@ -206,7 +207,7 @@ object DbManage {
 
     fun VerifyConfig() {
         if (!this::database.isInitialized) {
-            throw Exception("请先初始化数据库连接:Config()")
+            throw LerverUIException("请先初始化数据库连接:Config()")
         }
     }
 

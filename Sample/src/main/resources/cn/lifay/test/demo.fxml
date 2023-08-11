@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <AnchorPane fx:id="rootPane" prefHeight="771.0" prefWidth="1114.0" xmlns="http://javafx.com/javafx/20.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.DemoView">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.CommonDemoView">
     <children>
         <Button layoutX="124.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单"/>
         <Button layoutX="124.0" layoutY="207.0" mnemonicParsing="false" onAction="#info" text="信息提示"/>
