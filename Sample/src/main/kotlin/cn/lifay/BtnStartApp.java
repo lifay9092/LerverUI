@@ -1,5 +1,6 @@
 package cn.lifay;
 
+import cn.lifay.test.BtnDemo;
 import javafx.application.Application;
 
 /**

@@ -1,4 +1,4 @@
-package cn.lifay
+package cn.lifay.test
 
 import atlantafx.base.theme.PrimerLight
 import atlantafx.base.theme.Styles
