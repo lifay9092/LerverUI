@@ -6,7 +6,6 @@ import cn.lifay.extension.alertWarn
 import cn.lifay.extension.platformRun
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
-import cn.lifay.ui.BaseView
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -17,16 +16,12 @@ import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.HBox
-import javafx.stage.Stage
-import javafx.stage.StageStyle
 import java.net.URL
 import java.util.*
 
@@ -37,6 +32,7 @@ import java.util.*
  * @Date 2023/1/9 16:14
  */
 class CommonDemoView : Initializable {
+
     @FXML
     var splitMenuBtn = SplitMenuButton()
 
@@ -55,6 +51,15 @@ class CommonDemoView : Initializable {
 
     @FXML
     var tableView = TableView<TableTestVO>()
+
+    @FXML
+    var sendText = TextArea()
+
+    @FXML
+    var user1 = TextArea()
+
+    @FXML
+    var user2 = TextArea()
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         val observableArrayList = FXCollections.observableArrayList<TreeTestVO>()
@@ -189,6 +194,17 @@ class CommonDemoView : Initializable {
                 )
             }
         }
+
+        EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
+            platformRun {
+                user1.appendText("${it.text}\n")
+            }
+        }
+        EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
+            platformRun {
+                user2.appendText("${it.text}\n")
+            }
+        }
     }
 
     fun treeTest(actionEvent: ActionEvent) {
@@ -280,45 +296,8 @@ class CommonDemoView : Initializable {
 
     }
 
-    fun chat1(actionEvent: ActionEvent) {
-        val textArea = TextArea()
-        val button = Button("发送消息")
-        val hBox = HBox(10.0).apply {
-            children.addAll(
-                textArea,
-                //    button
-            )
-        }
-        val baseView = BaseView.createView(hBox)
-        EventBus.subscribe("接受通知", TextEvent::class) {
-            platformRun {
-                textArea.appendText("${it.text}\n")
-            }
-        }
-        val stage = Stage(StageStyle.DECORATED)
-        stage.scene = Scene(baseView.getRoot())
-        println("class:${stage.hashCode()}")
-        stage.show()
-
-    }
-
-    fun chat2(actionEvent: ActionEvent) {
-        val textArea = TextArea()
-        val button = Button("发送消息")
-        val hBox = HBox(10.0).apply {
-            children.addAll(
-                textArea,
-                button
-            )
-        }
-        val baseView = BaseView.createView(hBox)
-        button.setOnAction {
-            EventBus.publish(TextEvent("接受通知", textArea.text))
-        }
-
-        val stage = Stage(StageStyle.DECORATED)
-        stage.scene = Scene(baseView.getRoot())
-        stage.show()
+    fun chat(actionEvent: ActionEvent) {
+        EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
     }
 
 

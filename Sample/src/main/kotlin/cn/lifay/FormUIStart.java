@@ -9,7 +9,7 @@ import javafx.application.Application;
  * @author lifay
  * @date 2023/2/24 17:19
  **/
-public class StartFormUITest {
+public class FormUIStart {
 
     public static void main(String[] args) {
         Application.launch(FormUITest.class);

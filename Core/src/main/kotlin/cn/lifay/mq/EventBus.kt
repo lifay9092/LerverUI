@@ -19,8 +19,8 @@ object EventBus {
     /*
         订阅者列表 K=事件类型 V=回调函数列表
      */
-    val SUBSCRIBERS_TYPE = ConcurrentHashMap<String, KClass<out Event>>()
-    val SUBSCRIBERS_FUNC = ConcurrentHashMap<String, CopyOnWriteArraySet<(Event) -> Unit>>()
+    val SUBSCRIBERS_TYPE = ConcurrentHashMap<EventBusId, KClass<out Event>>()
+    val SUBSCRIBERS_FUNC = ConcurrentHashMap<EventBusId, CopyOnWriteArraySet<(Event) -> Unit>>()
 
     /**
      * 订阅注册:,指定id,Event传参class,回调函数
@@ -31,7 +31,7 @@ object EventBus {
      * }
      * @author lifay
      */
-    fun <T : Event> subscribe(id: String, eventType: KClass<T>, subscriber: (T) -> Unit) {
+    fun <T : Event> subscribe(id: EventBusId, eventType: KClass<T>, subscriber: (T) -> Unit) {
         Objects.requireNonNull(id)
         Objects.requireNonNull(eventType)
         Objects.requireNonNull(subscriber)
@@ -79,37 +79,12 @@ object EventBus {
      * @param event 事件体
      * @author lifay
      */
-    fun unSubscribe(id: String) {
+    fun unSubscribe(id: EventBusId) {
         Objects.requireNonNull(id)
         if (SUBSCRIBERS_TYPE.containsKey(id)) {
             SUBSCRIBERS_TYPE.remove(id)
             SUBSCRIBERS_FUNC.remove(id)
         }
     }
-/*
-    fun add(id: String, obj: BaseView<*>, f: KFunction2<Any, Array<out Any>, Any>) {
-        var receivers = RECEIVER_MAP[id]
-        if (receivers == null) {
-            receivers = ArrayList()
-        }
-        receivers.add(Pair(obj, f))
-        val referenceImpl = f as FunctionReferenceImpl
-        val method = referenceImpl.boundReceiver as Method
-//            println("f:" + method.name)
-        RECEIVER_MAP[id] = receivers
-        CLASS_METHOD_LIST.add("${obj.javaClass.name}_${method.name}")
-    }
-
-    fun has(clazzName: String, methodName: String): Boolean {
-        return CLASS_METHOD_LIST.contains("${clazzName}_${methodName}")
-    }
-
-    fun <T : Event> invoke(id: String, body: T) {
-        val receivers = RECEIVER_MAP[id]
-        receivers!!.forEach {
-            it.second(it.first, arrayOf(body))
-        }
-
-    }*/
 
 }
