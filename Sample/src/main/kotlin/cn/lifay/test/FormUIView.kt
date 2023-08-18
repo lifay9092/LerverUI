@@ -1,6 +1,7 @@
 package cn.lifay.test
 
 import cn.lifay.extension.alertConfirmation
+import cn.lifay.global.GlobalResource
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.Alert
@@ -20,6 +21,10 @@ class FormUIView {
     fun formTest(actionEvent: ActionEvent) {
         val userForm = UserForm()
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
+        userForm.ROOT_PANE.apply {
+            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
+            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+        }
         userForm.show()
     }
 

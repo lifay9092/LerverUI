@@ -14,6 +14,9 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCodeCombination
+import javafx.scene.input.KeyCombination
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -42,12 +45,14 @@ import kotlin.reflect.full.primaryConstructor
  * val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
  * val child = CheckElement("是否未成年:", UserData::child)
  * val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+ * addElement(id, name,type, child,sex)
  * ```
  * javaBean use [cn.lifay.ui.DelegateProp]:
  * ```
  * val id = TextElement<Person, Int>("ID：", DelegateProp("id"), primary = true)
  * val name = TextElement<Person, String>("姓名：", DelegateProp("name"))
  * val child = CheckElement<Person, Boolean>("成年：", DelegateProp("child"))
+ * addElement(id, name, child)
  * ```
  *@author lifay
  **/
@@ -114,8 +119,11 @@ abstract class FormUI<T : Any>(
      * @author lifay
      * @return
      */
-    override fun ROOT_PANE(): VBox {
-        this.root = VBox(10.0)
+    override fun rootPane(): VBox {
+        this.root = VBox(10.0).apply {
+            prefWidth = GlobalResource.FormWidth()
+            prefHeight = GlobalResource.FormHeight()
+        }
         return this.root
     }
 
@@ -163,6 +171,10 @@ abstract class FormUI<T : Any>(
         }
         stage.title = title
         stage.scene = Scene(root)
+
+        //快捷键
+        val saveKey = KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)
+        ROOT_PANE.scene.accelerators[saveKey] = Runnable { saveFunc() }
     }
 
     private fun refreshForm(t: T) {
@@ -260,28 +272,10 @@ abstract class FormUI<T : Any>(
 
         //pane.getChildren().add(btnGroup);
         //保存
+
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                asyncTaskLoading(stage, "保存中") {
-                    try {
-                        saveBtn.isDisable = true
-                        //检查
-                        if (!checkElementValue()) {
-                            return@asyncTaskLoading
-                        }
-                        //从元素赋值到实例
-                        elementToProp()
-                        //执行保存操作
-                        saveData(entity)
-                        showMessage("保存成功")
-                        refreshTable()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        showMessage("保存失败:" + e.message)
-                    } finally {
-                        saveBtn.isDisable = false
-                    }
-                }
+                saveFunc()
             }
         }
         //删除
@@ -340,7 +334,27 @@ abstract class FormUI<T : Any>(
         }
         return true
     }
-
+    private fun saveFunc(){
+        asyncTaskLoading(stage, "保存中") {
+            try {
+                saveBtn.isDisable = true
+                //检查
+                if (!checkElementValue()) {
+                    return@asyncTaskLoading
+                }
+                //从元素赋值到实例
+                elementToProp()
+                //执行保存操作
+                saveData(entity)
+                showMessage("保存成功")
+                refreshTable()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showMessage("保存失败:" + e.message)
+            } finally {
+                saveBtn.isDisable = false
+            }
+        }}
     protected fun initValue() {
         elements.forEach { it.initValue() }
     }

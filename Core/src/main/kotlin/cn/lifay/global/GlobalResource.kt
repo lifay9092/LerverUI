@@ -40,6 +40,22 @@ object GlobalResource {
     private var THEME_STYLE: Theme = PrimerLight()
 
     /**
+     * 表单宽度
+     */
+    fun FormWidth(): Double {
+        val default = SCREEN_WIDTH * 0.54
+       return if (default<1290) 1290.0 else default
+    }
+
+    /**
+     * 表单高度
+     */
+    fun FormHeight(): Double {
+        val default = SCREEN_HEIGHT * 0.45
+       return if (default<1022) 1022.0 else default
+    }
+
+    /**
      * 为窗体设置图标,否则默认：/icon.png
      */
     fun setGlobalIconImage(imgClassPath: String) {

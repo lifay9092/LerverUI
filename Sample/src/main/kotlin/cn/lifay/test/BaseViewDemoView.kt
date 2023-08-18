@@ -32,7 +32,7 @@ class BaseViewDemoView : BaseView<AnchorPane>() {
     @FXML
     var messageText = TextField()
 
-    override fun ROOT_PANE(): AnchorPane {
+    override fun rootPane(): AnchorPane {
         return this.rootPane
     }
 

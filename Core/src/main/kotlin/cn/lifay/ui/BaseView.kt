@@ -103,7 +103,7 @@ abstract class BaseView<R : Pane>() : Initializable {
                 /**
                  * 注册根容器
                  */
-                override fun ROOT_PANE(): R {
+                override fun rootPane(): R {
                     return rootPane
                 }
             }
@@ -130,6 +130,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             return Stage().apply {
                 this.title = title
                 this.isResizable = false
+                centerOnScreen()
                 this.scene = scene
                 this.setOnCloseRequest { closeFunc?.let { it() } }
                 this.bindEscKey()
@@ -141,7 +142,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 
 
     init {
-        ROOT_PANE = ROOT_PANE()
+        ROOT_PANE = rootPane()
 
 //        //注册方法
 //        val clazz = this.javaClass
@@ -156,7 +157,7 @@ abstract class BaseView<R : Pane>() : Initializable {
     /**
      * 注册根容器
      */
-    abstract fun ROOT_PANE(): R
+    abstract fun rootPane(): R
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
 
     }
@@ -182,11 +183,11 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
     open fun getRoot(): Parent {
-        return ROOT_PANE()
+        return rootPane()
     }
 
     open fun getWindow(): Window? {
-        return ROOT_PANE().scene.window
+        return rootPane().scene.window
     }
 
     /**
