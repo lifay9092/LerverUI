@@ -1,6 +1,7 @@
 package cn.lifay.test;
 
 import atlantafx.base.theme.PrimerLight;
+import cn.lifay.db.DbManage;
 import cn.lifay.global.GlobalResource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +18,7 @@ import javafx.stage.Stage;
 public class FormUITest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
+        DbManage.INSTANCE.Init("db.db");
         GlobalResource.loadTheme(new PrimerLight());
         FXMLLoader fxmlLoader = new FXMLLoader(FormUITest.class.getResource("formTest.fxml"));
         Parent load = fxmlLoader.load();

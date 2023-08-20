@@ -1,5 +1,6 @@
 package cn.lifay.test
 
+import cn.lifay.db.UserData
 import cn.lifay.extension.alertDetail
 import cn.lifay.extension.alertInfo
 import cn.lifay.extension.alertWarn
