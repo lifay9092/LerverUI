@@ -49,19 +49,10 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
     val form = GridPane()
 
     @FXML
-    lateinit var dataTable : TableView<T>
+    var dataTable = TableView<T>()
 
     @FXML
-    val dataTable1 = TableView<T>().apply {
-        columns.addAll(
-            TableColumn<T, String>("性别").apply {
-                prefWidth = 200.0
-                minWidth = 200.0
-                minHeight = 200.0
-            }
-
-        )
-    }
+    var dataTable1 = TableView<T>()
 
     @FXML
     val btnGroup = HBox()
@@ -123,8 +114,6 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
             form.vgap = 10.0
             form.padding = Insets(25.0, 25.0, 25.0, 25.0)
 
-
-
         } catch (e: Exception) {
             e.printStackTrace()
             throw LerverUIException("表单初始化失败:${e.message}")
@@ -142,7 +131,7 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         println("CurdUI initialize")
         super.initialize(p0, p1)
-        root.children.add(dataTable1)
+      //  root.children.add(dataTable1)
         val lasNameCol = TableColumn<T, String>("las文件名")
         lasNameCol.apply {
             text = "las文件名"
@@ -150,7 +139,13 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
             cellValueFactory = PropertyValueFactory("name")
             this.cellFactory = TextFieldTableCell.forTableColumn<T>()
         }
+        dataTable1.apply {
+            columns.addAll(
+                TableColumn<T, String>("性别").apply {
+                }
 
+            )
+        }
         //表格布局
         this.dataTable = TableView<T>().apply {
 //            columns.addAll(listOf(

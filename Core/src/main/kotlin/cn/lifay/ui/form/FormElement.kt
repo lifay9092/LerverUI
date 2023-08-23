@@ -217,7 +217,7 @@ abstract class FormElement<T : Any, R : Any>(
      */
     open fun getTableHead(): TableColumn<T, R> {
         val col = TableColumn<T, R>(label.replace(":", "").replace("：", ""))
-
+        col.prefWidth = 200.0
         when (r) {
             java.lang.Boolean::class.java -> {
                 col.setCellValueFactory { p: TableColumn.CellDataFeatures<T, R> ->
