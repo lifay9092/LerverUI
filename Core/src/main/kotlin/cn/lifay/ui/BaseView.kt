@@ -159,7 +159,6 @@ abstract class BaseView<R : Pane>() : Initializable {
      */
     abstract fun rootPane(): R
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-
     }
 
     protected fun initNotificationPane() {

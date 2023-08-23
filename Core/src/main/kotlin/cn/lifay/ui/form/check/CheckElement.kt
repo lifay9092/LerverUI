@@ -82,7 +82,7 @@ class CheckElement<T : Any, R : Any>(
     }
 
     override fun verify(): Boolean {
-        return false
+        return true
     }
 
     override fun defaultValue(): R {

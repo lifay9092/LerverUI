@@ -6,12 +6,14 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.CustomButtonNew
+import cn.lifay.ui.table.TableEditCell
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -19,12 +21,14 @@ import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
 import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.util.Callback
 import org.ktorm.entity.*
 import org.ktorm.schema.BaseTable
+import java.awt.SystemColor.text
 import java.net.URL
 import java.util.*
 
@@ -46,6 +50,18 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
 
     @FXML
     lateinit var dataTable : TableView<T>
+
+    @FXML
+    val dataTable1 = TableView<T>().apply {
+        columns.addAll(
+            TableColumn<T, String>("性别").apply {
+                prefWidth = 200.0
+                minWidth = 200.0
+                minHeight = 200.0
+            }
+
+        )
+    }
 
     @FXML
     val btnGroup = HBox()
@@ -121,51 +137,49 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
     override fun rootPane(): VBox {
         return this.root
     }
-//    /**
-//     * 注册根容器
-//     */
-//    override fun rootPane(): VBox {
-//        return this.root
-//    }
 
+    @FXML
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         println("CurdUI initialize")
+        super.initialize(p0, p1)
+        root.children.add(dataTable1)
+        val lasNameCol = TableColumn<T, String>("las文件名")
+        lasNameCol.apply {
+            text = "las文件名"
+            prefWidth = 400.0
+            cellValueFactory = PropertyValueFactory("name")
+            this.cellFactory = TextFieldTableCell.forTableColumn<T>()
+        }
 
         //表格布局
         this.dataTable = TableView<T>().apply {
-            padding = Insets(1.0, 2.0, 10.0, 2.0)
-            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
-            Styles.toggleStyleClass(dataTable, Styles.STRIPED)
-            columns.addAll(listOf(
-                TableColumn<T, String>("性别").apply {
-                    cellValueFactory = PropertyValueFactory("sex")
-                    prefWidth = 100.0
-                }
-
-            ))
+//            columns.addAll(listOf(
+//                lasNameCol,
+//                TableColumn<T,String>("性别").apply {
+//                    this.setCellValueFactory { p: TableColumn.CellDataFeatures<T, String> ->
+//                        SimpleStringProperty(p.value.toString())
+//                    }
+//                    this.cellValueFactoryProperty().addListener { observableValue, callback, callback2 ->
+//                        println()
+//                    }
+//                    this.cellFactory = TextFieldTableCell.forTableColumn<T>()
+//                }
+//            ))
             columns.addAll(tableHeadColumns())
-            setRowFactory {
-                val row = TableRow<T>()
-                row.setOnMouseClicked { event ->
-                    val item = row.item
-                    if (item != null) {
-                        if (event.clickCount == 2) {
-                            //refreshForm(item)
-                        }
-                    }
 
-                }
-                return@setRowFactory row
-            }
+            items.addListener(ListChangeListener<T> { e: ListChangeListener.Change<*>? ->
+                println(
+                    "Added item"
+                )
+            } as ListChangeListener<T>?)
         }
 
-        pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
-            refreshTable(new.toInt())
-        }
+//        pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
+//            refreshTable(new.toInt())
+//        }
 
         refreshTable(pageIndex)
-        initNotificationPane()
-
+      //  initNotificationPane()
     }
     var add: List<T>? = null
     constructor(initDefaultEntity: T?, buildElements: CurdUI<T>.() -> Unit, dbObjectGet: () -> BaseTable<T>, add: List<T>) : this() {
@@ -204,6 +218,9 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
             dataTable.items.addAll(
                 rows
             )
+//            dataTable1.items.addAll(
+//                rows
+//            )
 
         }
     }
@@ -211,6 +228,8 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
     fun addForm(actionEvent: ActionEvent) {
         try {
             dataTable.items.addAll(add!!)
+//            dataTable1.items.addAll(add!!)
+            println("数量:${dataTable.items.size}")
         } catch (e: Exception) {
             e.printStackTrace()
         }

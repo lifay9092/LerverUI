@@ -39,6 +39,7 @@ abstract class FormUINew<T : Any>(
      * 表单不是fxml导入，子类不需要当前方法
      */
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        super.initialize(p0, p1)
     }
     init {
         println("FormUINew init")

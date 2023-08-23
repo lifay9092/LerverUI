@@ -7,6 +7,7 @@ import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.CustomButton
 import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.HPos
@@ -168,6 +169,13 @@ abstract class FormUI<T : Any>(
                 }
                 return@setRowFactory row
             }
+            items.addListener(ListChangeListener<T> { e: ListChangeListener.Change<*>? ->
+                println(
+                    "Added item"
+                )
+            } as ListChangeListener<T>?)
+
+
         }
         stage.title = title
         stage.scene = Scene(root)
@@ -182,7 +190,7 @@ abstract class FormUI<T : Any>(
         propToElement()
     }
 
-    private fun refreshTable() {
+    public fun refreshTable() {
         platformRun {
             table.items.clear()
             table.items.addAll(datas())
