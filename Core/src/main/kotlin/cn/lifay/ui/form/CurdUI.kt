@@ -1,34 +1,16 @@
 package cn.lifay.ui.form
 
-import atlantafx.base.theme.Styles
-import cn.lifay.db.DbManage
 import cn.lifay.exception.LerverUIException
-import cn.lifay.extension.*
+import cn.lifay.extension.platformRun
 import cn.lifay.ui.BaseView
-import cn.lifay.ui.form.btn.CustomButtonNew
-import cn.lifay.ui.table.TableEditCell
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.beans.value.ObservableValue
-import javafx.collections.FXCollections
-import javafx.collections.ListChangeListener
-import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.*
-import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.util.Callback
-import org.ktorm.entity.*
-import org.ktorm.schema.BaseTable
-import java.awt.SystemColor.text
 import java.net.URL
 import java.util.*
 
@@ -50,9 +32,9 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
 
     @FXML
     var dataTable = TableView<T>()
-
-    @FXML
-    var dataTable1 = TableView<T>()
+//
+//    @FXML
+//    var dataTable1 = TableView<T>()
 
     @FXML
     val btnGroup = HBox()
@@ -64,21 +46,24 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
     var totalCountText = Label()
 
     @FXML
-    val pageIndexText = TextField()
+    var keyword = TextField()
 
     @FXML
-    val pageCountText = TextField()
+    var pageIndexText = TextField()
 
-    val pageIndex :Int
+    @FXML
+    var pageCountText = TextField()
+
+    val pageIndex: Int
         get() = pageIndexText.text.let {
             if (it.isBlank()) {
                 return 0
             } else {
-                return it.toInt()
+                return it.toInt() - 1
             }
         }
 
-    val pageCount :Int
+    val pageCount: Int
         get() = pageCountText.text.let {
             if (it.isBlank()) {
                 return 10
@@ -87,13 +72,8 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
             }
         }
 
-    var entity: T? = null
-    var initDefaultEntity: T? = null
-    lateinit var dbObject: EntitySequence<T, BaseTable<T>>
-
-    protected val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    protected val customButtons: ObservableList<CustomButtonNew<CurdUI<T>>> = FXCollections.observableArrayList()
-
+    private lateinit var pageFunc: (Int, Int) -> Pair<Int, List<T>>
+    private lateinit var heads: List<TableColumn<T, out Any>>
 //
 //    protected val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
 //    protected val saveBtn: Button = Button("保存").stylePrimary().icon(Feather.CHECK)
@@ -127,91 +107,41 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
         return this.root
     }
 
+    fun InitUI(heads: List<TableColumn<T, out Any>>, pageFunc: (Int, Int) -> Pair<Int, List<T>>) {
+        //表格布局
+        this.heads = heads
+
+        this.pageFunc = pageFunc
+    }
+
     @FXML
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         println("CurdUI initialize")
         super.initialize(p0, p1)
-      //  root.children.add(dataTable1)
-        val lasNameCol = TableColumn<T, String>("las文件名")
-        lasNameCol.apply {
-            text = "las文件名"
-            prefWidth = 400.0
-            cellValueFactory = PropertyValueFactory("name")
-            this.cellFactory = TextFieldTableCell.forTableColumn<T>()
+        this.dataTable.columns.addAll(heads)
+        println(this.dataTable.columns.size)
+
+        pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
+            pageIndexText.text = (new.toInt() + 1).toString()
+            search()
         }
-        dataTable1.apply {
-            columns.addAll(
-                TableColumn<T, String>("性别").apply {
-                }
+        pageIndexText.text = "1"
+        pageCountText.text = "10"
 
-            )
-        }
-        //表格布局
-        this.dataTable = TableView<T>().apply {
-//            columns.addAll(listOf(
-//                lasNameCol,
-//                TableColumn<T,String>("性别").apply {
-//                    this.setCellValueFactory { p: TableColumn.CellDataFeatures<T, String> ->
-//                        SimpleStringProperty(p.value.toString())
-//                    }
-//                    this.cellValueFactoryProperty().addListener { observableValue, callback, callback2 ->
-//                        println()
-//                    }
-//                    this.cellFactory = TextFieldTableCell.forTableColumn<T>()
-//                }
-//            ))
-            columns.addAll(tableHeadColumns())
-
-            items.addListener(ListChangeListener<T> { e: ListChangeListener.Change<*>? ->
-                println(
-                    "Added item"
-                )
-            } as ListChangeListener<T>?)
-        }
-
-//        pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
-//            refreshTable(new.toInt())
-//        }
-
-        refreshTable(pageIndex)
-      //  initNotificationPane()
-    }
-    var add: List<T>? = null
-    constructor(initDefaultEntity: T?, buildElements: CurdUI<T>.() -> Unit, dbObjectGet: () -> BaseTable<T>, add: List<T>) : this() {
-        println("CurdUI load")
-
-        this.initDefaultEntity = initDefaultEntity
-        this.dbObject = DbManage.database.sequenceOf(dbObjectGet())
-        this.add = add
-        buildElements()
-
-
+        search()
+        //  initNotificationPane()
     }
 
-    /*
-        表头设置
-     */
-    private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
-        return elements.map { it.getTableHead() }.toList()
-    }
 
-    fun addElement(vararg element: FormElement<T, *>) {
-        println("addElement")
-        elements.addAll(*element)
-    }
-
-    fun addCustomBtn(vararg customButton: CustomButtonNew<CurdUI<T>>) {
-        customButtons.addAll(*customButton)
-    }
-
-    private fun refreshTable(index :Int) {
+    @FXML
+    fun search(actionEvent: ActionEvent? = null) {
         platformRun {
-           // dataTable.items.clear()
-            totalCountText.text = "共 ${dbObject.totalRecordsInAllPages} 条"
-            val rows = dbObject.drop(index * pageCount)
-                .take(pageCount).toList()
+            dataTable.items.clear()
+            val pair = pageFunc(pageIndex, pageCount)
+            totalCountText.text = "共 ${pair.first} 条"
+
             dataTable.items.addAll(
-                rows
+                pair.second
             )
 //            dataTable1.items.addAll(
 //                rows
@@ -220,14 +150,21 @@ class CurdUI<T : Any> (): BaseView<VBox>() {
         }
     }
 
+    @FXML
+    fun clear(actionEvent: ActionEvent? = null) {
+        platformRun {
+            keyword.clear()
+        }
+    }
+
     fun addForm(actionEvent: ActionEvent) {
         try {
-            dataTable.items.addAll(add!!)
 //            dataTable1.items.addAll(add!!)
             println("数量:${dataTable.items.size}")
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
+
 
 }

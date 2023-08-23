@@ -3,26 +3,12 @@ package cn.lifay.test
 import cn.lifay.db.UserData
 import cn.lifay.db.UserDatas
 import cn.lifay.extension.alertConfirmation
-import cn.lifay.extension.styleWarn
 import cn.lifay.global.GlobalResource
-import cn.lifay.ui.form.CurdUI
-import cn.lifay.ui.form.FormUINew
-import cn.lifay.ui.form.btn.CustomButtonNew
-import cn.lifay.ui.form.check.CheckElement
-import cn.lifay.ui.form.radio.RadioElement
-import cn.lifay.ui.form.select.SelectElement
-import cn.lifay.ui.form.text.TextElement
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import javafx.fxml.FXMLLoader
-import javafx.scene.Scene
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
-import javafx.scene.control.Button
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.Pane
-import javafx.scene.layout.VBox
-import javafx.stage.Stage
 import org.ktorm.schema.BaseTable
 
 
@@ -46,7 +32,7 @@ class FormUIView {
     }
 
     fun formTestNew(actionEvent: ActionEvent) {
-        val userForm = UserFormNEW(UserData(1, "111111", SelectTypeEnum.C, true, "男"))
+        val userForm = UserManage()
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.show()
     }
@@ -82,29 +68,29 @@ class FormUIView {
     }
 
     fun formTestTemp(actionEvent: ActionEvent) {
-        val stage = Stage()
-        val fxmlLoader = FXMLLoader(FormUINew::class.java.getResource("curd.fxml"))
-        val curdUI = CurdUI<UserData>(null, buildElements = {
-            val id = TextElement("ID:", UserData::id, true)
-            val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
-            val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
-            val child = CheckElement("是否未成年:", UserData::child)
-            val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
-            addElement(id, name, type, child, sex)
-
-            addCustomBtn(CustomButtonNew(Button("测试自定义按钮").styleWarn()) {
-                println(it)
-            })
-        }, ::dbObject,add())
-        fxmlLoader.setController(curdUI)
-        val curdPane = fxmlLoader.load<Pane>()
-
-        stage.apply {
-            scene = Scene(curdPane)
-            this.title = title
-            GlobalResource.loadIcon(this)
-            show()
-        }
+//        val stage = Stage()
+//        val fxmlLoader = FXMLLoader(ManageUI::class.java.getResource("curd.fxml"))
+//        val curdUI = CurdUI<UserData>(null, buildElements = {
+//            val id = TextElement("ID:", UserData::id, true)
+//            val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
+//            val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
+//            val child = CheckElement("是否未成年:", UserData::child)
+//            val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+//            addElement(id, name, type, child, sex)
+//
+//            addCustomBtn(CustomButtonNew(Button("测试自定义按钮").styleWarn()) {
+//                println(it)
+//            })
+//        }, ::dbObject,add())
+//        fxmlLoader.setController(curdUI)
+//        val curdPane = fxmlLoader.load<Pane>()
+//
+//        stage.apply {
+//            scene = Scene(curdPane)
+//            this.title = title
+//            GlobalResource.loadIcon(this)
+//            show()
+//        }
     }
 
     fun dbObject(): BaseTable<UserData> {
