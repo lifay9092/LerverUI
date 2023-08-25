@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 import org.ktorm.dsl.QueryRowSet
 import org.ktorm.entity.sequenceOf
 import org.ktorm.schema.BaseTable
+import org.ktorm.schema.boolean
 import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 import java.util.UUID
@@ -28,14 +29,14 @@ object UserDatas : BaseTable<UserData>("USER_INFO") {
     val id = int("id").primaryKey()
     val name = varchar("name")
     val type = varchar("type")
-    val child = varchar("child")
+    val child = boolean("child")
     val sex = varchar("sex")
 
     override fun doCreateEntity(row: QueryRowSet, withReferences: Boolean) = UserData(
         id = row[id] ?: System.currentTimeMillis().toInt(),
         name = row[name]!!,
         type = SelectTypeEnum.valueOf(row[type]!!),
-        child = "1" == row[child],
+        child = true == row[child],
         sex = row[sex] ?: "",
         )
 

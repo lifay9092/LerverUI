@@ -1,26 +1,24 @@
 package cn.lifay.ui.form
 
-import atlantafx.base.theme.Styles
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.CustomButton
-import javafx.collections.FXCollections
-import javafx.collections.ListChangeListener
-import javafx.collections.ObservableList
 import javafx.event.EventHandler
 import javafx.geometry.HPos
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.Scene
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.TextArea
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.input.KeyCombination
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
@@ -57,41 +55,63 @@ import kotlin.reflect.full.primaryConstructor
  * ```
  *@author lifay
  **/
-abstract class FormUI<T : Any>(
-    title: String,
+class FormUI<T : Any>(
+    val title: String,
     initDefaultEntity: T? = null,
-    buildElements: FormUI<T>.() -> Unit,
+    val elements: ArrayList<FormElement<T, *>>,
+    val customButtons: ArrayList<CustomButton<FormUI<T>>>,
+    val saveDataFunc: ((T) -> Boolean)?,
+    val updateDataFunc: ((T) -> Boolean)?,
 ) : BaseView<VBox>() {
 
     protected var entity: T? = null
     private val stage = Stage().bindEscKey()
-    private lateinit var root : VBox
+    private lateinit var root: VBox
     private val form = GridPane()
-    private val table = TableView<T>()
 
     protected var btnGroup = HBox(20.0)
+    protected var isUpdate: Boolean = false
 
-    protected val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
+    //    protected lateinit var elements: ObservableList<FormElement<T, *>>
     protected val saveBtn: Button = Button("保存").stylePrimary().icon(Feather.CHECK)
-    protected val delBtn: Button = Button("删除").styleDanger().icon(Feather.TRASH)
-    protected val clearBtn: Button = Button("清空").styleWarn().icon(Feather.X)
-    protected val customButtons: ObservableList<CustomButton<FormUI<T>>> = FXCollections.observableArrayList()
 
-    private fun FormUI() {}
+    //    protected val updateBtn: Button = Button("更新").styleDanger().icon(Feather.EDIT)
+    protected val clearBtn: Button = Button("清空").styleWarn().icon(Feather.X)
+
+//    protected lateinit var saveDataFunc : (T) -> Boolean
+//    protected lateinit var updateDataFunc : (T) -> Boolean
+//    protected lateinit var deleteDataFunc : (Any) -> Boolean
+//
+//    fun FormUI(
+//        elements: ObservableList<FormElement<T, *>>,
+//        saveDataFunc : (T) -> Boolean,
+//        updateDataFunc : (T) -> Boolean,
+//        deleteDataFunc : (Any) -> Boolean) {
+//        this.saveDataFunc = elements
+//        this.saveDataFunc = saveDataFunc
+//        this.updateDataFunc = updateDataFunc
+//        this.deleteDataFunc = deleteDataFunc
+//    }
 
     init {
         // println("FormUI init")
         try {
-            uiInit(title, buildElements)
+            uiInit()
             if (initDefaultEntity == null) {
                 val tc = elements[0].tc
-                println("tc:$tc")
+//                println("tc:$tc")
                 val args = getElementInitValue()
-                println("args:${args.contentToString()}")
-                args.forEach { println(it) }
+//                println("args:${args.contentToString()}")
+//                args.forEach { println(it) }
                 this.entity = tc!!.primaryConstructor!!.call(*args)
             } else {
-                refreshForm(initDefaultEntity)
+                isUpdate = true
+                elements.forEach {
+                    if (it.primary){
+                        it.disable()
+                    }
+                }
+                refreshForm(initDefaultEntity!!)
             }
             initNotificationPane()
         } catch (e: Exception) {
@@ -121,68 +141,46 @@ abstract class FormUI<T : Any>(
      * @return
      */
     override fun rootPane(): VBox {
-        this.root = VBox(10.0).apply {
-            prefWidth = GlobalResource.FormWidth()
-            prefHeight = GlobalResource.FormHeight()
-        }
+        this.root = VBox(10.0)
         return this.root
     }
 
     /*
         界面初始化
      */
-    private fun uiInit(title: String, buildElements: (FormUI<T>) -> Unit) {
+    private fun uiInit() {
+        this.root.apply {
+            prefWidth = GlobalResource.FormWidth()
+//            prefHeight = 120.0 * elements.size
+        }
         stage.initModality(Modality.APPLICATION_MODAL)
         GlobalResource.loadIcon(stage)
 
-        root.children.addAll(form, table)
+        root.children.addAll(form)
 
         //表单布局
         form.alignment = Pos.CENTER
-        form.hgap = 10.0
-        form.vgap = 10.0
-        form.padding = Insets(25.0, 25.0, 25.0, 25.0)
+        form.hgap = 5.0
+        form.vgap = 5.0
+        form.padding = Insets(5.0, 5.0, 5.0, 5.0)
 
-        buildElements(this)
         if (elements.isEmpty()) {
             throw LerverUIException("未获取到有效表单元素!")
         }
         initElements()
 
-        //表格布局
-        this.table.apply {
-            padding = Insets(1.0, 2.0, 10.0, 2.0)
-            columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
-            Styles.toggleStyleClass(table, Styles.STRIPED)
-            columns.addAll(tableHeadColumns())
-            refreshTable()
-            setRowFactory {
-                val row = TableRow<T>()
-                row.setOnMouseClicked { event ->
-                    val item = row.item
-                    if (item != null) {
-                        if (event.clickCount == 2) {
-                            refreshForm(item)
-                        }
-                    }
-
-                }
-                return@setRowFactory row
-            }
-            items.addListener(ListChangeListener<T> { e: ListChangeListener.Change<*>? ->
-                println(
-                    "Added item"
-                )
-            } as ListChangeListener<T>?)
-
-
-        }
         stage.title = title
         stage.scene = Scene(root)
 
         //快捷键
         val saveKey = KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)
-        ROOT_PANE.scene.accelerators[saveKey] = Runnable { saveFunc() }
+        root.scene.accelerators[saveKey] = Runnable {
+            if (isUpdate) {
+                updateFunc()
+            } else {
+                saveFunc()
+            }
+        }
     }
 
     private fun refreshForm(t: T) {
@@ -190,27 +188,6 @@ abstract class FormUI<T : Any>(
         propToElement()
     }
 
-    public fun refreshTable() {
-        platformRun {
-            table.items.clear()
-            table.items.addAll(datas())
-        }
-    }
-
-    /*
-        表头设置
-     */
-    private fun tableHeadColumns(): List<TableColumn<T, out Any>> {
-        return elements.map { it.getTableHead() }.toList()
-    }
-
-    fun addElement(vararg element: FormElement<T, *>) {
-        elements.addAll(*element)
-    }
-
-    fun addCustomBtn(vararg customButton: CustomButton<FormUI<T>>) {
-        customButtons.addAll(*customButton)
-    }
 
     /**
      * 加载布局
@@ -268,8 +245,8 @@ abstract class FormUI<T : Any>(
         //布局按钮组
         btnGroup.alignment = Pos.BOTTOM_RIGHT
         btnGroup.spacing = 20.0
-        btnGroup.padding = Insets(20.0)
-        btnGroup.children.addAll(saveBtn, delBtn, clearBtn)
+        btnGroup.padding = Insets(10.0)
+        btnGroup.children.addAll(saveBtn, clearBtn)
 
         customButtons.forEach { customButton ->
             customButton.btn.setOnAction {
@@ -280,41 +257,12 @@ abstract class FormUI<T : Any>(
 
         //pane.getChildren().add(btnGroup);
         //保存
-
         saveBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
-                saveFunc()
+                if (isUpdate) updateFunc() else saveFunc()
             }
         }
-        //删除
-        delBtn.setOnMouseClicked { mouseEvent ->
-            if (mouseEvent.clickCount == 1) {
-                //确认
-                if (alertConfirmation("将要执行删除操作,是否继续?")) {
-                    asyncTaskLoading(stage) {
-                        try {
-                            delBtn.isDisable = true
-                            //从元素赋值到实例
-                            elementToProp()
-                            //获取主键值
-                            val idValue = getPrimaryValue() ?: throw LerverUIException("未获取到主键属性!")
-                            //执行保存操作
-                            checkPrimaryValue(idValue)
-                            delData(idValue)
-                            showMessage("删除成功")
-                            clear()
-                            refreshTable()
 
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            showMessage("删除失败:" + e.message)
-                        } finally {
-                            delBtn.isDisable = false
-                        }
-                    }
-                }
-            }
-        }
         //清空
         clearBtn.setOnMouseClicked { mouseEvent ->
             if (mouseEvent.clickCount == 1) {
@@ -331,9 +279,9 @@ abstract class FormUI<T : Any>(
         }
     }
 
-    private fun checkElementValue(): Boolean {
+    private fun checkElementValue(isUpdate: Boolean = false): Boolean {
         for (element in elements) {
-            if (element.primary) {
+            if (!isUpdate && element.primary) {
                 continue
             }
             if (!element.checkRequired()) {
@@ -342,7 +290,8 @@ abstract class FormUI<T : Any>(
         }
         return true
     }
-    private fun saveFunc(){
+
+    private fun saveFunc() {
         asyncTaskLoading(stage, "保存中") {
             try {
                 saveBtn.isDisable = true
@@ -353,16 +302,41 @@ abstract class FormUI<T : Any>(
                 //从元素赋值到实例
                 elementToProp()
                 //执行保存操作
-                saveData(entity)
-                showMessage("保存成功")
-                refreshTable()
+                if (saveDataFunc!!(entity!!)) {
+                    showMessage("保存成功")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
-                showMessage("保存失败:" + e.message)
+                showErrMessage("保存失败:" + e.message)
             } finally {
                 saveBtn.isDisable = false
             }
-        }}
+        }
+    }
+
+    private fun updateFunc() {
+        asyncTaskLoading(stage, "更新中") {
+            try {
+                saveBtn.isDisable = true
+                //检查
+                if (!checkElementValue(true)) {
+                    return@asyncTaskLoading
+                }
+                //从元素赋值到实例
+                elementToProp()
+                //执行保存操作
+                if (updateDataFunc!!(entity!!)) {
+                    showMessage("更新成功")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showErrMessage("更新失败:" + e.message)
+            } finally {
+                saveBtn.isDisable = false
+            }
+        }
+    }
+
     protected fun initValue() {
         elements.forEach { it.initValue() }
     }
@@ -425,21 +399,6 @@ abstract class FormUI<T : Any>(
             throw RuntimeException(e)
         }
     }
-
-    /**
-     * 构建表单元素
-     */
-    abstract fun datas(): List<T>
-
-    /**
-     * 保存数据
-     */
-    abstract fun saveData(entity: T?)
-
-    /**
-     * 删除数据
-     */
-    abstract fun delData(primaryValue: Any?)
 
     private fun checkPrimaryValue(id: Any?) {
         if (id == null) {

@@ -3,6 +3,7 @@ package cn.lifay.ui
 import atlantafx.base.theme.Styles
 import atlantafx.base.util.Animations
 import cn.lifay.extension.asyncDelayTask
+import cn.lifay.extension.backgroundColor
 import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
@@ -14,6 +15,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.layout.Pane
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.stage.Window
 import javafx.util.Duration
@@ -169,12 +171,14 @@ abstract class BaseView<R : Pane>() : Initializable {
 //        }
 //        println(GlobalResource.SCREEN_WIDTH)
 //        println(GlobalResource.MSG_WIDTH)
-
+        println(ROOT_PANE.children.size)
         NOTIFICATION_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
         MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH/2))
-
+        MESSAGE_PANE.backgroundColor(Color.BLACK)
         ROOT_PANE.children.add(NOTIFICATION_PANE)
         ROOT_PANE.children.add(MESSAGE_PANE)
+        println(ROOT_PANE.children.size)
+
     }
 
     open fun InitElemntStyle() {

@@ -4,6 +4,7 @@ import cn.lifay.db.UserData
 import cn.lifay.db.UserDatas
 import cn.lifay.extension.styleWarn
 import cn.lifay.ui.form.ManageUI
+import cn.lifay.ui.form.btn.CustomButton
 import cn.lifay.ui.form.btn.CustomButtonNew
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
@@ -24,15 +25,23 @@ class UserManage() : ManageUI<UserData>("用户管理", buildElements = {
     val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
     val child = CheckElement("是否未成年:", UserData::child)
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
-    addElement(id, name, type, child, sex)
+    addElements(id, name, type, child, sex)
 
-    addCustomBtn(CustomButtonNew(Button("测试自定义按钮").styleWarn()) {
+    addCustomBtns(CustomButton(Button("测试自定义按钮").styleWarn()) {
         println(it)
     })
 }) {
 
     override fun dbObject(): BaseTable<UserData> {
         return UserDatas
+    }
+
+    override fun updateDataFunc(entity: UserData): Boolean {
+        return true
+    }
+
+    override fun saveDataFunc(entity: UserData): Boolean {
+        return true
     }
 
 //    override fun add():  List<UserData> {

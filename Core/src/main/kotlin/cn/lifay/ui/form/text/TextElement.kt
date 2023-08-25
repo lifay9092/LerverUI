@@ -126,9 +126,11 @@ class TextElement<T : Any, R : Any> constructor(
     override fun registerGraphic(): Node {
         //  println("$label registerGraphic isTextArea:${_isTextArea}")
         val node = if (_isTextArea) {
-            val textArea = TextArea()
-            textArea.isWrapText = false
-            textArea
+            TextArea().apply {
+                isWrapText = false
+                prefHeight = 170.0
+                prefWidth = 250.0
+            }
         } else {
             val textField = TextField()
             textField

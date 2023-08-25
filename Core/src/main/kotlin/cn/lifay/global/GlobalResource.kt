@@ -43,16 +43,19 @@ object GlobalResource {
      * 表单宽度
      */
     fun FormWidth(): Double {
-        val default = SCREEN_WIDTH * 0.54
-       return if (default<1290) 1290.0 else default
+        println(SCREEN_WIDTH)
+        val default = SCREEN_WIDTH * 0.35
+       return if (default<1050) 650.0 else default
+//        return SCREEN_WIDTH * 0.25
     }
 
     /**
      * 表单高度
      */
     fun FormHeight(): Double {
-        val default = SCREEN_HEIGHT * 0.45
-       return if (default<1022) 1022.0 else default
+//        val default = SCREEN_HEIGHT * 0.45
+//       return if (default<1022) 1022.0 else default
+        return 860.0
     }
 
     /**

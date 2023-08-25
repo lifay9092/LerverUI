@@ -4,15 +4,14 @@ import cn.lifay.db.DbManage
 import cn.lifay.extension.bindEscKey
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
-import cn.lifay.ui.form.btn.CustomButtonNew
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
+import cn.lifay.ui.form.btn.CustomButton
 import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import org.ktorm.entity.*
 import org.ktorm.schema.BaseTable
+import org.ktorm.schema.Column
 import java.net.URL
 import java.util.*
 
@@ -30,9 +29,9 @@ abstract class ManageUI<T : Any>(
     private val stage = Stage().bindEscKey()
 
     protected lateinit var root: VBox
-    private val elements: ObservableList<FormElement<T, *>> = FXCollections.observableArrayList()
-    private var dbObject: EntitySequence<T, BaseTable<T>>
-    private val customButtons: ObservableList<CustomButtonNew<ManageUI<T>>> = FXCollections.observableArrayList()
+    private var table: BaseTable<T>
+    private var dbObjectSequence: EntitySequence<T, BaseTable<T>>
+    private val curdUI = CurdUI<T>()
 
     /**
      * 表单不是fxml导入，子类不需要当前方法
@@ -43,23 +42,27 @@ abstract class ManageUI<T : Any>(
 
     init {
         println("FormUINew init")
-        this.dbObject = DbManage.database.sequenceOf(dbObject())
+        this.table = dbObject()
+        this.dbObjectSequence = DbManage.database.sequenceOf(table)
         buildElements()
 
-        val fxmlLoader = FXMLLoader(ManageUI::class.java.getResource("curd.fxml"))
-        val curdUI = CurdUI<T>()
-        curdUI.InitUI(
-            elements.map { it.getTableHead() }.toList()
-        ) { pageIndex, pageCount ->
 
-            return@InitUI Pair(
-                dbObject.totalRecordsInAllPages, dbObject.drop(pageIndex * pageCount)
-                    .take(pageCount).toList()
-            )
+        val fxmlLoader = FXMLLoader(ManageUI::class.java.getResource("curd.fxml"))
+
+        curdUI.apply {
+            InitDbFunc(table) { pageIndex, pageCount ->
+                return@InitDbFunc Pair(
+                    dbObjectSequence.totalRecordsInAllPages, dbObjectSequence.drop(pageIndex * pageCount)
+                        .take(pageCount).toList()
+                )
+            }
+            InitFormFunc(::saveDataFunc,::updateDataFunc)
         }
+
         fxmlLoader.setController(curdUI)
         val curdPane = fxmlLoader.load<VBox>()
         root.children.add(curdPane)
+
 
         stage.apply {
             scene = Scene(root)
@@ -67,6 +70,7 @@ abstract class ManageUI<T : Any>(
             GlobalResource.loadIcon(this)
         }
     }
+
 
     /**
      * 注册根容器
@@ -83,19 +87,21 @@ abstract class ManageUI<T : Any>(
 
     //    abstract fun <V : BaseTable<T>> dbObject(): EntitySequence<T,V>
     abstract fun dbObject(): BaseTable<T>
+    abstract fun saveDataFunc(entity:T): Boolean
 
-    fun addElement(vararg element: FormElement<T, *>) {
-        println("addElement")
-        elements.addAll(*element)
+    abstract fun updateDataFunc(entity:T): Boolean
+
+    fun addElements(vararg elements: FormElement<T, *>) {
+        curdUI.InitElements(elements.toList())
     }
 
-    fun addCustomBtn(vararg customButton: CustomButtonNew<ManageUI<T>>) {
-        customButtons.addAll(*customButton)
+    fun addCustomBtns(vararg customButtons: CustomButton<FormUI<T>>) {
+        curdUI.addCustomButtons(customButtons)
     }
 
     fun page(pageIndex: Int, pageCount: Int): Pair<Int, List<T>> {
         return Pair(
-            dbObject.totalRecordsInAllPages, dbObject.drop(pageIndex * pageCount)
+            dbObjectSequence.totalRecordsInAllPages, dbObjectSequence.drop(pageIndex * pageCount)
                 .take(pageCount).toList()
         )
     }

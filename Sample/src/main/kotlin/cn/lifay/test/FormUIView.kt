@@ -38,8 +38,8 @@ class FormUIView {
     }
 
     fun formTest2(actionEvent: ActionEvent) {
-        val personForm = PersonForm(Person(1, "111111", true))
-        personForm.show()
+//        val personForm = PersonForm(Person(1, "111111", true))
+//        personForm.show()
     }
 
     fun formMsg(actionEvent: ActionEvent) {
