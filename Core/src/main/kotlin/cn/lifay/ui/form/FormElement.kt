@@ -4,6 +4,7 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.platformRun
 import cn.lifay.extension.textFillColor
 import cn.lifay.ui.DelegateProp
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
@@ -37,6 +38,7 @@ abstract class FormElement<T : Any, R : Any>(
     var property2: KMutableProperty1<T, R>? = null
     var customProp: DelegateProp<T, R>? = null
     var tc: KClass<T>? = null
+    var disableFlag = SimpleBooleanProperty(false)
 
     fun init() {
         //  println("$label FormElement init")
@@ -46,6 +48,8 @@ abstract class FormElement<T : Any, R : Any>(
         children.add(l)
         padding = Insets(5.0, 10.0, 5.0, 10.0)
         node = registerGraphic()
+        node.disableProperty().bind(disableFlag)
+
         children.add(node)
     }
 
@@ -126,7 +130,16 @@ abstract class FormElement<T : Any, R : Any>(
      *  控件不可编辑
      */
     fun disable() {
-        platformRun { node!!.isDisable = true }
+//        platformRun { node!!.isDisable = true }
+        disableFlag.value = true
+    }
+
+    /**
+     *  控件可编辑
+     */
+    fun enable() {
+//        platformRun { node!!.isDisable = true }
+        disableFlag.value = false
     }
 
     /**

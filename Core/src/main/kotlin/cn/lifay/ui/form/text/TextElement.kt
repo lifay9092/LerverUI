@@ -185,20 +185,18 @@ class TextElement<T : Any, R : Any> constructor(
     }
 
     override fun clear() {
+        if (disableFlag.value) {
+            return
+        }
         platformRun {
             when (node) {
                 is TextField -> {
                     (node as TextField).clear()
-                    if (primary) {
-                        node.setDisable(false)
-                    }
                 }
 
                 is TextArea -> {
                     (node as TextArea).clear()
-                    if (primary) {
-                        node.setDisable(false)
-                    }
+
                 }
 
                 else -> {

@@ -1,10 +1,12 @@
 package cn.lifay.test
 
 import cn.lifay.db.*
+import cn.lifay.db.UserDatas.userDatas
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.styleWarn
+import cn.lifay.ui.form.CurdUI
 import cn.lifay.ui.form.FormUI
-import cn.lifay.ui.form.ManageUI
+import cn.lifay.ui.form.btn.BaseButton
 import cn.lifay.ui.form.btn.CustomButton
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
@@ -12,8 +14,7 @@ import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextElement
 import javafx.scene.control.Button
 import org.ktorm.database.Database
-import org.ktorm.entity.add
-import org.ktorm.entity.sequenceOf
+import org.ktorm.entity.*
 import org.ktorm.schema.BaseTable
 
 /**
@@ -22,7 +23,7 @@ import org.ktorm.schema.BaseTable
  *@Author lifay
  *@Date 2023/2/4 18:24
  **/
-class UserForm(t: UserData? = null) : ManageUI<UserData>("用户管理", buildElements = {
+class UserForm(t: UserData? = null) : CurdUI<UserData>("用户管理", buildElements = {
 
     val id = TextElement("ID:", UserData::id, true)
     val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
@@ -31,7 +32,7 @@ class UserForm(t: UserData? = null) : ManageUI<UserData>("用户管理", buildEl
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
     addElements(id, name, type, child, sex)
 
-    addCustomBtns(CustomButton(Button("测试自定义按钮").styleWarn()) {
+    addCustomButtons(BaseButton(Button("测试自定义按钮").styleWarn()) {
         println(it)
     })
 }) {
@@ -71,11 +72,18 @@ class UserForm(t: UserData? = null) : ManageUI<UserData>("用户管理", buildEl
 //        return dataList
 //    }
 
-    override fun dbObject(): BaseTable<UserData> {
-        return UserDatas
+    override fun updateDataFunc(entity: UserData): Boolean {
+        return true
     }
 
-    override fun updateDataFunc(entity: UserData): Boolean {
+    override fun pageDataFunc(pageIndex: Int, pageCount: Int): Pair<Int, Collection<UserData>> {
+        return Pair(
+            DbManage.userDatas.totalRecordsInAllPages, DbManage.userDatas.drop(pageIndex * pageCount)
+                .take(pageCount).toList()
+        )
+    }
+
+    override fun delDataFunc(entity: UserData): Boolean {
         return true
     }
 

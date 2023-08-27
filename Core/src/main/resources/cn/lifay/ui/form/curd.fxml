@@ -24,7 +24,7 @@
                     </HBox.margin>
                 </Button>
             <Button mnemonicParsing="false" onAction="#addForm" prefHeight="23.0" prefWidth="62.0" text="新增" />
-                <Button alignment="CENTER" mnemonicParsing="false" text="批量删除" textAlignment="CENTER">
+                <Button alignment="CENTER" mnemonicParsing="false" onAction="#batchDelete" text="批量删除" textAlignment="CENTER">
                     <HBox.margin>
                         <Insets left="10.0" right="10.0" />
                     </HBox.margin>
@@ -41,7 +41,7 @@
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy></TableView>
-        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="850.0">
+        <HBox fx:id="endPane" alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="850.0">
             <children>
                 <Label fx:id="totalCountText">
                     <HBox.margin>
