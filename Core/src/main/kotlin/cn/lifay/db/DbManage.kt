@@ -7,6 +7,7 @@ import org.ktorm.logging.ConsoleLogger
 import org.ktorm.logging.LogLevel
 import org.ktorm.logging.Logger
 import org.ktorm.schema.BaseTable
+import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 import org.ktorm.support.sqlite.InsertOrUpdateStatementBuilder
 import org.ktorm.support.sqlite.insertOrUpdate
@@ -16,6 +17,8 @@ import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.reflect.full.memberProperties
+import kotlin.reflect.jvm.isAccessible
 
 /**
  *@ClassName DbManage
@@ -345,6 +348,154 @@ object DbManage {
         return cn.lifay.db.DbManage.database.deleteAll(t)
     }
 
+    /**
+     * 为BaseTable新增扩展方法:添加实体直接入库
+     */
+    inline fun <reified T : Any> BaseTable<T>.add(entity: T): Int {
+        val kClass = entity::class
+        val memberProperties = kClass.memberProperties
+        val temp = HashMap<String, Any?>()
+        for (memberProperty in memberProperties) {
+            memberProperty.isAccessible
+            val prop = memberProperty.name
+            val value = memberProperty.call(entity)
+            temp[prop] = value
+        }
+        insert(this) { tb ->
+            columns.forEach { col ->
+                val value = temp[col.name]
+                if (value != null) {
+                    when (value::class.java) {
+                        java.lang.Boolean::class.java -> {
+                            set(col as Column<Boolean>, value as Boolean)
+                        }
+
+                        java.lang.String::class.java -> {
+                            set(col as Column<String>, value as String)
+                        }
+
+                        java.lang.Integer::class.java -> {
+                            set(col as Column<Integer>, value as Integer)
+                        }
+
+                        java.lang.Double::class.java -> {
+                            set(col as Column<Double>, value as Double)
+                        }
+
+                        java.lang.Float::class.java -> {
+                            set(col as Column<Float>, value as Float)
+                        }
+
+                        java.lang.Long::class.java -> {
+                            set(col as Column<Long>, value as Long)
+                        }
+
+                        else -> {
+                            println("not surport")
+                            set(col as Column<String>, value.toString())
+                        }
+                    }
+                }
+            }
+        }
+        return 1
+    }
+
+    /**
+     * 为BaseTable新增扩展方法:更新实体直接入库
+     */
+    inline fun <reified T : Any> BaseTable<T>.update(entity: T): Int {
+        val kClass = entity::class
+        val memberProperties = kClass.memberProperties
+        val temp = HashMap<String, Any?>()
+        var pkName: String? = null
+        for (memberProperty in memberProperties) {
+            memberProperty.isAccessible
+            val prop = memberProperty.name
+            val value = memberProperty.call(entity)
+            val primary = isPrimary(this, prop)
+            if (primary) {
+                if (value == null) {
+                    throw LerverUIException("主键值不能为空!")
+                }
+                pkName = prop
+            }
+            temp[prop] = value
+        }
+        if (pkName == null) {
+            throw LerverUIException("未检测到主键值!")
+        }
+        update(this) { tb ->
+            columns.forEach { col ->
+                val value = temp[col.name]
+                if (value != null) {
+                    when (value::class.java) {
+                        java.lang.Boolean::class.java -> {
+
+                            set(col as Column<Boolean>, value as Boolean)
+                        }
+
+                        java.lang.String::class.java -> {
+                            set(col as Column<String>, value as String)
+                            if (pkName == col.name) {
+                                where {
+                                    col eq value
+                                }
+                            }
+                        }
+
+                        java.lang.Integer::class.java -> {
+                            set(col as Column<Integer>, value as Integer)
+                            if (pkName == col.name) {
+                                where {
+                                    col eq value
+                                }
+                            }
+                        }
+
+                        java.lang.Double::class.java -> {
+                            set(col as Column<Double>, value as Double)
+                        }
+
+                        java.lang.Float::class.java -> {
+                            set(col as Column<Float>, value as Float)
+                        }
+
+                        java.lang.Long::class.java -> {
+                            set(col as Column<Long>, value as Long)
+                            if (pkName == col.name) {
+                                where {
+                                    col eq value
+                                }
+                            }
+                        }
+
+                        else -> {
+                            println("not surport")
+                            set(col as Column<String>, value.toString())
+                            if (pkName == col.name) {
+                                where {
+                                    col eq value.toString()
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+        return 1
+    }
+
+    fun <T : Any> isPrimary(table: BaseTable<T>, colName: String): Boolean {
+        for (primaryKey in table.primaryKeys) {
+            if (primaryKey.name == colName) {
+                return true
+            }
+        }
+        return false
+    }
     /*
 
     fun find(predicate: (Table<E>) -> ColumnDeclaring<Boolean>): E? {
