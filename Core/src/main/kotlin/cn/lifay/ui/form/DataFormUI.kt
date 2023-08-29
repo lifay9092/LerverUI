@@ -1,37 +1,11 @@
 package cn.lifay.ui.form
 
-import cn.lifay.db.DbManage
-import cn.lifay.exception.LerverUIException
-import cn.lifay.extension.*
-import cn.lifay.global.GlobalResource
-import cn.lifay.ui.BaseView
+import cn.lifay.extension.asyncTaskLoading
+import cn.lifay.extension.icon
+import cn.lifay.extension.stylePrimary
 import cn.lifay.ui.form.btn.BaseButton
-import cn.lifay.ui.form.btn.CustomButton
-import javafx.event.EventHandler
-import javafx.geometry.HPos
-import javafx.geometry.Insets
-import javafx.geometry.Pos
-import javafx.scene.Scene
 import javafx.scene.control.Button
-import javafx.scene.control.TextArea
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCodeCombination
-import javafx.scene.input.KeyCombination
-import javafx.scene.layout.GridPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
-import javafx.stage.Modality
-import javafx.stage.Stage
-import javafx.stage.WindowEvent
 import org.kordamp.ikonli.feather.Feather
-import org.ktorm.dsl.eq
-import org.ktorm.schema.BaseTable
-import org.ktorm.schema.Column
-import java.net.URL
-import java.util.*
-import java.util.function.Consumer
-import kotlin.reflect.full.primaryConstructor
 
 
 /**
@@ -60,27 +34,27 @@ import kotlin.reflect.full.primaryConstructor
  * ```
  *@author lifay
  **/
-abstract class FormUI<T : Any>(
-    val isUpdate: Boolean = false,
-     buildFormUI: BaseFormUI<T>.() -> Unit,
-) : BaseFormUI<T>(if (isUpdate) "编辑" else "新增",buildFormUI) {
+abstract class DataFormUI<T : Any>(
+    open val _isUpdate: Boolean = false,
+    buildFormUI: BaseFormUI<T>.() -> Unit,
+) : BaseFormUI<T>(if (_isUpdate) "编辑" else "新增", buildFormUI) {
 
     //    protected lateinit var elements: ObservableList<FormElement<T, *>>
     private var saveBtn: BaseButton<BaseFormUI<T>>
 
     init {
-        println("FormUI init isUpdate:${isUpdate}")
-        if (isUpdate) {
+        println("DataFormUI init isUpdate:${_isUpdate}")
+        if (_isUpdate) {
             saveBtn = BaseButton(Button("更新").stylePrimary().icon(Feather.EDIT)) {
                 updateFunc()
             }
         } else {
-            saveBtn = BaseButton(Button("保存").stylePrimary().icon(Feather.CHECK)){
+            saveBtn = BaseButton(Button("保存").stylePrimary().icon(Feather.CHECK)) {
                 saveFunc()
             }
         }
 
-        val customBtns =listOf(
+        val customBtns = listOf(
             saveBtn,
             clearBtn()
         ).map { baseButton ->
@@ -89,8 +63,8 @@ abstract class FormUI<T : Any>(
             }
             baseButton.btn
         }
-        btnGroup.children.addAll(0,customBtns)
-        if (isUpdate) {
+        btnGroup.children.addAll(0, customBtns)
+        if (_isUpdate) {
             ELEMENTS_LIST.forEach {
                 if (it.primary) {
                     it.disable()
@@ -105,7 +79,7 @@ abstract class FormUI<T : Any>(
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun saveDataFunc(entity: T):Boolean
+    abstract fun saveDataFunc(entity: T): Boolean
 
     /**
      * 更新数据函数
@@ -113,7 +87,7 @@ abstract class FormUI<T : Any>(
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun updateDataFunc(entity: T):Boolean
+    abstract fun updateDataFunc(entity: T): Boolean
 
     private fun saveFunc() {
         asyncTaskLoading(super.ROOT_PANE.scene.window, "保存中") {

@@ -48,7 +48,7 @@ class FormUIView {
             )
 
             //添加按钮和操作
-            addBtns(
+            addCustomButtons(
                 BaseButton(Button("测试").styleInfo()) {
                     showNotification("测试获取name内容:${nameElement.getElementValue()}")
                 },
@@ -67,8 +67,19 @@ class FormUIView {
         }
         baseFormUI.show()
     }
-    fun formTest(actionEvent: ActionEvent) {
-        val userForm = UserForm()
+
+    fun formAddTest(actionEvent: ActionEvent) {
+        val userForm = UserDataForm()
+//        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
+        userForm.ROOT_PANE.apply {
+            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
+            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+        }
+        userForm.show()
+    }
+
+    fun formUpdateTest(actionEvent: ActionEvent) {
+        val userForm = UserDataForm(UserData(1, "121212", SelectTypeEnum.C, true, "男"), isUpdate = true)
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.ROOT_PANE.apply {
             prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
@@ -142,7 +153,8 @@ class FormUIView {
     fun dbObject(): BaseTable<UserData> {
         return UserDatas
     }
-    fun add():  List<UserData> {
+
+    fun add(): List<UserData> {
         return listOf(
             UserData(1, "111111", SelectTypeEnum.A, true, "男"),
             UserData(2, "2222", SelectTypeEnum.B, false, "女"),

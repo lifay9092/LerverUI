@@ -1,11 +1,11 @@
 package cn.lifay.ui.form
 
 import cn.lifay.exception.LerverUIException
-import cn.lifay.extension.*
+import cn.lifay.extension.bindEscKey
+import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.BaseButton
-import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.geometry.HPos
 import javafx.geometry.Insets
@@ -21,7 +21,6 @@ import javafx.stage.WindowEvent
 import java.net.URL
 import java.util.*
 import java.util.function.Consumer
-import kotlin.collections.ArrayList
 import kotlin.reflect.full.primaryConstructor
 
 
@@ -65,9 +64,10 @@ open class BaseFormUI<T : Any>(
 
     protected val ELEMENTS_LIST = ArrayList<FormElement<T, *>>()
     protected val BASE_BUTTON_LIST = ArrayList<BaseButton<BaseFormUI<T>>>()
-    protected var initDefaultEntity :T? = null
-    protected val BEFORE_FORM_INIT_CALL_LIST  =  ArrayList<BaseFormUI<T>.() -> Unit>()
-    protected var AFTER_FORM_INIT_CALL_LIST  =  ArrayList<BaseFormUI<T>.() -> Unit>()
+    protected var initDefaultEntity: T? = null
+    protected val BEFORE_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
+    protected var AFTER_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
+
     init {
         println("BaseFormUI init")
         try {
@@ -103,7 +103,7 @@ open class BaseFormUI<T : Any>(
         println("BaseFormUI initialize")
     }
 
-    fun defaultEntity(entity:T){
+    fun defaultEntity(entity: T) {
         this.initDefaultEntity = entity
     }
 
@@ -115,16 +115,18 @@ open class BaseFormUI<T : Any>(
         this.ELEMENTS_LIST.addAll(elements)
     }
 
-    fun addBtns(vararg customButtons: BaseButton<BaseFormUI<T>>) {
+    fun addCustomButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {
         this.BASE_BUTTON_LIST.addAll(customButtons)
     }
 
-    fun beforeFormInitCall(call : BaseFormUI<T>.() -> Unit) {
+    fun beforeFormInitCall(call: BaseFormUI<T>.() -> Unit) {
         this.BEFORE_FORM_INIT_CALL_LIST.add(call)
     }
-    fun afterFormInitCall(call : BaseFormUI<T>.() -> Unit) {
+
+    fun afterFormInitCall(call: BaseFormUI<T>.() -> Unit) {
         this.AFTER_FORM_INIT_CALL_LIST.add(call)
     }
+
     fun elements() = ELEMENTS_LIST
     private fun getElementInitValue(): Array<Any?> {
         return Array(ELEMENTS_LIST.size) {
@@ -253,7 +255,7 @@ open class BaseFormUI<T : Any>(
 
     protected fun checkElementValue(isUpdate: Boolean = false): Boolean {
         for (element in ELEMENTS_LIST) {
-            if (!isUpdate && element.primary) {
+            if (element.fillValue != null) {
                 continue
             }
             if (!element.checkRequired()) {

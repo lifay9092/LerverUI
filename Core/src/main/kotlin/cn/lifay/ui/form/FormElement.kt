@@ -38,8 +38,10 @@ abstract class FormElement<T : Any, R : Any>(
     var property2: KMutableProperty1<T, R>? = null
     var customProp: DelegateProp<T, R>? = null
     var tc: KClass<T>? = null
-    var disableFlag = SimpleBooleanProperty(false)
 
+    //用户可自定义元素值为空时的填充值
+    var fillValue: R? = null
+    var disableFlag = SimpleBooleanProperty(false)
     fun init() {
         //  println("$label FormElement init")
         alignment = Pos.CENTER_LEFT
@@ -203,7 +205,7 @@ abstract class FormElement<T : Any, R : Any>(
                     property2!!.set(t, elementValue)
                 } else {
                     //如果控制无值,实体属性有值 则赋予控件默认值
-                    property2!!.set(t, defaultValue()!!)
+                    property2!!.set(t, getDefaultValue()!!)
                 }
             } else {
                 if (elementValue != null) {
@@ -211,7 +213,7 @@ abstract class FormElement<T : Any, R : Any>(
                     property!!.set(t, elementValue)
                 } else if (property!!.get(t) != null) {
                     //如果控制无值,实体属性有值 则赋予控件默认值
-                    property!!.set(t, defaultValue()!!)
+                    property!!.set(t, getDefaultValue()!!)
                 }
             }
         } else {
@@ -220,9 +222,16 @@ abstract class FormElement<T : Any, R : Any>(
                 customProp!!.setValue(t, elementValue)
             } else if (customProp!!.getValue(t) != null) {
                 //如果控制无值,实体属性有值 则赋予控件默认值
-                customProp!!.setValue(t, defaultValue())
+                customProp!!.setValue(t, getDefaultValue())
             }
         }
+    }
+
+    private fun getDefaultValue(): R? {
+        if (fillValue != null) {
+            return fillValue
+        }
+        return defaultValue()
     }
 
     /**
@@ -293,6 +302,7 @@ abstract class FormElement<T : Any, R : Any>(
             java.lang.Boolean::class.java -> {
                 b
             }
+
             java.lang.String::class.java -> {
                 if (b) "1" else "0"
             }
@@ -304,6 +314,7 @@ abstract class FormElement<T : Any, R : Any>(
             java.lang.Double::class.java, java.lang.Float::class.java -> {
                 if (b) 1.0 else 0.0
             }
+
             else -> {
                 throw LerverUIException("not surport ${b} ${r}")
             }

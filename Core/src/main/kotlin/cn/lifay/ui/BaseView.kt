@@ -172,8 +172,9 @@ abstract class BaseView<R : Pane>() : Initializable {
 //        println(GlobalResource.SCREEN_WIDTH)
 //        println(GlobalResource.MSG_WIDTH)
         println(ROOT_PANE.children.size)
-        NOTIFICATION_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
-        MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH/2))
+        NOTIFICATION_PANE.layoutXProperty()
+            .bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
+        MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH / 2))
         MESSAGE_PANE.backgroundColor(Color.BLACK)
         ROOT_PANE.children.add(NOTIFICATION_PANE)
         ROOT_PANE.children.add(MESSAGE_PANE)
@@ -214,22 +215,26 @@ abstract class BaseView<R : Pane>() : Initializable {
     }
 
 
-    fun getMsgStyle(msgType: MsgType):String{
+    fun getMsgStyle(msgType: MsgType): String {
         return when (msgType) {
             MsgType.ACCENT -> {
-                    Styles.ACCENT
+                Styles.ACCENT
             }
+
             MsgType.WARNING -> {
-                    Styles.WARNING
+                Styles.WARNING
             }
+
             MsgType.DANGER -> {
-                    Styles.DANGER
+                Styles.DANGER
             }
+
             MsgType.SUCCESS -> {
-                    Styles.SUCCESS
+                Styles.SUCCESS
             }
         }
     }
+
     /**
      * 弹出系统通知
      * @author lifay
@@ -243,7 +248,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             message,
             FontIcon(Material2OutlinedAL.INFO)
         )
-        msg.styleClass.addAll(getMsgStyle(msgType),Styles.ELEVATED_1)
+        msg.styleClass.addAll(getMsgStyle(msgType), Styles.ELEVATED_1)
 
         val closeFunc = {
             NOTIFICATION_PANE.children.remove(msg)
@@ -298,7 +303,7 @@ abstract class BaseView<R : Pane>() : Initializable {
             message,
             FontIcon(Material2OutlinedAL.INFO)
         )
-        msg.styleClass.addAll(getMsgStyle(msgType),Styles.ELEVATED_1)
+        msg.styleClass.addAll(getMsgStyle(msgType), Styles.ELEVATED_1)
 
 //        if (!ROOT_PANE.children.contains(MESSAGE_PANE)) {
 //            platformRun { ROOT_PANE.children.add(MESSAGE_PANE) }

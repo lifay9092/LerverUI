@@ -9,11 +9,11 @@ import kotlin.reflect.KClass
 import kotlin.reflect.jvm.reflect
 
 object EventBus {
-/*
+    /*
 
-    private val RECEIVER_MAP = HashMap<String, ArrayList<Pair<BaseView<*>, KFunction2<Any, Array<Event>, Any>>>>()
-    private val CLASS_METHOD_LIST = ArrayList<String>()
-*/
+        private val RECEIVER_MAP = HashMap<String, ArrayList<Pair<BaseView<*>, KFunction2<Any, Array<Event>, Any>>>>()
+        private val CLASS_METHOD_LIST = ArrayList<String>()
+    */
 
 
     /*

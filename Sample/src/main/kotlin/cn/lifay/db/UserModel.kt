@@ -8,7 +8,6 @@ import org.ktorm.schema.BaseTable
 import org.ktorm.schema.boolean
 import org.ktorm.schema.int
 import org.ktorm.schema.varchar
-import java.util.UUID
 
 @Serializable
 data class UserData(
@@ -38,7 +37,7 @@ object UserDatas : BaseTable<UserData>("USER_INFO") {
         type = SelectTypeEnum.valueOf(row[type]!!),
         child = true == row[child],
         sex = row[sex] ?: "",
-        )
+    )
 
     val DbManage.userDatas get() = database.sequenceOf(UserDatas)
 

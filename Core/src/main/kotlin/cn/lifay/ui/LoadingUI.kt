@@ -48,7 +48,7 @@ class LoadingUI(
         stage.initOwner(owner)
         stage.initStyle(StageStyle.TRANSPARENT)
         stage.initModality(Modality.APPLICATION_MODAL)
-       // stage.icons.addAll(owner.icons)
+        // stage.icons.addAll(owner.icons)
         stage.x = owner.x
         stage.y = owner.y
         stage.height = owner.height

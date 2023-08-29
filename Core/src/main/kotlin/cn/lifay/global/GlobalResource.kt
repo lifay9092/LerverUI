@@ -45,7 +45,7 @@ object GlobalResource {
     fun FormWidth(): Double {
         println(SCREEN_WIDTH)
         val default = SCREEN_WIDTH * 0.35
-       return if (default<1050) 650.0 else default
+        return if (default < 1050) 650.0 else default
 //        return SCREEN_WIDTH * 0.25
     }
 

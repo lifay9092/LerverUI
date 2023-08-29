@@ -1,14 +1,11 @@
 package cn.lifay.ui.form
 
 import atlantafx.base.theme.Styles
-import cn.lifay.db.DbManage
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.BaseButton
-import cn.lifay.ui.form.btn.CustomButton
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.geometry.Insets
@@ -16,23 +13,12 @@ import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.CheckBoxTableCell
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
-import javafx.util.Callback
-import org.ktorm.dsl.eq
-import org.ktorm.dsl.select
-import org.ktorm.dsl.where
-import org.ktorm.entity.*
-import org.ktorm.schema.BaseTable
-import org.ktorm.schema.Column
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.reflect.KFunction1
 
 
 /**
@@ -41,17 +27,17 @@ import kotlin.reflect.KFunction1
  *@Author lifay
  *@Date 2023/8/19 22:50
  **/
-abstract class CurdUI<T : Any> (
+abstract class CurdUI<T : Any>(
     title: String,
     buildElements: CurdUI<T>.() -> Unit,
-    ): BaseView<VBox>() {
+) : BaseView<VBox>() {
 
     private val stage = Stage().bindEscKey()
 
     @FXML
     val root = VBox().apply {
-        prefHeight=539.0
-        prefWidth=918.0
+        prefHeight = 539.0
+        prefWidth = 918.0
     }
 
 
@@ -76,7 +62,7 @@ abstract class CurdUI<T : Any> (
 
     @FXML
     var keyword = TextField().apply {
-        HBox.setMargin(this, Insets(0.0,20.0,0.0,10.0))
+        HBox.setMargin(this, Insets(0.0, 20.0, 0.0, 10.0))
     }
 
     @FXML
@@ -105,7 +91,7 @@ abstract class CurdUI<T : Any> (
 
     private val elements = ArrayList<FormElement<T, *>>()
 
-    protected val customButtons = ArrayList<BaseButton<FormUI<T>>>()
+    protected val customButtons = ArrayList<BaseButton<DataFormUI<T>>>()
 
     private fun CurdUI() {}
 
@@ -119,31 +105,31 @@ abstract class CurdUI<T : Any> (
 
             btnGroup.apply {
                 alignment = Pos.CENTER_LEFT
-                prefHeight=47.0
-                prefWidth=850.0
-                VBox.setMargin(this, Insets(20.0,0.0,10.0,0.0))
+                prefHeight = 47.0
+                prefWidth = 850.0
+                VBox.setMargin(this, Insets(20.0, 0.0, 10.0, 0.0))
                 children.addAll(
                     keyword,
                     Button("搜索").apply {
-                        prefHeight=23.0
-                        prefWidth=62.0
-                        HBox.setMargin(this, Insets(0.0,20.0,0.0,0.0))
+                        prefHeight = 23.0
+                        prefWidth = 62.0
+                        HBox.setMargin(this, Insets(0.0, 20.0, 0.0, 0.0))
                         stylePrimary()
                         setOnAction {
                             search(it)
                         }
                     },
                     Button("重置").apply {
-                        prefHeight=23.0
-                        prefWidth=62.0
-                        HBox.setMargin(this, Insets(0.0,300.0,0.0,0.0))
+                        prefHeight = 23.0
+                        prefWidth = 62.0
+                        HBox.setMargin(this, Insets(0.0, 300.0, 0.0, 0.0))
                         setOnAction {
                             clear(it)
                         }
                     },
                     Button("新增").apply {
-                        prefHeight=23.0
-                        prefWidth=62.0
+                        prefHeight = 23.0
+                        prefWidth = 62.0
                         stylePrimary()
                         outline()
                         setOnAction {
@@ -151,12 +137,12 @@ abstract class CurdUI<T : Any> (
                         }
                     },
                     Button("批量删除").apply {
-                        alignment =  Pos.CENTER
+                        alignment = Pos.CENTER
                         textAlignment = TextAlignment.CENTER
-                        prefHeight=23.0
-                        prefWidth=82.0
+                        prefHeight = 23.0
+                        prefWidth = 82.0
                         styleDanger()
-                        HBox.setMargin(this, Insets(0.0,10.0,0.0,10.0))
+                        HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
                         setOnAction {
                             batchDelete(it)
                         }
@@ -165,8 +151,8 @@ abstract class CurdUI<T : Any> (
             }
             this.dataTable.apply {
                 padding = Insets(1.0, 2.0, 10.0, 2.0)
-                prefHeight=408.0
-                prefWidth=850.0
+                prefHeight = 408.0
+                prefWidth = 850.0
                 columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
                 Styles.toggleStyleClass(this, Styles.STRIPED)
                 this.isEditable = true
@@ -185,48 +171,48 @@ abstract class CurdUI<T : Any> (
                 }
             }
             endPane.apply {
-                alignment =  Pos.CENTER_LEFT
-                prefHeight=26.0
-                prefWidth=850.0
+                alignment = Pos.CENTER_LEFT
+                prefHeight = 26.0
+                prefWidth = 850.0
                 children.addAll(
                     totalCountText.apply {
-                        HBox.setMargin(this, Insets(0.0,20.0,0.0,10.0))
+                        HBox.setMargin(this, Insets(0.0, 20.0, 0.0, 10.0))
                     },
                     pagination.apply {
-                        prefHeight=26.0
-                        prefWidth=287.0
+                        prefHeight = 26.0
+                        prefWidth = 287.0
                         style = "-fx-page-information-visible: false;"
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,30.0))
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 30.0))
                     },
                     Label("跳转到").apply {
-                        prefHeight=15.0
-                        prefWidth=43.0
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,5.0))
+                        prefHeight = 15.0
+                        prefWidth = 43.0
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 5.0))
                     },
                     pageIndexText.apply {
-                        prefHeight=23.0
-                        prefWidth=48.0
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,5.0))
+                        prefHeight = 23.0
+                        prefWidth = 48.0
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 5.0))
                     },
                     Button("GO").apply {
-                        prefHeight=23.0
-                        prefWidth=48.0
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,3.0))
+                        prefHeight = 23.0
+                        prefWidth = 48.0
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 3.0))
                         setOnAction {
                             search(it)
                         }
                     },
                     Label("每页数量").apply {
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,11.0))
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 11.0))
                     },
                     pageCountText.apply {
-                        prefHeight=23.0
-                        prefWidth=48.0
-                        HBox.setMargin(this, Insets(0.0,0.0,0.0,5.0))
+                        prefHeight = 23.0
+                        prefWidth = 48.0
+                        HBox.setMargin(this, Insets(0.0, 0.0, 0.0, 5.0))
                     },
                 )
             }
-            root.children.addAll(btnGroup,dataTable,endPane)
+            root.children.addAll(btnGroup, dataTable, endPane)
             stage.scene = Scene(root)
 
             println(this.dataTable.columns.size)
@@ -254,10 +240,12 @@ abstract class CurdUI<T : Any> (
 
     //是否操作所有元素
     var selectAll = true
+
     //为元素提供索引
-    val checkMap = HashMap<Int,SimpleBooleanProperty>()
+    val checkMap = HashMap<Int, SimpleBooleanProperty>()
+
     //清空checkMap回调函数
-    lateinit var clearDataTableCheck : () -> Unit
+    lateinit var clearDataTableCheck: () -> Unit
 
     fun InitTableHeads(): List<TableColumn<T, *>> {
         val checkBox = CheckBox()
@@ -306,7 +294,7 @@ abstract class CurdUI<T : Any> (
                     checkMap.forEach { k, v ->
                         v.value = true
                     }
-                }else if (old && !new) {
+                } else if (old && !new) {
                     //取消全选
                     checkMap.forEach { k, v ->
                         v.value = false
@@ -319,9 +307,10 @@ abstract class CurdUI<T : Any> (
             checkMap.clear()
             checkBox.isSelected = false
         }
-        return mutableListOf<TableColumn<T,*>>(checkTableColumn
-            ).apply {
-                addAll(elements.map { it.getTableHead() }.toList())
+        return mutableListOf<TableColumn<T, *>>(
+            checkTableColumn
+        ).apply {
+            addAll(elements.map { it.getTableHead() }.toList())
         }
 
     }
@@ -346,7 +335,7 @@ abstract class CurdUI<T : Any> (
      * @param pageCount 每页数量
      * @return f-总数量 s-分页数据列表
      */
-    abstract fun pageDataFunc(pageIndex:Int, pageCount:Int):Pair<Int,Collection<T>>
+    abstract fun pageDataFunc(pageIndex: Int, pageCount: Int): Pair<Int, Collection<T>>
 
     /**
      * 保存数据函数
@@ -354,7 +343,7 @@ abstract class CurdUI<T : Any> (
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun saveDataFunc(entity: T):Boolean
+    abstract fun saveDataFunc(entity: T): Boolean
 
     /**
      * 更新数据函数
@@ -362,7 +351,7 @@ abstract class CurdUI<T : Any> (
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun updateDataFunc(entity: T):Boolean
+    abstract fun updateDataFunc(entity: T): Boolean
 
     /**
      * 删除数据函数
@@ -370,7 +359,7 @@ abstract class CurdUI<T : Any> (
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun delDataFunc(entity: T):Boolean
+    abstract fun delDataFunc(entity: T): Boolean
 
     fun search(actionEvent: ActionEvent? = null) {
         platformRun {
@@ -415,9 +404,9 @@ abstract class CurdUI<T : Any> (
     fun addForm(actionEvent: ActionEvent) {
         try {
 //            dataTable1.items.addAll(add!!)
-            val formUI = object : FormUI<T>(buildFormUI = {
+            val dataFormUI = object : DataFormUI<T>(buildFormUI = {
                 addElements(elements)
-            }){
+            }) {
                 override fun saveDataFunc(entity: T): Boolean {
                     return this@CurdUI.saveDataFunc(entity)
                 }
@@ -427,7 +416,7 @@ abstract class CurdUI<T : Any> (
                 }
 
             }
-            formUI.show()
+            dataFormUI.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -435,10 +424,10 @@ abstract class CurdUI<T : Any> (
 
     fun editForm(entity: T) {
         try {
-            val formUI = object : FormUI<T>(buildFormUI = {
+            val dataFormUI = object : DataFormUI<T>(true, buildFormUI = {
                 defaultEntity(entity)
                 addElements(elements)
-            }){
+            }) {
                 override fun saveDataFunc(entity: T): Boolean {
                     return this@CurdUI.saveDataFunc(entity)
                 }
@@ -448,7 +437,7 @@ abstract class CurdUI<T : Any> (
                 }
 
             }
-            formUI.show()
+            dataFormUI.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -466,10 +455,12 @@ abstract class CurdUI<T : Any> (
             e.printStackTrace()
         }
     }
+
     fun addElements(vararg elements: FormElement<T, *>) {
         this.elements.addAll(elements)
     }
-    fun addCustomButtons(vararg customButtons: BaseButton<FormUI<T>>) {
+
+    fun addCustomButtons(vararg customButtons: BaseButton<DataFormUI<T>>) {
         this.customButtons.addAll(customButtons)
     }
 

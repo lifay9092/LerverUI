@@ -7,6 +7,7 @@ import org.ktorm.schema.varchar
 
 interface Department : Entity<Department> {
     companion object : Entity.Factory<Department>()
+
     val id: Int
     var name: String
     var location: String

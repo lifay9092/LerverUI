@@ -1,7 +1,7 @@
 package cn.lifay.ui.form.btn
 
 import cn.lifay.ui.form.BaseFormUI
-import cn.lifay.ui.form.FormUI
+import cn.lifay.ui.form.DataFormUI
 import javafx.scene.control.Button
 
 /**
@@ -10,15 +10,17 @@ import javafx.scene.control.Button
  *@Author lifay
  *@Date 2023/4/5 20:11
  **/
-class CustomButton<T : FormUI<*>>(val btn: Button, val actionFunc: (T) -> Unit) {
+class CustomButton<T : DataFormUI<*>>(val btn: Button, val actionFunc: (T) -> Unit) {
 
 }
+
 class BaseButton<T : BaseFormUI<*>>(val btn: Button, val actionFunc: (T) -> Unit) {
 
-    fun disable(){
+    fun disable() {
         btn.isDisable = true
     }
-    fun enable(){
+
+    fun enable() {
         btn.isDisable = false
     }
 }
