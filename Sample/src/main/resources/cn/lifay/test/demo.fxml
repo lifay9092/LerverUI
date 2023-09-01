@@ -16,8 +16,9 @@
         <Button layoutX="124.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单" />
         <Button layoutX="124.0" layoutY="207.0" mnemonicParsing="false" onAction="#info" text="信息提示" />
         <Button layoutX="124.0" layoutY="246.0" mnemonicParsing="false" onAction="#warn" text="警告提示" />
-        <Button layoutX="124.0" layoutY="285.0" mnemonicParsing="false" onAction="#error" text="错误提示" />
-        <SplitMenuButton fx:id="splitMenuBtn" layoutX="124.0" layoutY="325.0" />
+        <Button layoutX="124.0" layoutY="285.0" mnemonicParsing="false" onAction="#detail" text="详细提示" />
+        <Button layoutX="124.0" layoutY="324.0" mnemonicParsing="false" onAction="#error" text="错误提示" />
+        <SplitMenuButton fx:id="splitMenuBtn" layoutX="124.0" layoutY="366.0" />
         <TableView fx:id="tableView" layoutX="290.0" layoutY="484.0" prefHeight="223.0" prefWidth="719.0">
         </TableView>
         <Button layoutX="124.0" layoutY="480.0" mnemonicParsing="false" onAction="#tableText" text="测试表格" />
@@ -32,13 +33,13 @@
       <VBox alignment="TOP_CENTER" layoutX="1037.0" layoutY="33.0" prefHeight="714.0" prefWidth="288.0">
          <children>
             <Label text="发送消息" />
-            <TextArea prefHeight="200.0" prefWidth="200.0" fx:id="sendText"/>
+            <TextArea fx:id="sendText" prefHeight="200.0" prefWidth="200.0" />
               <Button mnemonicParsing="false" onAction="#chat" text="发送" />
             <Separator prefHeight="44.0" prefWidth="288.0" />
             <Label text="接受者1" />
-            <TextArea prefHeight="200.0" prefWidth="200.0" fx:id="user1"/>
+            <TextArea fx:id="user1" prefHeight="200.0" prefWidth="200.0" />
             <Label alignment="CENTER" contentDisplay="CENTER" text="接受者2" />
-            <TextArea prefHeight="200.0" prefWidth="200.0" fx:id="user2"/>
+            <TextArea fx:id="user2" prefHeight="200.0" prefWidth="200.0" />
          </children>
       </VBox>
     </children>

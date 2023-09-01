@@ -286,8 +286,8 @@ inline fun alertWarn(title: String, message: String, vararg buttonTypes: ButtonT
  * @param message 弹窗展示信息
  * @return 接收用户点击按钮类型
  */
-inline fun alertError(head: String, message: String = head, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
-    return alertError("错误提示框", head, message, *buttonTypes)
+inline fun alertError(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
+    return alertError("错误提示", "错误信息", message, *buttonTypes)
 }
 
 /**
@@ -300,7 +300,7 @@ inline fun alertError(head: String, message: String = head, vararg buttonTypes: 
 inline fun alertError(
     title: String,
     head: String,
-    message: String = head,
+    message: String,
     vararg buttonTypes: ButtonType?
 ): Optional<ButtonType> {
     return alertDetail(title, head, message, Alert.AlertType.ERROR, false, *buttonTypes)
@@ -349,12 +349,13 @@ inline fun alertDetail(
                 isEditable = false
                 isWrapText = true
                 prefWidth = 800.0
-                prefHeight = 800.0
-                maxWidth = Double.MAX_VALUE
-                maxHeight = Double.MAX_VALUE
+                prefHeight = 500.0
+                maxWidth = 900.0
+                maxHeight = 600.0
             })
         }
         dialogPane.prefWidth = 750.0
+//        dialogPane.prefHeight = 600.0
         dialogPane.isExpanded = isExpanded
     }
     return alert.showAndWait()
@@ -384,12 +385,13 @@ inline fun alertDetail(
                 isEditable = false
                 isWrapText = true
                 prefWidth = 800.0
-                prefHeight = 800.0
-                maxWidth = Double.MAX_VALUE
-                maxHeight = Double.MAX_VALUE
+                prefHeight = 500.0
+                maxWidth = 900.0
+                maxHeight = 600.0
             })
         }
         dialogPane.prefWidth = 750.0
+//        dialogPane.prefHeight = 600.0
         dialogPane.isExpanded = isExpanded
     }
     return alert.showAndWait()
@@ -406,4 +408,27 @@ fun copyToClipboard(text: String) {
     // 封装文本内容
     val trans = StringSelection(text)
     clipboard.setContents(trans, null)
+}
+
+fun String.toCamelCase(symbol:Char = '_'):String{
+
+    return if (this.contains(symbol)) {
+        val length: Int = this.length
+        val sb = StringBuilder(length)
+        var upperCase = false
+        for (i in 0 until length) {
+            val c: Char = this.get(i)
+            if (c == symbol) {
+                upperCase = true
+            } else if (upperCase) {
+                sb.append(c.uppercaseChar())
+                upperCase = false
+            } else {
+                sb.append(c.lowercaseChar())
+            }
+        }
+        sb.toString()
+    } else {
+        this.lowercase()
+    }
 }

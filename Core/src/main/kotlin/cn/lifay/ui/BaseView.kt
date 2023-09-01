@@ -57,6 +57,14 @@ abstract class BaseView<R : Pane>() : Initializable {
         spacing = 15.0
         layoutY = 15.0
     }
+    constructor(fxml: URL) : this(){
+        val loader = FXMLLoader(fxml)
+//        loader.setRoot(rootPane())
+        loader.setController(this)
+        loader.load<R>()
+        ROOT_PANE = loader.getRoot()
+        initNotificationPane()
+    }
 
     companion object {
 

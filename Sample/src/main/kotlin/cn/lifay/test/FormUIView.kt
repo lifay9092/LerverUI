@@ -12,13 +12,18 @@ import cn.lifay.ui.form.clearBtn
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
 import cn.lifay.ui.form.text.TextElement
+import javafx.collections.FXCollections
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
+import javafx.fxml.Initializable
 import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.Button
+import javafx.scene.control.ListView
 import javafx.scene.layout.AnchorPane
 import org.ktorm.schema.BaseTable
+import java.net.URL
+import java.util.*
 
 
 /**
@@ -26,7 +31,10 @@ import org.ktorm.schema.BaseTable
  * @author lifay
  * @date 2023/2/24 17:22
  **/
-class FormUIView {
+class FormUIView : Initializable{
+    @FXML
+    lateinit var listView : ListView<String>
+
     @FXML
     var rootPane = AnchorPane()
 
@@ -160,6 +168,10 @@ class FormUIView {
             UserData(2, "2222", SelectTypeEnum.B, false, "女"),
             UserData(3, "33333", SelectTypeEnum.C, true, "男")
         )
+    }
+
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        listView = ListView(FXCollections.observableArrayList("1","1","1","1","1"))
     }
 
 

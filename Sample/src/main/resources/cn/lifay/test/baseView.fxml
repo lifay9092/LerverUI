@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="rootPane" prefHeight="353.0" prefWidth="892.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+
+        <TextField fx:id="notificationText" layoutX="495.0" layoutY="21.0" text="系统消息文本" />
+        <TextField fx:id="messageText" layoutX="495.0" layoutY="52.0" text="提示消息文本" />
+        <TabPane fx:id="tabPane" layoutX="63.0" layoutY="95.0" prefHeight="749.0" prefWidth="397.0" tabClosingPolicy="UNAVAILABLE">
+
+            <tabs>
+                <Tab text="Untitled Tab 1">
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    </content>
+                </Tab>
+
+            </tabs>
+        </TabPane>
+
+    </children>
+
+</AnchorPane>
