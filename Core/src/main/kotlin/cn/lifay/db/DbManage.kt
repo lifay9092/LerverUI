@@ -1,6 +1,7 @@
 package cn.lifay.db
 
 import cn.lifay.exception.LerverUIException
+import cn.lifay.extension.toCamelCase
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.logging.ConsoleLogger
@@ -348,6 +349,7 @@ object DbManage {
         return cn.lifay.db.DbManage.database.deleteAll(t)
     }
 
+
     /**
      * 为BaseTable新增扩展方法:添加实体直接入库
      */
@@ -363,7 +365,7 @@ object DbManage {
         }
         insert(this) { tb ->
             columns.forEach { col ->
-                val value = temp[col.name]
+                val value = temp[col.name.toCamelCase()]
                 if (value != null) {
                     when (value::class.java) {
                         java.lang.Boolean::class.java -> {
@@ -427,7 +429,7 @@ object DbManage {
         }
         update(this) { tb ->
             columns.forEach { col ->
-                val value = temp[col.name]
+                val value = temp[col.name.toCamelCase()]
                 if (value != null) {
                     when (value::class.java) {
                         java.lang.Boolean::class.java -> {
@@ -437,7 +439,7 @@ object DbManage {
 
                         java.lang.String::class.java -> {
                             set(col as Column<String>, value as String)
-                            if (pkName == col.name) {
+                            if (pkName == col.name.toCamelCase()) {
                                 where {
                                     col eq value
                                 }
@@ -446,7 +448,7 @@ object DbManage {
 
                         java.lang.Integer::class.java -> {
                             set(col as Column<Integer>, value as Integer)
-                            if (pkName == col.name) {
+                            if (pkName == col.name.toCamelCase()) {
                                 where {
                                     col eq value
                                 }
@@ -463,7 +465,7 @@ object DbManage {
 
                         java.lang.Long::class.java -> {
                             set(col as Column<Long>, value as Long)
-                            if (pkName == col.name) {
+                            if (pkName == col.name.toCamelCase()) {
                                 where {
                                     col eq value
                                 }
@@ -473,7 +475,7 @@ object DbManage {
                         else -> {
                             println("not surport")
                             set(col as Column<String>, value.toString())
-                            if (pkName == col.name) {
+                            if (pkName == col.name.toCamelCase()) {
                                 where {
                                     col eq value.toString()
                                 }
