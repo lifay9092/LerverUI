@@ -1,6 +1,7 @@
 package cn.lifay.ui.tree
 
 import cn.lifay.ui.tree.TreeViewCache.DATA_TYPE
+import cn.lifay.ui.tree.TreeViewCache.ITEM_BUSI_TO_TREEITEM_MAP
 import cn.lifay.ui.tree.TreeViewCache.ITEM_KEYWORD_MAP
 import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.ui.tree.TreeViewCache.LIST_HELP_MAP
@@ -18,7 +19,11 @@ object TreeViewCache {
 
     /* treeViewId=获取图标的函数 */
     val TREE_IMG_CALL_MAP = HashMap<String, (TreeItem<*>) -> Unit>()
+
+    /*k=TreeView的hascode, v=id和父id属性委托 */
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
+
+    /*k=TreeView的hascode, v=id和children属性委托 */
     val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
     var DATA_TYPE = DataType.LIST
 
@@ -29,6 +34,7 @@ object TreeViewCache {
 
     val ITEM_TO_TREE_MAP = HashMap<Int, String>()
     val TREE_TO_ITEM_MAP = HashMap<String, ArrayList<Int>>()
+    val ITEM_BUSI_TO_TREEITEM_MAP = HashMap<String, TreeItem<*>>()
 
     val ITEM_KEYWORD_MAP = HashMap<Int, String>()
 
@@ -194,6 +200,8 @@ fun <V, B> TreeView<V>.initList(
                 imgCall(item)
             }
             initList(item, prop, datas, filterFunc, imgCall)
+            val busiId = prop.first.get(it)
+            ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = item
             item
         }.filter {
             if (filterFunc == null || filterFunc(it.value)) {
@@ -236,6 +244,8 @@ fun <V, B> TreeView<V>.initTree(
             imgCall(item)
         }
         initTree(item, idProp, childrenProp, filterFunc, imgCall)
+        val busiId = idProp.get(it)
+        ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = item
         item
     }.filter {
         if (filterFunc == null || filterFunc(it.value)) {
@@ -253,8 +263,14 @@ fun <V, B> TreeView<V>.initTree(
  * 清理TreeView的缓存数据，窗口关闭的时候回调此方法
  */
 fun <V> TreeView<V>.ClearCache() {
-    clearTreeViewMap(treeId)
-    clearTreeItemMap(treeId)
+//    clearTreeViewMap(treeId)
+//    clearTreeItemMap(treeId)
+    LIST_HELP_MAP.clear()
+    TREE_HELP_MAP.clear()
+    TREE_DATA_CALL_MAP.clear()
+    TREE_IMG_CALL_MAP.clear()
+    TREE_TO_ITEM_MAP.clear()
+    ITEM_BUSI_TO_TREEITEM_MAP.clear()
 }
 
 fun clearTreeViewMap(treeId: String) {
@@ -287,6 +303,7 @@ fun <V : Any> TreeItem<V>.UpdateChild(
         for (child in children) {
             if (idProp.get(child.value) == idProp.get(data)) {
                 child.value = data
+                child.CacheBusiIdMap()
                 break
             }
         }
@@ -295,6 +312,7 @@ fun <V : Any> TreeItem<V>.UpdateChild(
         for (child in children) {
             if (idProp.get(child.value) == idProp.get(data)) {
                 child.value = data
+                child.CacheBusiIdMap()
                 break
             }
         }
@@ -314,6 +332,7 @@ fun <V> TreeItem<V>.AddChildren(
         val child = TreeItem(data)
         imgCall?.let { it(child) }
         child.treeViewId = this.treeViewId
+        child.CacheBusiIdMap()
         //添加子节点
         children.add(child)
     }
@@ -332,6 +351,7 @@ fun <V> TreeItem<V>.AddChildrenList(
         val child = TreeItem(data)
         imgCall?.let { it(child) }
         child.treeViewId = this.treeViewId
+        child.CacheBusiIdMap()
         //添加子节点
         children.add(child)
     }
@@ -347,8 +367,26 @@ fun <V> TreeItem<V>.UpdateItem(
     this.value = data
     val imgCall = TREE_IMG_CALL_MAP[this.treeViewId]
     imgCall?.let { it(this) }
+    CacheBusiIdMap()
 }
 
+
+fun <V> TreeView<V>.GetItemByBuidId(id: String): TreeItem<V>? {
+    val item = ITEM_BUSI_TO_TREEITEM_MAP[id] ?: return null
+    return item as? TreeItem<V>
+}
+
+fun <V> TreeItem<V>.CacheBusiIdMap() {
+    if (DATA_TYPE == TreeViewCache.DataType.LIST) {
+        val props = LIST_HELP_MAP[this.treeViewId] as Pair<KProperty1<V, Any>, KProperty1<V, Any>>
+        val busiId = props.first.get(value)
+        ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = this
+    } else {
+        val props = TREE_HELP_MAP[this.treeViewId] as Pair<KProperty1<V, Any>, KProperty1<V, List<V>>>
+        val busiId = props.first.get(value)
+        ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = this
+    }
+}
 
 /**
  * 删除当前item元素

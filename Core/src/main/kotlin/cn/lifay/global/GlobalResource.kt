@@ -31,7 +31,7 @@ object GlobalResource {
     /**
      * 全局窗口图标资源
      */
-    var ICON = GlobalResource.javaClass.getResource("/icon.png")?.toExternalForm()
+    var ICON_PNG = GlobalResource.javaClass.getResource("/icon.png")?.toExternalForm()
     lateinit var ICON_IMG: Image
 
     /**
@@ -45,7 +45,7 @@ object GlobalResource {
     fun FormWidth(): Double {
         println(SCREEN_WIDTH)
         val default = SCREEN_WIDTH * 0.35
-        return if (default < 1050) 650.0 else default
+        return if (default < 1050) 850.0 else default
 //        return SCREEN_WIDTH * 0.25
     }
 
@@ -62,10 +62,8 @@ object GlobalResource {
      * 为窗体设置图标,否则默认：/icon.png
      */
     fun setGlobalIconImage(imgClassPath: String) {
-        GlobalResource.javaClass.getResource("/icon.png")?.let {
-            ICON = it.toExternalForm()
-            ICON_IMG = Image(ICON)
-        }
+        ICON_PNG = imgClassPath
+        ICON_IMG = Image(ICON_PNG)
     }
 
     /**
@@ -73,7 +71,7 @@ object GlobalResource {
      */
     fun loadIcon(stage: Stage) {
         if (!this::ICON_IMG.isInitialized) {
-            ICON?.let {
+            ICON_PNG?.let {
                 ICON_IMG = Image(it)
                 stage.icons.add(ICON_IMG)
             }

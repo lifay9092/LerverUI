@@ -310,6 +310,9 @@ class CommonDemoView : Initializable {
 
     fun treeTestUpt(actionEvent: ActionEvent) {
         rootTreeItem.children[0].UpdateItem(TreeTestVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
+        val treeItem = treeView.GetItemByBuidId("add1")
+        treeItem?.UpdateItem(TreeTestVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
+        println(treeItem?.value)
     }
 
     fun treeTestDel1(actionEvent: ActionEvent) {

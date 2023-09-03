@@ -22,7 +22,8 @@ class SelectElement<T : Any, R : Any> constructor(
     customProp: DelegateProp<T, R>?,
     items: Collection<R?>,
     required: Boolean = false,
-    initValue: R? = null
+    initValue: R? = null,
+    val nodeBuild: (ChoiceBox<R>.() -> Unit)?
 ) :
     FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
@@ -42,8 +43,9 @@ class SelectElement<T : Any, R : Any> constructor(
             label: String,
             property: KMutableProperty1<T, R>,
             items: Collection<R?>,
-            initValue: R? = null
-        ) = SelectElement(T::class, R::class.java, label, property, null, null, items, false, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ChoiceBox<R>.() -> Unit)? = null
+        ) = SelectElement(T::class, R::class.java, label, property, null, null, items, false, initValue, nodeBuild)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
@@ -51,8 +53,9 @@ class SelectElement<T : Any, R : Any> constructor(
             property: KMutableProperty1<T, R?>,
             items: Collection<R?>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = SelectElement(T::class, R::class.java, label, null, property, null, items, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ChoiceBox<R>.() -> Unit)? = null
+        ) = SelectElement(T::class, R::class.java, label, null, property, null, items, required, initValue, nodeBuild)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
@@ -60,8 +63,9 @@ class SelectElement<T : Any, R : Any> constructor(
             customProp: DelegateProp<T, R>,
             items: Collection<R?>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = SelectElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ChoiceBox<R>.() -> Unit)? = null
+        ) = SelectElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue, nodeBuild)
 
     }
 
@@ -69,7 +73,9 @@ class SelectElement<T : Any, R : Any> constructor(
 
 
     override fun registerGraphic(): Node {
-        return ChoiceBox<R>()
+        return ChoiceBox<R>().apply {
+            nodeBuild?.let { it(this) }
+        }
     }
 
     override fun graphic(): ChoiceBox<*> {

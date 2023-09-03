@@ -222,7 +222,9 @@ open class BaseFormUI<T : Any>(
 //                    continue
 //                }
                 val element: FormElement<T, *> = ELEMENTS_LIST[elementIndex]
-                element.enable()
+                if (!element.isDisable) {
+                    element.enable()
+                }
                 GridPane.setHalignment(element, HPos.LEFT)
                 if (element.graphic() is TextArea) {
                     form.addRow(x, element)

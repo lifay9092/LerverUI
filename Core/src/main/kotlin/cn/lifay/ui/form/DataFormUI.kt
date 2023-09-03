@@ -66,7 +66,9 @@ abstract class DataFormUI<T : Any>(
         btnGroup.children.addAll(0, customBtns)
         if (_isUpdate) {
             ELEMENTS_LIST.forEach {
-                if (it.primary) {
+                if (it.isDisable) {
+                    it.disable()
+                } else if (it.primary) {
                     it.disable()
                 }
             }

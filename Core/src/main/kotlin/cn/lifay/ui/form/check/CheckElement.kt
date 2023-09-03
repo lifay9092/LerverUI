@@ -21,7 +21,8 @@ class CheckElement<T : Any, R : Any>(
     property: KMutableProperty1<T, R?>?,
     customProp: DelegateProp<T, R>?,
     required: Boolean,
-    initValue: R? = null
+    initValue: R? = null,
+    val nodeBuild: (CheckBox.() -> Unit)?
 ) :
     FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
@@ -39,29 +40,34 @@ class CheckElement<T : Any, R : Any>(
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R>,
-            initValue: R? = null
-        ) = CheckElement(T::class, R::class.java, label, property, null, null, true, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (CheckBox.() -> Unit)? = null
+        ) = CheckElement(T::class, R::class.java, label, property, null, null, true, initValue, nodeBuild)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             property: KMutableProperty1<T, R?>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = CheckElement(T::class, R::class.java, label, null, property, null, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (CheckBox.() -> Unit)? = null
+        ) = CheckElement(T::class, R::class.java, label, null, property, null, required, initValue, nodeBuild)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = CheckElement(T::class, R::class.java, label, null, null, customProp, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (CheckBox.() -> Unit)? = null
+        ) = CheckElement(T::class, R::class.java, label, null, null, customProp, required, initValue, nodeBuild)
 
     }
 
     override fun registerGraphic(): Node {
-        return CheckBox()
+        return CheckBox().apply {
+            nodeBuild?.let { it(this) }
+        }
     }
 
     override fun graphic(): CheckBox {

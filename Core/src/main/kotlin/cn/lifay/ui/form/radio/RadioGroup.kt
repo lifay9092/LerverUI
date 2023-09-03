@@ -12,7 +12,7 @@ import javafx.scene.layout.HBox
  **/
 class RadioGroup() : HBox(10.0) {
     //    protected lateinit var items : Collection<String>
-    protected val group = ToggleGroup()
+    val group = ToggleGroup()
 
     var text: String
         get() {

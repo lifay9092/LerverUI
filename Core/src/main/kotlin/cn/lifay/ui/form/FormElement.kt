@@ -4,7 +4,6 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.platformRun
 import cn.lifay.extension.textFillColor
 import cn.lifay.ui.DelegateProp
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Insets
@@ -41,19 +40,19 @@ abstract class FormElement<T : Any, R : Any>(
 
     //用户可自定义元素值为空时的填充值
     var fillValue: R? = null
-    var disableFlag = SimpleBooleanProperty(false)
+//    var disableFlag = SimpleBooleanProperty(_isDisable)
     fun init() {
-        //  println("$label FormElement init")
-        alignment = Pos.CENTER_LEFT
-        val l = Label(label).textFillColor("#606266")
-        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
-        children.add(l)
-        padding = Insets(5.0, 10.0, 5.0, 10.0)
-        node = registerGraphic()
-        node.disableProperty().bind(disableFlag)
-
-        children.add(node)
-    }
+    //  println("$label FormElement init")
+    alignment = Pos.CENTER_LEFT
+    val l = Label(label).textFillColor("#606266")
+    l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+    children.add(l)
+    padding = Insets(5.0, 10.0, 5.0, 10.0)
+    node = registerGraphic()
+//        node.disableProperty().bind(disableFlag)
+//        disableFlag.value = _isDisable
+    children.add(node)
+}
 
     /**
      *  注册输入值控件实例
@@ -133,7 +132,7 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun disable() {
 //        platformRun { node!!.isDisable = true }
-        disableFlag.value = true
+        node.isDisable = true
     }
 
     /**
@@ -141,7 +140,7 @@ abstract class FormElement<T : Any, R : Any>(
      */
     fun enable() {
 //        platformRun { node!!.isDisable = true }
-        disableFlag.value = false
+        node.isDisable = false
     }
 
     /**

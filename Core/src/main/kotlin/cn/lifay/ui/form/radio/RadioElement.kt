@@ -3,6 +3,7 @@ package cn.lifay.ui.form.radio
 import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.form.FormElement
 import javafx.scene.Node
+import javafx.scene.control.ToggleGroup
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 
@@ -21,7 +22,8 @@ class RadioElement<T : Any, R : Any>(
     customProp: DelegateProp<T, R>?,
     private var items: List<R>,
     required: Boolean,
-    initValue: R? = null
+    initValue: R? = null,
+    val nodeBuild: (ToggleGroup.() -> Unit)?
 ) : FormElement<T, R>(r, label, required = required, initValue = initValue) {
 
     init {
@@ -40,8 +42,9 @@ class RadioElement<T : Any, R : Any>(
             label: String,
             property: KMutableProperty1<T, R>,
             items: List<R>,
-            initValue: R? = null
-        ) = RadioElement(T::class, R::class.java, label, property, null, null, items, true, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ToggleGroup.() -> Unit)? = null
+        ) = RadioElement(T::class, R::class.java, label, property, null, null, items, true, initValue, nodeBuild)
 
         /*注入 property 返回值不为空 对应var ? */
         inline operator fun <reified T : Any, reified R : Any> invoke(
@@ -49,8 +52,9 @@ class RadioElement<T : Any, R : Any>(
             property: KMutableProperty1<T, R?>,
             items: List<R>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = RadioElement(T::class, R::class.java, label, null, property, null, items, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ToggleGroup.() -> Unit)? = null
+        ) = RadioElement(T::class, R::class.java, label, null, property, null, items, required, initValue, nodeBuild)
 
         /*注入 customProp javabean */
         inline operator fun <reified T : Any, reified R : Any> invoke(
@@ -58,13 +62,16 @@ class RadioElement<T : Any, R : Any>(
             customProp: DelegateProp<T, R>,
             items: List<R>,
             required: Boolean = false,
-            initValue: R? = null
-        ) = RadioElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue)
+            initValue: R? = null,
+            noinline nodeBuild: (ToggleGroup.() -> Unit)? = null
+        ) = RadioElement(T::class, R::class.java, label, null, null, customProp, items, required, initValue, nodeBuild)
     }
 
 
     override fun registerGraphic(): Node {
-        return RadioGroup()
+        return RadioGroup().apply {
+            nodeBuild?.let { it(this.group) }
+        }
     }
 
     override fun graphic(): RadioGroup {

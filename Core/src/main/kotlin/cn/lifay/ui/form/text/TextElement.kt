@@ -27,14 +27,11 @@ class TextElement<T : Any, R : Any> constructor(
     customProp: DelegateProp<T, R>?,
     primary: Boolean = false,
     required: Boolean = false,
-    var isTextArea: Boolean = false,
-    var isTextDisable: Boolean = false,
-    initValue: R? = null
+    val isTextArea: Boolean = false,
+    initValue: R? = null,
+    val nodeBuild: (TextInputControl.() -> Unit)?
 ) :
     FormElement<T, R>(r, label, primary, required, initValue) {
-
-    var _isTextArea = isTextArea
-    var _isDisable = isTextDisable
 
     init {
         //   println("TextElement init")
@@ -42,8 +39,6 @@ class TextElement<T : Any, R : Any> constructor(
         super.property = property
         super.customProp = customProp
         super.tc = t
-        //  println("$label isTextArea:${_isTextArea}")
-        // this._isTextArea = isTextArea
         init()
     }
 
@@ -55,8 +50,8 @@ class TextElement<T : Any, R : Any> constructor(
             property: KMutableProperty1<T, R>,
             primary: Boolean = false,
             isTextArea: Boolean = false,
-            isDisable: Boolean = false,
-            initValue: R? = null
+            initValue: R? = null,
+            noinline nodeBuild: (TextInputControl.() -> Unit)? = null
         ) = TextElement(
             T::class,
             R::class.java,
@@ -67,8 +62,8 @@ class TextElement<T : Any, R : Any> constructor(
             primary,
             true,
             isTextArea,
-            isDisable,
-            initValue
+            initValue,
+            nodeBuild
         )
 
         /*注入 property 返回值不为空 对应var ? */
@@ -80,8 +75,8 @@ class TextElement<T : Any, R : Any> constructor(
             required: Boolean = false,
             primary: Boolean = false,
             isTextArea: Boolean = false,
-            isDisable: Boolean = false,
-            initValue: R? = null
+            initValue: R? = null,
+            noinline nodeBuild: (TextInputControl.() -> Unit)? = null
         ) = TextElement(
             T::class,
             R::class.java,
@@ -92,8 +87,8 @@ class TextElement<T : Any, R : Any> constructor(
             primary,
             required,
             isTextArea,
-            isDisable,
-            initValue
+            initValue,
+            nodeBuild
         )
 
         /*注入 customProp javabean */
@@ -105,8 +100,8 @@ class TextElement<T : Any, R : Any> constructor(
             required: Boolean = false,
             primary: Boolean = false,
             isTextArea: Boolean = false,
-            isDisable: Boolean = false,
-            initValue: R? = null
+            initValue: R? = null,
+            noinline nodeBuild: (TextInputControl.() -> Unit)? = null
         ) = TextElement(
             T::class,
             R::class.java,
@@ -117,25 +112,27 @@ class TextElement<T : Any, R : Any> constructor(
             primary,
             required,
             isTextArea,
-            isDisable,
-            initValue
+            initValue,
+            nodeBuild
         )
 
     }
 
     override fun registerGraphic(): Node {
         //  println("$label registerGraphic isTextArea:${_isTextArea}")
-        val node = if (_isTextArea) {
+        val node = if (isTextArea) {
             TextArea().apply {
-                isWrapText = false
+                isWrapText = true
                 prefHeight = 170.0
                 prefWidth = 250.0
+                nodeBuild?.let { it(this) }
             }
         } else {
             val textField = TextField()
+            nodeBuild?.let { it(textField) }
             textField
         }
-        node.isDisable = _isDisable
+
         return node
     }
 
@@ -185,7 +182,7 @@ class TextElement<T : Any, R : Any> constructor(
     }
 
     override fun clear() {
-        if (disableFlag.value) {
+        if (node.isDisable) {
             return
         }
         platformRun {
@@ -196,9 +193,7 @@ class TextElement<T : Any, R : Any> constructor(
 
                 is TextArea -> {
                     (node as TextArea).clear()
-
                 }
-
                 else -> {
                 }
             }

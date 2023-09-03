@@ -79,6 +79,9 @@ class UserForm(t: UserData? = null) : FormUI<UserData>("用户管理", t) {}
 
 buildElements()
 元素跟字段数量、顺序一致
+
+var
+
 java.lang.IllegalArgumentException: argument type mismatch
 
 

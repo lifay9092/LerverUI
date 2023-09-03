@@ -2,6 +2,7 @@ package cn.lifay.extension
 
 import atlantafx.base.theme.Styles
 import cn.lifay.exception.LerverUIException
+import cn.lifay.global.GlobalResource
 import cn.lifay.ui.LoadingUI
 import javafx.application.Platform
 import javafx.css.PseudoClass
@@ -18,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kordamp.ikonli.feather.Feather
+import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -87,14 +88,14 @@ inline fun asyncTaskLoading(
     owner: Window,
     msg: String = "请耐心等待...",
     animation: Boolean = false,
-    crossinline block: () -> Unit
+    crossinline handle: () -> Unit
 ) {
     val loadingUI = LoadingUI(owner, animation = animation, msg = msg)
     CoroutineScope(Dispatchers.Default).launch {
         try {
             platformRun { loadingUI.show() }
             //执行任务
-            block()
+            handle()
         } catch (e: LerverUIException) {
             e.printStackTrace()
         } finally {
@@ -191,7 +192,7 @@ fun Button.outline(): Button {
     return this
 }
 
-fun Button.icon(icon: Feather): Button {
+fun Button.icon(icon: Ikon): Button {
     //  this.backgroundColor("#ec4414")
     // this.textFill = Color.WHITE
     this.graphic = FontIcon(icon)
@@ -214,6 +215,11 @@ fun Stage.bindEscKey(): Stage {
             close()
         }
     }
+    return this
+}
+
+fun Stage.loadIcon(): Stage {
+    GlobalResource.loadIcon(this)
     return this
 }
 
@@ -286,8 +292,12 @@ inline fun alertWarn(title: String, message: String, vararg buttonTypes: ButtonT
  * @param message 弹窗展示信息
  * @return 接收用户点击按钮类型
  */
-inline fun alertError(message: String, vararg buttonTypes: ButtonType?): Optional<ButtonType> {
-    return alertError("错误提示", "错误信息", message, *buttonTypes)
+inline fun alertError(
+    message: String,
+    isExpanded: Boolean = false,
+    vararg buttonTypes: ButtonType?
+): Optional<ButtonType> {
+    return alertError("错误提示", "错误信息", message, isExpanded, *buttonTypes)
 }
 
 /**
@@ -301,9 +311,10 @@ inline fun alertError(
     title: String,
     head: String,
     message: String,
+    isExpanded: Boolean = false,
     vararg buttonTypes: ButtonType?
 ): Optional<ButtonType> {
-    return alertDetail(title, head, message, Alert.AlertType.ERROR, false, *buttonTypes)
+    return alertDetail(title, head, message, Alert.AlertType.ERROR, isExpanded, *buttonTypes)
 }
 
 /**
@@ -355,7 +366,6 @@ inline fun alertDetail(
             })
         }
         dialogPane.prefWidth = 750.0
-//        dialogPane.prefHeight = 600.0
         dialogPane.isExpanded = isExpanded
     }
     return alert.showAndWait()
