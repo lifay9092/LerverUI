@@ -498,28 +498,5 @@ object DbManage {
         }
         return false
     }
-    /*
-
-    fun find(predicate: (Table<E>) -> ColumnDeclaring<Boolean>): E? {
-        return SEQUENCE.find(predicate)
-    }
-
-    fun filter(predicate: (Table<E>) -> ColumnDeclaring<Boolean>): EntitySequence<E, Table<E>> {
-        return SEQUENCE.filter(predicate)
-    }
-
-    fun add(entity: E): Int {
-        return SEQUENCE.add(entity)
-    }
-
-    fun update(entity: E): Int {
-        return SEQUENCE.update(entity)
-    }
-
-    fun delete(predicate: (Table<E>) -> ColumnDeclaring<Boolean>): Boolean {
-        val entity = find(predicate) ?: return false
-        entity.delete()
-        return true
-    }*/
 
 }
