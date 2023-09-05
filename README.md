@@ -105,9 +105,9 @@ stage.bindEscKey()
 
 9.常用弹出提示
 
-![](D:\IdeaProjects\LerverUI\doc\info.png)
-![](D:\IdeaProjects\LerverUI\doc\warn.png)
-![](D:\IdeaProjects\LerverUI\doc\error.png)
+![info](doc/info.png)
+![warn](doc/warn.png)
+![error](doc/error.png)
 
 ```
 alertInfo("信息打印")
@@ -166,9 +166,9 @@ EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
 **一.视图容器**
 
 > 基础Controller容器：BaseView 内置封装了便捷功能
-![](D:\IdeaProjects\LerverUI\doc\message.png)
-![](D:\IdeaProjects\LerverUI\doc\notification.png)
-![](D:\IdeaProjects\LerverUI\doc\baseview.png)
+![message](doc/message.png)
+![notification](doc/notification.png)
+![baseview](doc/baseview.png)
 
 1.视图类定义（1）
 
@@ -248,7 +248,7 @@ stage.show()
 > 自动绑定实体类、组合表单元素和基础操作功能
 
 1.定义普通表单 BaseFormUI（这里选择直接实例化,也可创建一个类继承和实现BaseFormUI）
-![](D:\IdeaProjects\LerverUI\doc\baseview.png)
+![baseview](doc/baseview.png)
 
 ```kotlin
 val baseFormUI = BaseFormUI<UserData>("测试基础表单") {
@@ -299,7 +299,7 @@ baseFormUI.show()
 ```
 
 2.定义数据表单 DataFormUI（这里选择创建一个类继承和实现DataFormUI,也可直接实例化并实现）
-![](D:\IdeaProjects\LerverUI\doc\dataform.png)
+![dataform](doc/dataform.png)
 
 ```kotlin
 //注意变量需要可修改,定义为var
@@ -348,8 +348,7 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
 ```
 
 3.定义CURD增删查改界面 CurdUI（这里选择创建一个类继承和实现CurdUI,也可直接实例化并实现）
-![](D:\IdeaProjects\LerverUI\doc\curd.png)
-
+![curd](doc/curd.png)
 ```kotlin
 class UserManage : CurdUI<UserData>("用户管理", buildElements = {
 
@@ -395,7 +394,7 @@ class UserManage : CurdUI<UserData>("用户管理", buildElements = {
 ```
 *四.树视图*
 
->考虑到树有很多应用场景，业务过程中产生很多冗余代码
+> 考虑到树有很多应用场景，业务过程中产生很多冗余代码
 
 - 根据数据集（分List数据、Tree数据两种数据源）自动构建树节点，也可一键动态刷新
 - 动态添加
@@ -403,11 +402,14 @@ class UserManage : CurdUI<UserData>("用户管理", buildElements = {
 - 动态修改
 
 **四.样式按钮**
->必须先开启ElementUI
+> 必须先开启ElementUI
 
-styleClass分别对应 `button button-primary button-success button-info button-warning button-danger`![image-20201014164041215](doc/image-20201014164041215.png)
+styleClass分别对应 `button button-primary button-success button-info button-warning button-danger`
+
+![image-20201014164041215](doc/image-20201014164041215.png)
 
 ```xml
+
 <Button fx:id="viewBatchBtn" mnemonicParsing="false" onAction="#viewBatch" prefHeight="31.0"
-                    prefWidth="97.0" styleClass="button-warn" text="查看参数"/>
+        prefWidth="97.0" styleClass="button-warn" text="查看参数"/>
 ```
