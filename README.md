@@ -105,6 +105,10 @@ stage.bindEscKey()
 
 9.常用弹出提示
 
+![](D:\IdeaProjects\LerverUI\doc\info.png)
+![](D:\IdeaProjects\LerverUI\doc\warn.png)
+![](D:\IdeaProjects\LerverUI\doc\error.png)
+
 ```
 alertInfo("信息打印")
 alertWarn("警告打印")
@@ -162,6 +166,9 @@ EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
 **一.视图容器**
 
 > 基础Controller容器：BaseView 内置封装了便捷功能
+![](D:\IdeaProjects\LerverUI\doc\message.png)
+![](D:\IdeaProjects\LerverUI\doc\notification.png)
+![](D:\IdeaProjects\LerverUI\doc\baseview.png)
 
 1.视图类定义（1）
 
@@ -241,6 +248,7 @@ stage.show()
 > 自动绑定实体类、组合表单元素和基础操作功能
 
 1.定义普通表单 BaseFormUI（这里选择直接实例化,也可创建一个类继承和实现BaseFormUI）
+![](D:\IdeaProjects\LerverUI\doc\baseview.png)
 
 ```kotlin
 val baseFormUI = BaseFormUI<UserData>("测试基础表单") {
@@ -291,6 +299,7 @@ baseFormUI.show()
 ```
 
 2.定义数据表单 DataFormUI（这里选择创建一个类继承和实现DataFormUI,也可直接实例化并实现）
+![](D:\IdeaProjects\LerverUI\doc\dataform.png)
 
 ```kotlin
 //注意变量需要可修改,定义为var
@@ -339,6 +348,7 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
 ```
 
 3.定义CURD增删查改界面 CurdUI（这里选择创建一个类继承和实现CurdUI,也可直接实例化并实现）
+![](D:\IdeaProjects\LerverUI\doc\curd.png)
 
 ```kotlin
 class UserManage : CurdUI<UserData>("用户管理", buildElements = {
