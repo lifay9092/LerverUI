@@ -44,19 +44,18 @@ class FormUIView : Initializable{
             //设置默认填充内容
             defaultEntity(UserData(11, "11", SelectTypeEnum.A, true, "男"))
 
-            //添加元素
+            //定义和添加元素
             val nameElement =
                 TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值") {
                     isDisable = true
+                    isEditable = false
                 }
             addElements(
-                TextElement("ID:", UserData::id, true),
+                TextElement("ID:", UserData::id, true) {},
                 nameElement,
                 SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList()),
                 CheckElement("是否未成年:", UserData::child),
-                RadioElement("性别:", UserData::sex, listOf("男", "女")) {
-
-                }
+                RadioElement("性别:", UserData::sex, listOf("男", "女"))
             )
 
             //添加按钮和操作
@@ -73,7 +72,7 @@ class FormUIView : Initializable{
             }
 
             //窗口关闭操作
-            setOnCloseRequest() {
+            setOnCloseRequest {
                 println("窗口已关闭")
             }
         }

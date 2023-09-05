@@ -38,18 +38,13 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
             println(it)
         })
     }) {
-    //    constructor(title: String,t: UserData?):this(title){
-//        if (t != null) {
-//            this.t = t
-//        }
-//    }
 
     val dataList = mutableListOf<UserData>(
 //        UserData(1, "111111", SelectTypeEnum.A, true, "男"),
 //        UserData(2, "2222", SelectTypeEnum.B, false, "女"),
 //        UserData(3, "33333", SelectTypeEnum.C, true, "男")
     )
-
+    //保存操作
     override fun saveDataFunc(entity: UserData): Boolean {
         if (entity!!.name!!.isBlank()) {
             throw LerverUIException("名称不能为空!")
@@ -58,21 +53,10 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
         return true
     }
 
-//    override fun delData(primaryValue: Any?) {
-//        println("删除数据操作:$primaryValue")
-//        showNotification("保存数据操作:$primaryValue")
-//    }
-//
-//
-//    override fun datas(): List<UserData> {
-//
-//        return dataList
-//    }
-
+    //更新操作
     override fun updateDataFunc(entity: UserData): Boolean {
         UserDatas.update(entity)
         return true
     }
-
 
 }

@@ -23,7 +23,7 @@ import org.ktorm.entity.*
  *@Author lifay
  *@Date 2023/2/4 18:24
  **/
-class UserManage() : CurdUI<UserData>("用户管理", buildElements = {
+class UserManage : CurdUI<UserData>("用户管理", buildElements = {
     val id = TextElement("ID:", UserData::id, true)
     val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
     val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
@@ -36,7 +36,7 @@ class UserManage() : CurdUI<UserData>("用户管理", buildElements = {
     })
 }) {
 
-
+    //分页实现,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
     override fun pageDataFunc(pageIndex: Int, pageCount: Int): Pair<Int, Collection<UserData>> {
         return Pair(
             DbManage.userDatas.totalRecordsInAllPages, DbManage.userDatas.drop(pageIndex * pageCount)
@@ -44,10 +44,12 @@ class UserManage() : CurdUI<UserData>("用户管理", buildElements = {
         )
     }
 
+    //更新操作
     override fun updateDataFunc(entity: UserData): Boolean {
         return true
     }
 
+    //保存操作
     override fun saveDataFunc(entity: UserData): Boolean {
         val department = Department {}
         DbManage.database.sequenceOf(Departments).add(department)
@@ -60,18 +62,10 @@ class UserManage() : CurdUI<UserData>("用户管理", buildElements = {
         return true
     }
 
-
+    //删除操作
     override fun delDataFunc(entity: UserData): Boolean {
         return true
     }
-
-//    override fun add():  List<UserData> {
-//        return listOf(
-//            UserData(1, "111111", SelectTypeEnum.A, true, "男"),
-//            UserData(2, "2222", SelectTypeEnum.B, false, "女"),
-//            UserData(3, "33333", SelectTypeEnum.C, true, "男")
-//        )
-//    }
 
 
 }

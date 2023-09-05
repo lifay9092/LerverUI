@@ -7,7 +7,6 @@ import cn.lifay.extension.backgroundColor
 import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
-import cn.lifay.mq.event.Event
 import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -68,19 +67,19 @@ abstract class BaseView<R : Pane>() : Initializable {
 
     companion object {
 
-        /**
-         * 创建新的视图-fxml
-         * @param fxml fxml资源
-         * @param isGlobalResource 是否跟随GlobalResource样式
-         */
-        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, isGlobalResource: Boolean = true): T {
-            val loader = FXMLLoader(fxml)
-            var load = loader.load<R>()
-            return loader.getController<T?>().apply {
-                ROOT_PANE = load
-                initNotificationPane()
-            }
-        }
+//        /**
+//         * 创建新的视图-fxml
+//         * @param fxml fxml资源
+//         * @param isGlobalResource 是否跟随GlobalResource样式
+//         */
+//        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, isGlobalResource: Boolean = true): T {
+//            val loader = FXMLLoader(fxml)
+//            var load = loader.load<R>()
+//            return loader.getController<T?>().apply {
+//                ROOT_PANE = load
+//                initNotificationPane()
+//            }
+//        }
 
         /**
          * 创建新的视图-fxml
@@ -90,7 +89,6 @@ abstract class BaseView<R : Pane>() : Initializable {
          */
         fun <T : BaseView<R>, R : Pane> createView(
             fxml: URL,
-            isGlobalResource: Boolean = true,
             initFunc: (T.() -> Unit)? = null
         ): T {
             val loader = FXMLLoader(fxml)
@@ -104,9 +102,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 
         /**
          * 创建新的视图-rootPane
-         * @param fxml fxml资源
-         * @param isGlobalResource 是否跟随GlobalResource样式
-         * @param initFunc 视图初始化后执行的方法
+         * @param rootPane fxml资源
          */
         fun <R : Pane> createView(rootPane: R): BaseView<R> {
             val baseView = object : BaseView<R>() {
@@ -125,17 +121,16 @@ abstract class BaseView<R : Pane>() : Initializable {
         /**
          * 创建新的视图fxml、Stage窗口 并返回Stage
          * @param fxml fxml资源
-         * @param isGlobalResource 是否跟随GlobalResource样式
          * @param closeFunc 窗口关闭后回调函数，默认null
          * @param initFunc 视图初始化后执行的方法
          */
         fun <T : BaseView<R>, R : Pane> createViewStage(
             title: String,
-            fxml: URL, isGlobalResource: Boolean = true,
+            fxml: URL,
             closeFunc: (() -> Unit)? = null,
             initFunc: (T.() -> Unit)? = null
         ): Stage {
-            val view = createView(fxml, isGlobalResource, initFunc)
+            val view = createView(fxml, initFunc)
             val scene = Scene(view.getRoot())
             return Stage().apply {
                 this.title = title
@@ -179,7 +174,7 @@ abstract class BaseView<R : Pane>() : Initializable {
 //        }
 //        println(GlobalResource.SCREEN_WIDTH)
 //        println(GlobalResource.MSG_WIDTH)
-        println(ROOT_PANE.children.size)
+//        println(ROOT_PANE.children.size)
         NOTIFICATION_PANE.layoutXProperty()
             .bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
         MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH / 2))
@@ -202,28 +197,28 @@ abstract class BaseView<R : Pane>() : Initializable {
         return rootPane().scene.window
     }
 
-    /**
-     * 发送消息
-     * @param id 接受者ID
-     * @param body 参数值
-     * @author lifay
-     * @return
-     */
-    open fun <T : Event> send(id: String, body: T) {
-//        val stackTraceElements = Thread.currentThread().stackTrace
-////        stackTraceElements.forEach { println(it) }
-//        val element = stackTraceElements[2]
-////        println(element)
-//        if (EventBus.has(element.className, element.methodName)) {
-//            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
-//        }
-//        asyncTask {
-//            EventBus.invoke(id, body)
-//        }
-    }
+//    /**
+//     * 发送消息
+//     * @param id 接受者ID
+//     * @param body 参数值
+//     * @author lifay
+//     * @return
+//     */
+//    open fun <T : Event> send(id: String, body: T) {
+////        val stackTraceElements = Thread.currentThread().stackTrace
+//////        stackTraceElements.forEach { println(it) }
+////        val element = stackTraceElements[2]
+//////        println(element)
+////        if (EventBus.has(element.className, element.methodName)) {
+////            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
+////        }
+////        asyncTask {
+////            EventBus.invoke(id, body)
+////        }
+//    }
 
 
-    fun getMsgStyle(msgType: MsgType): String {
+    private fun getMsgStyle(msgType: MsgType): String {
         return when (msgType) {
             MsgType.ACCENT -> {
                 Styles.ACCENT
