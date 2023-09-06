@@ -371,7 +371,7 @@ fun <V> TreeItem<V>.UpdateItem(
 }
 
 
-fun <V> TreeView<V>.GetItemByBuidId(id: String): TreeItem<V>? {
+fun <V> TreeView<V>.GetItemByBusiId(id: String): TreeItem<V>? {
     val item = ITEM_BUSI_TO_TREEITEM_MAP[id] ?: return null
     return item as? TreeItem<V>
 }

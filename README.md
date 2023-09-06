@@ -392,24 +392,63 @@ class UserManage : CurdUI<UserData>("用户管理", buildElements = {
 
 }
 ```
-*四.树视图*
+
+*三.树视图*
 
 > 考虑到树有很多应用场景，业务过程中产生很多冗余代码
 
-- 根据数据集（分List数据、Tree数据两种数据源）自动构建树节点，也可一键动态刷新
+- 根据数据集自动构建树节点，也可一键动态刷新
 - 动态添加
 - 动态删除
 - 动态修改
 
-**四.样式按钮**
-> 必须先开启ElementUI
+注册和定义数据源
 
-styleClass分别对应 `button button-primary button-success button-info button-warning button-danger`
+```kotlin
+//（分List数据、Tree数据两种数据源）
+//Register-为treeView实例注册，示例中数据源为List模式，所以需要传入id和parentId的属性引用，函数体内是获取数据源的逻辑代码
+treeView.apply {
+    root = rootTreeItem
+    isShowRoot = true
+    Register(TreeTestVO::id, TreeTestVO::parentId, true) {
+        listOf(test1, test2, test3)
+    }
+}
 
-![image-20201014164041215](doc/image-20201014164041215.png)
+//刷新树节点，并可选择添加过滤逻辑
+treeView.RefreshTree<TreeTestVO, String>(filterFunc = {
+    it.name.contains(s2)
+})
 
-```xml
+//根据实体类的id查找所在TreeItem实例，并更新实体
+val treeItem = treeView.GetItemByBusiId("add1")
+treeItem?.UpdateItem(TreeTestVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
 
-<Button fx:id="viewBatchBtn" mnemonicParsing="false" onAction="#viewBatch" prefHeight="31.0"
-        prefWidth="97.0" styleClass="button-warn" text="查看参数"/>
+//为treeItem添加子元素
+val selectedItem = treeView.selectionModel.selectedItem
+selectedItem.AddChildren(
+    TreeTestVO(
+        "根节点下节点1",
+        "6",
+        "根节点下节点1",
+        SimpleStringProperty("根节点下节点1")
+    )
+)
+selectedItem.AddChildrenList(
+    listOf(
+        TreeTestVO(
+            "根节点下节点2",
+            "6",
+            "根节点下节点2",
+            SimpleStringProperty("根节点下节点2")
+        )
+    )
+)
+
+//删除当前TreeItem节点
+rootTreeItem.children[0].DeleteThis()
+
+//删除当前TreeItem的子节点
+rootTreeItem.DeleteChildItem { it.id == "4" }
+
 ```
