@@ -88,6 +88,8 @@ inline fun asyncTaskLoading(
     owner: Window,
     msg: String = "请耐心等待...",
     animation: Boolean = false,
+    noinline success: (() -> Unit)? = null,
+    noinline fail: (() -> Unit)? = null,
     crossinline handle: () -> Unit
 ) {
     val loadingUI = LoadingUI(owner, animation = animation, msg = msg)
@@ -96,11 +98,15 @@ inline fun asyncTaskLoading(
             platformRun { loadingUI.show() }
             //执行任务
             handle()
+            success?.let { it() }
         } catch (e: LerverUIException) {
             e.printStackTrace()
+            fail?.let { it() }
         } finally {
             platformRun { loadingUI.closeStage() }
         }
+
+    }.invokeOnCompletion {
     }
 }
 

@@ -1,11 +1,10 @@
 package cn.lifay.test
 
-import cn.lifay.db.DbManage
 import cn.lifay.global.GlobalResource
+import cn.lifay.ui.BaseView
 import javafx.application.Application
-import javafx.fxml.FXMLLoader
 import javafx.scene.Scene
-import javafx.scene.layout.Pane
+import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
 
 /*
@@ -18,9 +17,11 @@ class CommonDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobalResource.loadTheme()
-        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
-        val root = fxmlLoader.load<Pane>()
-        val scene = Scene(root)
+        val view =
+            BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
+//        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
+//        val root = fxmlLoader.load<Pane>()
+        val scene = Scene(view.ROOT_PANE)
         primaryStage.title = "Hello World"
         primaryStage.scene = scene
         primaryStage.show()

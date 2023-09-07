@@ -4,6 +4,7 @@ import cn.lifay.db.UserData
 import cn.lifay.extension.*
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
+import cn.lifay.ui.BaseView
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -13,7 +14,6 @@ import javafx.collections.FXCollections
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
-import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
@@ -29,7 +29,7 @@ import java.util.*
  * @Author 李方宇
  * @Date 2023/1/9 16:14
  */
-class CommonDemoView : Initializable {
+class CommonDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var splitMenuBtn = SplitMenuButton()
@@ -38,7 +38,7 @@ class CommonDemoView : Initializable {
     var keywordText = TextField()
 
     @FXML
-    lateinit var rootPane: AnchorPane
+    var rootPane = AnchorPane()
 
     @FXML
     var treeView = TreeView<TreeTestVO>()
@@ -58,6 +58,9 @@ class CommonDemoView : Initializable {
 
     @FXML
     var user2 = TextArea()
+    override fun rootPane(): AnchorPane {
+        return rootPane
+    }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         val observableArrayList = FXCollections.observableArrayList<TreeTestVO>()
@@ -326,6 +329,17 @@ class CommonDemoView : Initializable {
 
     fun chat(actionEvent: ActionEvent) {
         EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
+    }
+
+    fun taskAction() {
+        //  showNotification("111")
+        asyncTaskLoading(rootPane.scene.window, "出错", true, success = {
+            println("ddddddddd")
+            showNotification("222")
+        }) {
+            //  showNotification("333")
+            Thread.sleep(3333)
+        }
     }
 
 

@@ -181,7 +181,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         MESSAGE_PANE.backgroundColor(Color.BLACK)
         ROOT_PANE.children.add(NOTIFICATION_PANE)
         ROOT_PANE.children.add(MESSAGE_PANE)
-        println(ROOT_PANE.children.size)
+//        println(ROOT_PANE.children.size)
 
     }
 
@@ -247,6 +247,10 @@ abstract class BaseView<R : Pane>() : Initializable {
         msgType: MsgType = MsgType.ACCENT,
         millis: Long = 3000
     ) {
+        if (!ROOT_PANE.children.contains(NOTIFICATION_PANE)) {
+            println("BaseView实例化方式不对,未执行initNotificationPane")
+            return
+        }
         val msg = atlantafx.base.controls.Notification(
             message,
             FontIcon(Material2OutlinedAL.INFO)
