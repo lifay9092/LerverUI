@@ -255,9 +255,12 @@ open class BaseFormUI<T : Any>(
 
     }
 
-    protected fun checkElementValue(isUpdate: Boolean = false): Boolean {
+    protected fun checkElementValue(isSkipPrimary: Boolean = false): Boolean {
         for (element in ELEMENTS_LIST) {
             if (element.fillValue != null) {
+                continue
+            }
+            if (isSkipPrimary && element.primary){
                 continue
             }
             if (!element.checkRequired()) {

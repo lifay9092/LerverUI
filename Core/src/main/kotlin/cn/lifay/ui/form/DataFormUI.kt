@@ -96,7 +96,7 @@ abstract class DataFormUI<T : Any>(
             try {
                 saveBtn.disable()
                 //检查
-                if (!checkElementValue()) {
+                if (!checkElementValue(true)) {
                     return@asyncTaskLoading
                 }
                 //从元素赋值到实例

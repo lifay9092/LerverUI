@@ -2,6 +2,7 @@ package cn.lifay.db
 
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
+import cn.lifay.logutil.StaticLog
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.logging.ConsoleLogger
@@ -43,45 +44,50 @@ object DbManage {
                                 VALUES (%s, '${LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)}' );
                           """
     lateinit var database: Database
-
+    const val WRAP = "\n"
     fun Init(DB_NAME: String = "db.db") {
-        //获取db配置文件
-        val userDir = System.getProperty("user.dir")
-        val dbConfigPath = "${userDir + File.separator}db.config"
-        val dbConfigFile = File(dbConfigPath)
-        if (!dbConfigFile.exists()) {
-            //拷贝db.db
-            val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
-            if (resourceAsStream == null) {
-                throw LerverUIException("失败")
+
+        try {//获取db配置文件
+            val userDir = System.getProperty("user.dir")
+            val dbConfigPath = "${userDir + File.separator}db.config"
+            val dbConfigFile = File(dbConfigPath)
+            if (!dbConfigFile.exists()) {
+                StaticLog.debug("db.config 不存在...")
+                //拷贝db.db
+    //            val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
+    //            if (resourceAsStream == null) {
+    //                throw LerverUIException("失败")
+    //            }
+                val dbPath = userDir + File.separator + DB_NAME
+    //            resourceAsStream.use {
+    //                File(dbPath).writeBytes(it.readAllBytes())
+    //            }
+                //配置数据库连接文件:db.config
+                val jdbcUrl = "jdbc:sqlite:${dbPath}".replace("\\", "/")
+                val text = """
+                        url = ${jdbcUrl}
+                        user =
+                        password =
+                    """.trimIndent()
+                dbConfigFile.writeText(text, Charset.forName("utf-8"))
+                InitDataBase(jdbcUrl, "", "")
+            } else {
+                StaticLog.debug("db.config 已存在...")
+                dbConfigFile.inputStream().use {
+                    val properties = Properties()
+                    properties.load(it)
+                    val url =
+                        properties.getProperty(
+                            "url",
+                            "jdbc:sqlite:${(userDir + File.separator).replace("\\", "/") + DB_NAME}"
+                        )
+                    val user = properties.getProperty("user", "")
+                    val password = properties.getProperty("password", "")
+                    InitDataBase(url, user, password)
+                }
             }
-            val dbPath = userDir + File.separator + DB_NAME
-            resourceAsStream.use {
-                File(dbPath).writeBytes(it.readAllBytes())
-            }
-            //配置数据库连接文件:db.config
-            val jdbcUrl = "jdbc:sqlite:${dbPath}".replace("\\", "/")
-            val text = """
-                    url = ${jdbcUrl}
-                    user =
-                    password =
-                """.trimIndent()
-            dbConfigFile.writeText(text, Charset.forName("utf-8"))
-            cn.lifay.db.DbManage.InitDataBase(jdbcUrl, "", "")
-        } else {
-            println("db.config 已存在...")
-            dbConfigFile.inputStream().use {
-                val properties = Properties()
-                properties.load(it)
-                val url =
-                    properties.getProperty(
-                        "url",
-                        "jdbc:sqlite:${(userDir + File.separator).replace("\\", "/") + DB_NAME}"
-                    )
-                val user = properties.getProperty("user", "")
-                val password = properties.getProperty("password", "")
-                cn.lifay.db.DbManage.InitDataBase(url, user, password)
-            }
+        } catch (e: Exception) {
+            StaticLog.error(e)
         }
 
     }
@@ -92,18 +98,17 @@ object DbManage {
         password: String,
         logger: Logger = ConsoleLogger(threshold = LogLevel.DEBUG)
     ) {
-        cn.lifay.db.DbManage.database = Database.connect(
+        database = Database.connect(
             url = url,
             user = user,
             password = password,
             logger = logger
         )
-        println("dbUrl:${url}")
-        println()
-        println()
+        StaticLog.debug("dbUrl:${url + WRAP + WRAP}")
+
         /*更新版本脚本*/
         //db最后一次版本
-        val lastVersion = cn.lifay.db.DbManage.GetLastVersion(true)
+        val lastVersion = GetLastVersion(true)
         if (lastVersion.isBlank()) {
             throw LerverUIException("初始化db失败")
         }
@@ -120,31 +125,31 @@ object DbManage {
                     continue
                 }
                 //执行脚本
-                println(sqlFile.name)
-                println()
+                StaticLog.debug(sqlFile.name + WRAP)
                 // val result = ExecuteSql(*sqlFile.readText().split(";").filter { it.trim().isNotBlank() }.map { "$it;" }.toTypedArray())
-                val result = cn.lifay.db.DbManage.ExecuteSql(sqlFile.readText())
+                val result = ExecuteSql(sqlFile.readText())
                 if (!result) {
                     throw LerverUIException("升级版本失败:${sqlFile.name}")
                 } else {
                     println("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
                 }
-                println()
-                println()
+                StaticLog.debug(WRAP)
+                StaticLog.debug(WRAP)
             }
             if (lastVersion != newLasVersion) {
                 //版本号不一致,更新版本
-                cn.lifay.db.DbManage.ExecuteSql(cn.lifay.db.DbManage.INSERT_NEW_VERSION_SQL.format(newLasVersion))
-                cn.lifay.db.DbManage.GetLastVersion()
-                println("更新完成")
+                ExecuteSql(INSERT_NEW_VERSION_SQL.format(newLasVersion))
+                GetLastVersion()
+                StaticLog.debug("更新完成")
             }
         }
     }
 
     fun ExecuteSql(sql: String): Boolean {
         try {
-            cn.lifay.db.DbManage.database.useConnection { connection ->
+            VerifyConfig()
+            database.useConnection { connection ->
                 val runner = cn.lifay.db.ScriptRunner(connection, true, true)
                 runner.runScript(sql.reader())
                 /*connection.createStatement().use { statement ->
@@ -174,21 +179,21 @@ object DbManage {
 
     fun GetLastVersion(init: Boolean = false): String {
         try {
-            val version = cn.lifay.db.DbManage.database.useConnection { connection ->
+            val version = database.useConnection { connection ->
                 connection.prepareStatement(cn.lifay.db.DbManage.GET_LAST_VERSION).use { statement ->
                     statement.executeQuery().getString(1)
                 }
             }
-            println("当前版本号:$version")
+            StaticLog.debug("当前版本号:$version")
             return version
         } catch (e: Exception) {
             //新建库表
             if (init && e.message?.contains("no such table: APP_VERSION") == true) {
-                println("新建版本表[APP_VERSION]")
-                val createVersionTb = cn.lifay.db.DbManage.database.useConnection { connection ->
+                StaticLog.debug("新建版本表[APP_VERSION]")
+                val createVersionTb = database.useConnection { connection ->
                     try {
-                        return@useConnection cn.lifay.db.DbManage.ExecuteSql(
-                            cn.lifay.db.DbManage.CREATE_VERSION_TB_SQL + "\n" + cn.lifay.db.DbManage.INSERT_NEW_VERSION_SQL.format(
+                        return@useConnection ExecuteSql(
+                            cn.lifay.db.DbManage.CREATE_VERSION_TB_SQL + "\n" + INSERT_NEW_VERSION_SQL.format(
                                 "0"
                             )
                         )
@@ -199,7 +204,7 @@ object DbManage {
                     }
                 }
                 if (createVersionTb) {
-                    return cn.lifay.db.DbManage.GetLastVersion()
+                    return GetLastVersion()
                 }
             } else {
                 e.printStackTrace()
@@ -211,7 +216,8 @@ object DbManage {
 
     fun VerifyConfig() {
         if (!this::database.isInitialized) {
-            throw LerverUIException("请先初始化数据库连接:Config()")
+            StaticLog.error("请先初始化数据库连接:Init()")
+            throw LerverUIException("请先初始化数据库连接:Init()")
         }
     }
 
@@ -241,7 +247,8 @@ object DbManage {
             }
     */
     inline fun <reified T : BaseTable<*>> from(t: T): QuerySource {
-        return cn.lifay.db.DbManage.database.from(t)
+        VerifyConfig()
+        return database.from(t)
     }
 
     /*
@@ -261,7 +268,8 @@ object DbManage {
         t: T,
         noinline block: InsertOrUpdateStatementBuilder.(T) -> Unit
     ): Int {
-        return cn.lifay.db.DbManage.database.insertOrUpdate(t, block)
+        VerifyConfig()
+        return database.insertOrUpdate(t, block)
     }
 
     /*
@@ -275,7 +283,8 @@ object DbManage {
             }
        */
     inline fun <reified T : BaseTable<*>> insert(t: T, noinline block: AssignmentsBuilder.(T) -> Unit): Int {
-        return cn.lifay.db.DbManage.database.insert(t, block)
+        VerifyConfig()
+        return database.insert(t, block)
     }
 
     /*
@@ -302,7 +311,8 @@ object DbManage {
         t: T,
         noinline block: BatchInsertStatementBuilder<T>.() -> Unit
     ): IntArray {
-        return cn.lifay.db.DbManage.database.batchInsert(t, block)
+        VerifyConfig()
+        return database.batchInsert(t, block)
     }
 
     /*
@@ -316,7 +326,8 @@ object DbManage {
         }
       */
     inline fun <reified T : BaseTable<*>> update(t: T, noinline block: UpdateStatementBuilder.(T) -> Unit): Int {
-        return cn.lifay.db.DbManage.database.update(t, block)
+        VerifyConfig()
+        return database.update(t, block)
     }
 
     /*
@@ -335,18 +346,21 @@ object DbManage {
         t: T,
         noinline block: BatchUpdateStatementBuilder<T>.() -> Unit
     ): IntArray {
-        return cn.lifay.db.DbManage.database.batchUpdate(t, block)
+        VerifyConfig()
+        return database.batchUpdate(t, block)
     }
 
     /*
         delete(Employees) { it.id eq 4 }
      */
     inline fun <reified T : BaseTable<*>> delete(t: T, noinline predicate: (T) -> ColumnDeclaring<Boolean>): Int {
-        return cn.lifay.db.DbManage.database.delete(t, predicate)
+        VerifyConfig()
+        return database.delete(t, predicate)
     }
 
     inline fun <reified T : BaseTable<*>> deleteAll(t: T): Int {
-        return cn.lifay.db.DbManage.database.deleteAll(t)
+        VerifyConfig()
+        return database.deleteAll(t)
     }
 
 
@@ -418,6 +432,7 @@ object DbManage {
             val primary = isPrimary(this, prop)
             if (primary) {
                 if (value == null) {
+                    StaticLog.error("主键值不能为空!")
                     throw LerverUIException("主键值不能为空!")
                 }
                 pkName = prop
@@ -425,6 +440,7 @@ object DbManage {
             temp[prop] = value
         }
         if (pkName == null) {
+            StaticLog.error("未检测到主键值!")
             throw LerverUIException("未检测到主键值!")
         }
         update(this) { tb ->
