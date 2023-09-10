@@ -1,5 +1,6 @@
 package cn.lifay.logutil
 
+import cn.lifay.extension.notExistCreate
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Paths
@@ -12,13 +13,7 @@ enum class LogLevelEnum {
     WARN,
     ERROR,
 }
-fun File.notExistCreate(): File {
-    if (!this.exists()) {
-        this.parentFile.mkdirs()
-        this.createNewFile()
-    }
-    return this
-}
+
 object StaticLog {
 
     val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")

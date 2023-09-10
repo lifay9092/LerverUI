@@ -425,26 +425,3 @@ fun copyToClipboard(text: String) {
     val trans = StringSelection(text)
     clipboard.setContents(trans, null)
 }
-
-fun String.toCamelCase(symbol:Char = '_'):String{
-
-    return if (this.contains(symbol)) {
-        val length: Int = this.length
-        val sb = StringBuilder(length)
-        var upperCase = false
-        for (i in 0 until length) {
-            val c: Char = this.get(i)
-            if (c == symbol) {
-                upperCase = true
-            } else if (upperCase) {
-                sb.append(c.uppercaseChar())
-                upperCase = false
-            } else {
-                sb.append(c.lowercaseChar())
-            }
-        }
-        sb.toString()
-    } else {
-        this.lowercase()
-    }
-}
