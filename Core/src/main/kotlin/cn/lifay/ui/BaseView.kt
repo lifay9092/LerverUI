@@ -7,6 +7,7 @@ import cn.lifay.extension.backgroundColor
 import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
+import cn.lifay.logutil.StaticLog
 import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -248,7 +249,7 @@ abstract class BaseView<R : Pane>() : Initializable {
         millis: Long = 3000
     ) {
         if (!ROOT_PANE.children.contains(NOTIFICATION_PANE)) {
-            println("BaseView实例化方式不对,未执行initNotificationPane")
+            StaticLog.error("BaseView实例化方式不对,未执行initNotificationPane")
             return
         }
         val msg = atlantafx.base.controls.Notification(

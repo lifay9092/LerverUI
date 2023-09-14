@@ -36,7 +36,7 @@ object EventBus {
         Objects.requireNonNull(eventType)
         Objects.requireNonNull(subscriber)
 
-        println("func:${subscriber.hashCode()}")
+//        println("func:${subscriber.hashCode()}")
         if (!SUBSCRIBERS_TYPE.containsKey(id)) {
             val eventFuncs = CopyOnWriteArraySet<(Event) -> Unit>()
             eventFuncs!!.add(subscriber as ((Event) -> Unit)?)
@@ -63,11 +63,11 @@ object EventBus {
                 throw EventBusException("event class 不一致！ subscribers:${eventType} publish:${event::class}")
             }
             val eventFuncs = SUBSCRIBERS_FUNC[event.id]
-            println(eventFuncs?.size)
+            //println(eventFuncs?.size)
             eventFuncs?.forEach {
                 asyncTask {
-                    println(it.reflect())
-                    println(it(event))
+                   // println(it.reflect())
+                   it(event)
                 }
             }
         }

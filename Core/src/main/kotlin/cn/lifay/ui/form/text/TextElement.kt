@@ -168,7 +168,7 @@ class TextElement<T : Any, R : Any> constructor(
             }
 
             else -> {
-                println("not surport")
+          //      println("not surport")
             }
         } as R?
     }

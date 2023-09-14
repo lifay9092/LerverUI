@@ -131,7 +131,7 @@ object DbManage {
                 if (!result) {
                     throw LerverUIException("升级版本失败:${sqlFile.name}")
                 } else {
-                    println("${sqlFile.name} 升级成功...")
+                    StaticLog.debug("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
                 }
                 StaticLog.debug(WRAP)
@@ -407,7 +407,7 @@ object DbManage {
                         }
 
                         else -> {
-                            println("not surport")
+                            StaticLog.error("not surport")
                             set(col as Column<String>, value.toString())
                         }
                     }
@@ -489,7 +489,7 @@ object DbManage {
                         }
 
                         else -> {
-                            println("not surport")
+                            StaticLog.error("not surport")
                             set(col as Column<String>, value.toString())
                             if (pkName == col.name.toCamelCase()) {
                                 where {

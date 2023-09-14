@@ -69,7 +69,7 @@ open class BaseFormUI<T : Any>(
     protected var AFTER_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
 
     init {
-        println("BaseFormUI init")
+       // println("BaseFormUI init")
         try {
 
             BEFORE_FORM_INIT_CALL_LIST.forEach { it() }
@@ -100,7 +100,7 @@ open class BaseFormUI<T : Any>(
      * 表单不是fxml导入，子类不需要当前方法
      */
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        println("BaseFormUI initialize")
+       // println("BaseFormUI initialize")
     }
 
     fun defaultEntity(entity: T) {

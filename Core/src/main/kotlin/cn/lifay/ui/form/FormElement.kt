@@ -262,7 +262,7 @@ abstract class FormElement<T : Any, R : Any>(
                 col.cellValueFactory = PropertyValueFactory(getPropName())
             }
         }
-        println(col.toString())
+       // println(col.toString())
         return col
     }
 

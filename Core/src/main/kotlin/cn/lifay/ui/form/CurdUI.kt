@@ -97,7 +97,7 @@ abstract class CurdUI<T : Any>(
 
     init {
 
-        println("CurdUI init")
+       // println("CurdUI init")
         try {
             buildElements()
 
@@ -215,7 +215,7 @@ abstract class CurdUI<T : Any>(
             root.children.addAll(btnGroup, dataTable, endPane)
             stage.scene = Scene(root)
 
-            println(this.dataTable.columns.size)
+         //   println(this.dataTable.columns.size)
 
             pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
                 pageIndexText.text = (new.toInt() + 1).toString()
@@ -322,7 +322,7 @@ abstract class CurdUI<T : Any>(
 
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        println("CurdUI initialize")
+      //  println("CurdUI initialize")
         super.initialize(p0, p1)
 
         //  initNotificationPane()

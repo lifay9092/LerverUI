@@ -43,7 +43,7 @@ object GlobalResource {
      * 表单宽度
      */
     fun FormWidth(): Double {
-        println(SCREEN_WIDTH)
+        //println(SCREEN_WIDTH)
         val default = SCREEN_WIDTH * 0.35
         return if (default < 1050) 850.0 else default
 //        return SCREEN_WIDTH * 0.25
