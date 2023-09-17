@@ -2,7 +2,7 @@
 <metadata modelVersion="1.1.0">
   <groupId>cn.lifay</groupId>
   <artifactId>LerverUI</artifactId>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.15-SNAPSHOT</version>
   <versioning>
       <snapshot>
           <timestamp>20230409.141049</timestamp>

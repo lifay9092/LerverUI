@@ -14,7 +14,7 @@ enum class LogLevelEnum {
     ERROR,
 }
 
-object StaticLog {
+object LerverLog {
 
     val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")
 

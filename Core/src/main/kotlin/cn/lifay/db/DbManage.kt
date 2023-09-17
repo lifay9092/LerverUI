@@ -2,7 +2,7 @@ package cn.lifay.db
 
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
-import cn.lifay.logutil.StaticLog
+import cn.lifay.logutil.LerverLog
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.logging.ConsoleLogger
@@ -52,7 +52,7 @@ object DbManage {
             val dbConfigPath = "${userDir + File.separator}db.config"
             val dbConfigFile = File(dbConfigPath)
             if (!dbConfigFile.exists()) {
-                StaticLog.debug("db.config 不存在...")
+                LerverLog.debug("db.config 不存在...")
                 //拷贝db.db
     //            val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
     //            if (resourceAsStream == null) {
@@ -72,7 +72,7 @@ object DbManage {
                 dbConfigFile.writeText(text, Charset.forName("utf-8"))
                 InitDataBase(jdbcUrl, "", "")
             } else {
-                StaticLog.debug("db.config 已存在...")
+                LerverLog.debug("db.config 已存在...")
                 dbConfigFile.inputStream().use {
                     val properties = Properties()
                     properties.load(it)
@@ -87,7 +87,7 @@ object DbManage {
                 }
             }
         } catch (e: Exception) {
-            StaticLog.error(e)
+            LerverLog.error(e)
         }
 
     }
@@ -104,7 +104,7 @@ object DbManage {
             password = password,
             logger = logger
         )
-        StaticLog.debug("dbUrl:${url + WRAP + WRAP}")
+        LerverLog.debug("dbUrl:${url + WRAP + WRAP}")
 
         /*更新版本脚本*/
         //db最后一次版本
@@ -125,23 +125,23 @@ object DbManage {
                     continue
                 }
                 //执行脚本
-                StaticLog.debug(sqlFile.name + WRAP)
+                LerverLog.debug(sqlFile.name + WRAP)
                 // val result = ExecuteSql(*sqlFile.readText().split(";").filter { it.trim().isNotBlank() }.map { "$it;" }.toTypedArray())
                 val result = ExecuteSql(sqlFile.readText())
                 if (!result) {
                     throw LerverUIException("升级版本失败:${sqlFile.name}")
                 } else {
-                    StaticLog.debug("${sqlFile.name} 升级成功...")
+                    LerverLog.debug("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
                 }
-                StaticLog.debug(WRAP)
-                StaticLog.debug(WRAP)
+                LerverLog.debug(WRAP)
+                LerverLog.debug(WRAP)
             }
             if (lastVersion != newLasVersion) {
                 //版本号不一致,更新版本
                 ExecuteSql(INSERT_NEW_VERSION_SQL.format(newLasVersion))
                 GetLastVersion()
-                StaticLog.debug("更新完成")
+                LerverLog.debug("更新完成")
             }
         }
     }
@@ -184,12 +184,12 @@ object DbManage {
                     statement.executeQuery().getString(1)
                 }
             }
-            StaticLog.debug("当前版本号:$version")
+            LerverLog.debug("当前版本号:$version")
             return version
         } catch (e: Exception) {
             //新建库表
             if (init && e.message?.contains("no such table: APP_VERSION") == true) {
-                StaticLog.debug("新建版本表[APP_VERSION]")
+                LerverLog.debug("新建版本表[APP_VERSION]")
                 val createVersionTb = database.useConnection { connection ->
                     try {
                         return@useConnection ExecuteSql(
@@ -216,7 +216,7 @@ object DbManage {
 
     fun VerifyConfig() {
         if (!this::database.isInitialized) {
-            StaticLog.error("请先初始化数据库连接:Init()")
+            LerverLog.error("请先初始化数据库连接:Init()")
             throw LerverUIException("请先初始化数据库连接:Init()")
         }
     }
@@ -407,7 +407,7 @@ object DbManage {
                         }
 
                         else -> {
-                            StaticLog.error("not surport")
+                            LerverLog.error("not surport")
                             set(col as Column<String>, value.toString())
                         }
                     }
@@ -432,7 +432,7 @@ object DbManage {
             val primary = isPrimary(this, prop)
             if (primary) {
                 if (value == null) {
-                    StaticLog.error("主键值不能为空!")
+                    LerverLog.error("主键值不能为空!")
                     throw LerverUIException("主键值不能为空!")
                 }
                 pkName = prop
@@ -440,7 +440,7 @@ object DbManage {
             temp[prop] = value
         }
         if (pkName == null) {
-            StaticLog.error("未检测到主键值!")
+            LerverLog.error("未检测到主键值!")
             throw LerverUIException("未检测到主键值!")
         }
         update(this) { tb ->
@@ -489,7 +489,7 @@ object DbManage {
                         }
 
                         else -> {
-                            StaticLog.error("not surport")
+                            LerverLog.error("not surport")
                             set(col as Column<String>, value.toString())
                             if (pkName == col.name.toCamelCase()) {
                                 where {
