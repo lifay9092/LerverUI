@@ -81,7 +81,7 @@ abstract class DataFormUI<T : Any>(
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun saveDataFunc(entity: T): Boolean
+    abstract fun saveData(entity: T): Boolean
 
     /**
      * 更新数据函数
@@ -89,7 +89,7 @@ abstract class DataFormUI<T : Any>(
      * @param entity 数据
      * @return 执行结果
      */
-    abstract fun updateDataFunc(entity: T): Boolean
+    abstract fun updateData(entity: T): Boolean
 
     private fun saveFunc() {
         asyncTaskLoading(super.ROOT_PANE.scene.window, "保存中") {
@@ -102,7 +102,7 @@ abstract class DataFormUI<T : Any>(
                 //从元素赋值到实例
                 super.elementToProp()
                 //执行保存操作
-                saveDataFunc(entity!!)
+                saveData(entity!!)
                 showMessage("保存成功")
                 super.clear()
             } catch (e: Exception) {
@@ -125,7 +125,7 @@ abstract class DataFormUI<T : Any>(
                 //从元素赋值到实例
                 elementToProp()
                 //执行保存操作
-                updateDataFunc(entity!!)
+                updateData(entity!!)
                 showMessage("更新成功")
             } catch (e: Exception) {
                 e.printStackTrace()

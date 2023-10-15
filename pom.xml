@@ -6,7 +6,7 @@
 
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Parent</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>Core</module>

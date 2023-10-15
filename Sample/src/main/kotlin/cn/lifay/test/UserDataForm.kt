@@ -54,7 +54,7 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
     }
 
     //更新操作
-    override fun updateDataFunc(entity: UserData): Boolean {
+    override fun updateData(entity: UserData): Boolean {
         UserDatas.update(entity)
         return true
     }

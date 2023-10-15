@@ -407,12 +407,20 @@ abstract class CurdUI<T : Any>(
             val dataFormUI = object : DataFormUI<T>(buildFormUI = {
                 addElements(elements)
             }) {
-                override fun saveDataFunc(entity: T): Boolean {
-                    return this@CurdUI.saveDataFunc(entity)
+                override fun saveData(entity: T): Boolean {
+                    if (this@CurdUI.saveDataFunc(entity)) {
+                        search()
+                        return true
+                    }
+                    return false
                 }
 
-                override fun updateDataFunc(entity: T): Boolean {
-                    return this@CurdUI.updateDataFunc(entity)
+                override fun updateData(entity: T): Boolean {
+                    if (this@CurdUI.updateDataFunc(entity)) {
+                        search()
+                        return true
+                    }
+                    return false
                 }
 
             }
@@ -428,14 +436,25 @@ abstract class CurdUI<T : Any>(
                 defaultEntity(entity)
                 addElements(elements)
             }) {
-                override fun saveDataFunc(entity: T): Boolean {
-                    return this@CurdUI.saveDataFunc(entity)
+                override fun saveData(entity: T): Boolean {
+                    if (this@CurdUI.saveDataFunc(entity)) {
+                        search()
+                        return true
+                    }
+                    return false
                 }
 
-                override fun updateDataFunc(entity: T): Boolean {
-                    return this@CurdUI.updateDataFunc(entity)
+                override fun updateData(entity: T): Boolean {
+                    if (this@CurdUI.updateDataFunc(entity)) {
+                        search()
+                        return true
+                    }
+                    return false
                 }
 
+            }
+            dataFormUI.setOnCloseRequest {
+                dataFormUI.clear()
             }
             dataFormUI.show()
         } catch (e: Exception) {
@@ -447,12 +466,21 @@ abstract class CurdUI<T : Any>(
     @FXML
     fun batchDelete(actionEvent: ActionEvent) {
         try {
-            for (checkedItem in getCheckedItems()) {
-
+            val items = getCheckedItems()
+            if (items.size == 0) {
+                return
+            }
+            if (alertConfirmation("是否删除这 ${items.size} 条数据?")) {
+                for (checkedItem in items) {
+                    delDataFunc(checkedItem)
+                }
+                showNotification("删除成功")
+                search()
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
+            alertError("删除失败:${e.message}", true)
         }
     }
 

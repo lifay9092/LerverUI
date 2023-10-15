@@ -275,7 +275,7 @@ open class BaseFormUI<T : Any>(
         ELEMENTS_LIST.forEach { it.initValue() }
     }
 
-    protected fun clear() {
+    fun clear() {
         ELEMENTS_LIST.forEach(Consumer { obj: FormElement<T, *> ->
             platformRun {
                 if (obj.initValue != null) {
