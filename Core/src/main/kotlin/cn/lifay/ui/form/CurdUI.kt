@@ -215,7 +215,7 @@ abstract class CurdUI<T : Any>(
             root.children.addAll(btnGroup, dataTable, endPane)
             stage.scene = Scene(root)
 
-         //   println(this.dataTable.columns.size)
+            //   println(this.dataTable.columns.size)
 
             pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
                 pageIndexText.text = (new.toInt() + 1).toString()
@@ -223,6 +223,8 @@ abstract class CurdUI<T : Any>(
             }
             pageIndexText.text = "1"
             pageCountText.text = "10"
+
+            initNotificationPane()
 
             search()
         } catch (e: Exception) {
@@ -454,7 +456,11 @@ abstract class CurdUI<T : Any>(
 
             }
             dataFormUI.setOnCloseRequest {
-                dataFormUI.clear()
+                elements.forEach {
+                    it.graphic().isDisable = false
+                    it.clear()
+                    println(it.getElementValue())
+                }
             }
             dataFormUI.show()
         } catch (e: Exception) {
@@ -467,7 +473,7 @@ abstract class CurdUI<T : Any>(
     fun batchDelete(actionEvent: ActionEvent) {
         try {
             val items = getCheckedItems()
-            if (items.size == 0) {
+            if (items.isEmpty()) {
                 return
             }
             if (alertConfirmation("是否删除这 ${items.size} 条数据?")) {

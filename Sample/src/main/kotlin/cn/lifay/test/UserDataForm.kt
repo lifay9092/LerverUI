@@ -45,7 +45,7 @@ class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
 //        UserData(3, "33333", SelectTypeEnum.C, true, "男")
     )
     //保存操作
-    override fun saveDataFunc(entity: UserData): Boolean {
+    override fun saveData(entity: UserData): Boolean {
         if (entity!!.name!!.isBlank()) {
             throw LerverUIException("名称不能为空!")
         }
