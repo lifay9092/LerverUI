@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.lifay.LerverUI</groupId>
         <artifactId>Parent</artifactId>
-        <version>${revision}</version>
+        <version>1.18-SNAPSHOT</version>
         <!--        <version>1.15-SNAPSHOT</version>-->
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>cn.lifay.LerverUI</groupId>
             <artifactId>Core</artifactId>
-            <version>${revision}</version>
+            <version>1.18-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

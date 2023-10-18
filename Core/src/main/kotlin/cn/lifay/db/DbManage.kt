@@ -515,4 +515,10 @@ object DbManage {
         return false
     }
 
+    fun likeKeyword(keyword:String):String{
+        if (!keyword.contains("%")) {
+            return "%${keyword}%"
+        }
+        return keyword
+    }
 }
