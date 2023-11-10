@@ -342,5 +342,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
         }
     }
 
+    fun copyText(actionEvent: ActionEvent) {
+        copyToClipboard("测试复制的文字")
+    }
+
 
 }

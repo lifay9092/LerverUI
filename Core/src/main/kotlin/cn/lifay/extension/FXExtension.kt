@@ -9,8 +9,8 @@ import javafx.css.PseudoClass
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
+import javafx.scene.image.Image
+import javafx.scene.input.*
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -21,9 +21,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
-import java.awt.Toolkit
-import java.awt.datatransfer.StringSelection
+import java.io.File
 import java.util.*
+
 
 /**
  * 检查参数
@@ -420,8 +420,34 @@ inline fun alertDetail(
  */
 fun copyToClipboard(text: String) {
     // 获取系统剪贴板
-    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-    // 封装文本内容
-    val trans = StringSelection(text)
-    clipboard.setContents(trans, null)
+    val clipboard: Clipboard = Clipboard.getSystemClipboard()
+    val clipboardContent = ClipboardContent()
+    clipboardContent.putString(text)
+    clipboard.setContent(clipboardContent)
+}
+
+/**
+ * 把图片设置到系统剪贴板
+ * @param image 图片
+ * @author lifay
+ */
+fun copyToClipboard(image: Image) {
+    // 获取系统剪贴板
+    val clipboard: Clipboard = Clipboard.getSystemClipboard()
+    val clipboardContent = ClipboardContent()
+    clipboardContent.putImage(image)
+    clipboard.setContent(clipboardContent)
+}
+
+/**
+ * 把文件设置到系统剪贴板
+ * @param files 文件
+ * @author lifay
+ */
+fun copyToClipboard(files: MutableList<File>) {
+    // 获取系统剪贴板
+    val clipboard: Clipboard = Clipboard.getSystemClipboard()
+    val clipboardContent = ClipboardContent()
+    clipboardContent.putFiles(files)
+    clipboard.setContent(clipboardContent)
 }

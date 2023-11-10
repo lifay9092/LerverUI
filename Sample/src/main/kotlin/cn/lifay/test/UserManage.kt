@@ -14,7 +14,6 @@ import cn.lifay.ui.form.text.TextElement
 import javafx.scene.control.Button
 import org.ktorm.dsl.like
 import org.ktorm.entity.*
-import org.ktorm.schema.BaseTable
 import org.ktorm.schema.ColumnDeclaring
 
 /**
@@ -40,7 +39,7 @@ class UserManage : CurdUI<UserData,UserDatas>("用户管理", buildElements = {
 
     override fun pageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
         return Pair(DbManage.userDatas) {
-            it.name like DbManage.likeKeyword(keyword)
+            it.name like DbManage.formatLikeKeyword(keyword)
         }
     }
 

@@ -1,7 +1,6 @@
 package cn.lifay.ui.form
 
 import atlantafx.base.theme.Styles
-import cn.lifay.db.DbManage
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
@@ -36,7 +35,10 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
     buildElements: CurdUI<T,E>.() -> Unit,
 ) : BaseView<VBox>() {
 
-    private val stage = Stage().bindEscKey()
+    private val stage = Stage().apply {
+        bindEscKey()
+        loadIcon()
+    }
 
     @FXML
     val root = VBox().apply {
@@ -348,9 +350,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
      * 分页查询函数
      *
      * @param keyword 关键字
-     * @param pageIndex 页码
-     * @param pageCount 每页数量
-     * @return f-总数量 s-分页数据列表
+     * @return f-ObjectBaseTable s-关键字匹配逻辑
      */
     abstract fun pageInit(keyword:String): Pair<EntitySequence<T, E>,((E) -> ColumnDeclaring<Boolean>)?>
 
@@ -386,18 +386,18 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
             val pageInit = pageInit(keyword.text)
             val entitySequence = pageInit.first
             val filterFunc = pageInit.second
-            if (keyword.text.isBlank() || filterFunc == null) {
-                totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
-                dataTable.items.addAll(
-                    entitySequence.drop(pageIndex * pageCount)
-                        .take(pageCount).toList()
-                )
-            } else {
+            if (!keyword.text.isBlank() && filterFunc != null) {
                 totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
                 dataTable.items.addAll(
                     entitySequence.filter {
                         return@filter filterFunc(it)
                     }.drop(pageIndex * pageCount)
+                        .take(pageCount).toList()
+                )
+            } else {
+                totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
+                dataTable.items.addAll(
+                    entitySequence.drop(pageIndex * pageCount)
                         .take(pageCount).toList()
                 )
             }
