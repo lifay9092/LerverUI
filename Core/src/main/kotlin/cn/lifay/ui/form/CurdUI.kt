@@ -17,6 +17,8 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
+import org.kordamp.ikonli.feather.Feather
+import org.kordamp.ikonli.material2.Material2AL
 import org.ktorm.entity.*
 import org.ktorm.schema.BaseTable
 import org.ktorm.schema.ColumnDeclaring
@@ -135,19 +137,21 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
                     },
                     Button("新增").apply {
                         prefHeight = 23.0
-                        prefWidth = 62.0
+                        prefWidth = 82.0
                         stylePrimary()
+                        icon(Material2AL.ADD)
                         outline()
                         setOnAction {
                             addForm(it)
                         }
                     },
-                    Button("批量删除").apply {
+                    Button("删除").apply {
                         alignment = Pos.CENTER
                         textAlignment = TextAlignment.CENTER
                         prefHeight = 23.0
                         prefWidth = 82.0
                         styleDanger()
+                        icon(Feather.TRASH)
                         HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
                         setOnAction {
                             batchDelete(it)
