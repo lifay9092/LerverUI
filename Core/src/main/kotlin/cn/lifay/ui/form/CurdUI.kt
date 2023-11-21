@@ -161,7 +161,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
             }
             this.dataTable.apply {
                 padding = Insets(1.0, 2.0, 10.0, 2.0)
-                prefHeight = 408.0
+                prefHeight = 458.0
                 prefWidth = 850.0
                 columnResizePolicy = TableView.CONSTRAINED_RESIZE_POLICY
                 Styles.toggleStyleClass(this, Styles.STRIPED)
