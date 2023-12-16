@@ -150,7 +150,8 @@ object DbManage {
         try {
             VerifyConfig()
             database.useConnection { connection ->
-                val runner = cn.lifay.db.ScriptRunner(connection, true, true)
+//                println(sql)
+                val runner = ScriptRunner(connection)
                 runner.runScript(sql.reader())
                 /*connection.createStatement().use { statement ->
                     for (sql in sqls) {
