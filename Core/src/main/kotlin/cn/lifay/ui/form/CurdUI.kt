@@ -99,7 +99,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
 
     private val elements = ArrayList<FormElement<T, *>>()
 
-    protected val customButtons = ArrayList<BaseButton<DataFormUI<T>>>()
+    protected val customButtons = ArrayList<BaseButton<BaseFormUI<T>>>()
 
     private fun CurdUI() {}
 
@@ -435,6 +435,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
 //            dataTable1.items.addAll(add!!)
             val dataFormUI = object : DataFormUI<T>(buildFormUI = {
                 addElements(elements)
+                addCustomButtons(*customButtons.toTypedArray())
             }) {
                 override fun saveData(entity: T): Boolean {
                     if (this@CurdUI.saveDataFunc(entity)) {
@@ -464,6 +465,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
             val dataFormUI = object : DataFormUI<T>(true, buildFormUI = {
                 defaultEntity(entity)
                 addElements(elements)
+                addCustomButtons(*customButtons.toTypedArray())
             }) {
                 override fun saveData(entity: T): Boolean {
                     if (this@CurdUI.saveDataFunc(entity)) {
@@ -521,7 +523,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
         this.elements.addAll(elements)
     }
 
-    fun addCustomButtons(vararg customButtons: BaseButton<DataFormUI<T>>) {
+    fun addCustomButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {
         this.customButtons.addAll(customButtons)
     }
 
