@@ -6,6 +6,8 @@ import javafx.application.Application
 import javafx.scene.image.Image
 import javafx.stage.Screen
 import javafx.stage.Stage
+import org.kordamp.ikonli.Ikon
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * GlobalResource 全局资源类
@@ -112,4 +114,13 @@ object GlobalResource {
         return THEME_STYLE
     }
 
+    /**
+     * 获取一个图标
+     * @author lifay
+     */
+    fun graphicIcon(ikon: Ikon, style: String): FontIcon {
+        return FontIcon(ikon).apply {
+            styleClass.add(style)
+        }
+    }
 }
