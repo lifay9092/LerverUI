@@ -4,8 +4,8 @@ import cn.lifay.db.*
 import cn.lifay.db.UserDatas.userDatas
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.styleWarn
+import cn.lifay.ui.form.BaseFormUI
 import cn.lifay.ui.form.CurdUI
-import cn.lifay.ui.form.DataFormUI
 import cn.lifay.ui.form.btn.BaseButton
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
@@ -30,13 +30,12 @@ class UserManage : CurdUI<UserData,UserDatas>("用户管理", buildElements = {
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
     addElements(id, name, type, child, sex)
 
-    addCustomButtons(BaseButton<DataFormUI<UserData>>(Button("测试自定义按钮").styleWarn()) {
+    addCustomButtons(BaseButton<BaseFormUI<UserData>>(Button("测试自定义按钮").styleWarn()) {
         println(it)
     })
 }) {
 
     //分页实现,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
-
     override fun pageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
         return Pair(DbManage.userDatas) {
             it.name like DbManage.formatLikeKeyword(keyword)
