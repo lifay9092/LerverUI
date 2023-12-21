@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
+import javafx.stage.Window
 import javafx.stage.WindowEvent
 import java.net.URL
 import java.util.*
@@ -178,7 +179,9 @@ open class BaseFormUI<T : Any>(
         stage.scene = Scene(root)
 
     }
-
+    override fun getWindow():Window{
+        return stage
+    }
     private fun refreshForm(t: T) {
         this.entity = t
         propToElement()
