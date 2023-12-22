@@ -390,7 +390,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
             val pageInit = pageInit(keyword.text)
             val entitySequence = pageInit.first
             val filterFunc = pageInit.second
-            if (!keyword.text.isBlank() && filterFunc != null) {
+            if (filterFunc != null) {
                 totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
                 dataTable.items.addAll(
                     entitySequence.filter {
@@ -488,7 +488,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
                 elements.forEach {
                     it.graphic().isDisable = false
                     it.clear()
-                    println(it.getElementValue())
+//                    println(it.getElementValue())
                 }
             }
             dataFormUI.show()
