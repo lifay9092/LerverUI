@@ -3,6 +3,7 @@ package cn.lifay.db
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
 import cn.lifay.logutil.LerverLog
+import javafx.beans.property.SimpleStringProperty
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.logging.ConsoleLogger
@@ -44,6 +45,9 @@ object DbManage {
                                 VALUES (%s, '${LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)}' );
                           """
     lateinit var database: Database
+
+    val TEXT_PROPERTY = SimpleStringProperty()
+
     const val WRAP = "\n"
     fun Init(DB_NAME: String = "db.db") {
 
@@ -52,7 +56,7 @@ object DbManage {
             val dbConfigPath = "${userDir + File.separator}db.config"
             val dbConfigFile = File(dbConfigPath)
             if (!dbConfigFile.exists()) {
-                LerverLog.debug("db.config 不存在...")
+                output("db.config 不存在...")
                 //拷贝db.db
     //            val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
     //            if (resourceAsStream == null) {
@@ -72,7 +76,7 @@ object DbManage {
                 dbConfigFile.writeText(text, Charset.forName("utf-8"))
                 InitDataBase(jdbcUrl, "", "")
             } else {
-                LerverLog.debug("db.config 已存在...")
+                output("db.config 已存在...")
                 dbConfigFile.inputStream().use {
                     val properties = Properties()
                     properties.load(it)
@@ -92,6 +96,12 @@ object DbManage {
 
     }
 
+    private fun output(s: String) {
+        val n = s + WRAP
+        TEXT_PROPERTY.set(n)
+        LerverLog.debug(n)
+    }
+
     fun InitDataBase(
         url: String,
         user: String,
@@ -104,7 +114,7 @@ object DbManage {
             password = password,
             logger = logger
         )
-        LerverLog.debug("dbUrl:${url + WRAP + WRAP}")
+        output("dbUrl:${url + WRAP + WRAP}")
 
         /*更新版本脚本*/
         //db最后一次版本
@@ -125,23 +135,22 @@ object DbManage {
                     continue
                 }
                 //执行脚本
-                LerverLog.debug(sqlFile.name + WRAP)
+                output(sqlFile.name + WRAP)
                 // val result = ExecuteSql(*sqlFile.readText().split(";").filter { it.trim().isNotBlank() }.map { "$it;" }.toTypedArray())
                 val result = ExecuteSql(sqlFile.readText())
                 if (!result) {
                     throw LerverUIException("升级版本失败:${sqlFile.name}")
                 } else {
-                    LerverLog.debug("${sqlFile.name} 升级成功...")
+                    output("${sqlFile.name} 升级成功...")
                     newLasVersion = sqlFileName
                 }
-                LerverLog.debug(WRAP)
-                LerverLog.debug(WRAP)
+                output("")
             }
             if (lastVersion != newLasVersion) {
                 //版本号不一致,更新版本
                 ExecuteSql(INSERT_NEW_VERSION_SQL.format(newLasVersion))
                 GetLastVersion()
-                LerverLog.debug("更新完成")
+                output("更新完成")
             }
         }
     }
@@ -185,12 +194,12 @@ object DbManage {
                     statement.executeQuery().getString(1)
                 }
             }
-            LerverLog.debug("当前版本号:$version")
+            output("当前版本号:$version")
             return version
         } catch (e: Exception) {
             //新建库表
             if (init && e.message?.contains("no such table: APP_VERSION") == true) {
-                LerverLog.debug("新建版本表[APP_VERSION]")
+                output("新建版本表[APP_VERSION]")
                 val createVersionTb = database.useConnection { connection ->
                     try {
                         return@useConnection ExecuteSql(
