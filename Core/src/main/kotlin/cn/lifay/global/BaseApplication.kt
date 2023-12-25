@@ -14,8 +14,7 @@ abstract class BaseApplication(
 
     init {
         println("初始化")
-        LerverLog.SetLogPrefix(logPrefix)
-        LerverLog.SetLogsDirPath(logPath)
+        LerverLog.InitLog(logPrefix, logPath)
         GlobalResource.loadTheme(theme)
     }
 

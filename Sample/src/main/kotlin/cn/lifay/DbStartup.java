@@ -15,7 +15,7 @@ public class DbStartup {
             pane.getChildren().add(new Button("dasdsadasd"));
 
             Stage stage = new Stage();
-            stage.setTitle("ddddd");
+            stage.setTitle("首页");
             stage.centerOnScreen();
             stage.setScene(new Scene(pane));
             return stage;

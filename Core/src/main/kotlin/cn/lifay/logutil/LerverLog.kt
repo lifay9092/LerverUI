@@ -15,8 +15,8 @@ enum class LogLevelEnum {
 }
 
 class GlobeLog(
-    val LOG_PREFIX: String,
-    val LOG_PATH: String
+    var LOG_PREFIX: String,
+    var LOG_PATH: String
 ) {
 
 
@@ -24,19 +24,19 @@ class GlobeLog(
 
 
     init {
-        println("LerverLog init")
+        initLogFile()
     }
 
 
-    private var LOG_DEBUG_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-debug.log")
-    private var LOG_INFO_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-info.log")
-    private var LOG_WARN_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-warn.log")
-    private var LOG_ERROR_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-error.log")
+    private lateinit var LOG_DEBUG_PATH: String
+    private lateinit var LOG_INFO_PATH: String
+    private lateinit var LOG_WARN_PATH: String
+    private lateinit var LOG_ERROR_PATH: String
 
-    private var DEBUG_FILE = File(LOG_DEBUG_PATH).notExistCreate()
-    private var INFO_FILE = File(LOG_INFO_PATH).notExistCreate()
-    private var WARN_FILE = File(LOG_WARN_PATH).notExistCreate()
-    private var ERROR_FILE = File(LOG_ERROR_PATH).notExistCreate()
+    private lateinit var DEBUG_FILE: File
+    private lateinit var INFO_FILE: File
+    private lateinit var WARN_FILE: File
+    private lateinit var ERROR_FILE: File
 
     fun initLogFile() {
 
@@ -54,6 +54,7 @@ class GlobeLog(
     fun SetLogPrefix(prefix: String) {
         println("SetLogPrefix init")
         LOG_PREFIX = prefix
+        initLogFile()
     }
 
     fun SetLogsDirPath(path: String) {
@@ -66,19 +67,20 @@ class GlobeLog(
         return Paths.get(basePath, *paths).toString()
     }
 
-
-}
-object LerverLog {
-    val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")
-    lateinit var globeLog: GlobeLog
-    
-    fun isWindows(): Boolean = File.separator == "\\"
+    fun log(text: String, level: LogLevelEnum = LogLevelEnum.DEBUG) {
+        when (level) {
+            LogLevelEnum.DEBUG -> writeText(level.name, text, DEBUG_FILE)
+            LogLevelEnum.INFO -> writeText(level.name, text, INFO_FILE)
+            LogLevelEnum.WARN -> writeText(level.name, text, WARN_FILE)
+            LogLevelEnum.ERROR -> writeText(level.name, text, ERROR_FILE, DEBUG_FILE, INFO_FILE)
+        }
+    }
 
     @Synchronized
     private fun writeText(level: String, text: String, vararg logFile: File) {
         val stack = getStackTraceName(Thread.currentThread().stackTrace[4])
         val s = "${
-            LocalDateTime.now().format(DATE_TIME_FORMAT_STR)
+            LocalDateTime.now().format(LerverLog.DATE_TIME_FORMAT_STR)
         } <${stack}> [${level}]:  ${text}\n"
         for (file in logFile) {
             file.appendText(s, Charset.defaultCharset())
@@ -88,13 +90,29 @@ object LerverLog {
         }
     }
 
-    fun log(text: String, level: LogLevelEnum = LogLevelEnum.DEBUG) {
-        when (level) {
-            LogLevelEnum.DEBUG -> LerverLog.writeText(level.name, text, DEBUG_FILE)
-            LogLevelEnum.INFO -> LerverLog.writeText(level.name, text, INFO_FILE)
-            LogLevelEnum.WARN -> LerverLog.writeText(level.name, text, WARN_FILE)
-            LogLevelEnum.ERROR -> LerverLog.writeText(level.name, text, ERROR_FILE, DEBUG_FILE, INFO_FILE)
-        }
+    private fun getStackTraceName(stackTraceElement: StackTraceElement): String {
+        return stackTraceElement.fileName!!.split(".")[0] + "." + stackTraceElement.methodName + "(${stackTraceElement.lineNumber})"
+    }
+
+}
+object LerverLog {
+
+    private lateinit var GLOBE_LOG: GlobeLog
+
+    val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")
+
+    fun isWindows(): Boolean = File.separator == "\\"
+
+    fun InitLog(logPrefix: String, logPath: String) {
+        GLOBE_LOG = GlobeLog(logPrefix, logPath)
+    }
+
+    fun SetLogPrefix(prefix: String) {
+        GLOBE_LOG.SetLogPrefix(prefix)
+    }
+
+    fun SetLogsDirPath(path: String) {
+        GLOBE_LOG.SetLogsDirPath(path)
     }
 
     fun debug(text: String) {
@@ -117,8 +135,8 @@ object LerverLog {
         error(e.stackTraceToString())
         error(e.message!!)
     }
-    private fun getStackTraceName(stackTraceElement: StackTraceElement): String {
-        return stackTraceElement.fileName!!.split(".")[0] + "." + stackTraceElement.methodName + "(${stackTraceElement.lineNumber})"
-    }
 
+    fun log(text: String, level: LogLevelEnum = LogLevelEnum.DEBUG) {
+        GLOBE_LOG.log(text, level)
+    }
 }
