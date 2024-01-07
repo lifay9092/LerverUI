@@ -3,6 +3,7 @@ package cn.lifay.db
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
 import cn.lifay.logutil.LerverLog
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -16,6 +17,7 @@ import org.ktorm.support.sqlite.InsertOrUpdateStatementBuilder
 import org.ktorm.support.sqlite.insertOrUpdate
 import java.io.File
 import java.io.FileFilter
+import java.math.BigDecimal
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -47,6 +49,7 @@ object DbManage {
     lateinit var database: Database
 
     val TEXT_PROPERTY = SimpleStringProperty()
+    val PROGRESS_PROPERTY = SimpleDoubleProperty()
 
     const val WRAP = "\n"
     fun Init(DB_NAME: String = "db.db") {
@@ -127,11 +130,19 @@ object DbManage {
         val sqlDir = File("${System.getProperty("user.dir") + File.separator}scripts")
         if (sqlDir.exists()) {
             var newLasVersion = lastVersion
-            for (sqlFile in sqlDir.listFiles(FileFilter { it.isFile && it.name.endsWith(".sql") })
-                .sortedBy { it.name }) {
+            val sqlFiles = sqlDir.listFiles(FileFilter { it.isFile && it.name.endsWith(".sql") })
+                .sortedBy { it.name }
+            val totalLen = sqlFiles.size / 100.toDouble()
+
+            for ((index, sqlFile) in sqlFiles.withIndex()) {
                 val sqlFileNames = sqlFile.name.split(".")
                 val sqlFileName = sqlFileNames[0]
+                val nowLen = index + 1
                 if (sqlFileName.toInt() <= lastVersionNo) {
+                    //低版本 跳过
+                    val decimalValue = BigDecimal(nowLen / totalLen)
+                    val twoDecimalPlaces = decimalValue.setScale(2, BigDecimal.ROUND_HALF_UP) // "3.14"
+                    PROGRESS_PROPERTY.set(twoDecimalPlaces.toDouble())
                     continue
                 }
                 //执行脚本
@@ -145,7 +156,12 @@ object DbManage {
                     newLasVersion = sqlFileName
                 }
                 output("")
+                val decimalValue = BigDecimal(nowLen / totalLen)
+                val twoDecimalPlaces = decimalValue.setScale(2, BigDecimal.ROUND_HALF_UP) // "3.14"
+                PROGRESS_PROPERTY.set(twoDecimalPlaces.toDouble())
+//                PROGRESS_PROPERTY.set(nowLen/totalLen)
             }
+
             if (lastVersion != newLasVersion) {
                 //版本号不一致,更新版本
                 ExecuteSql(INSERT_NEW_VERSION_SQL.format(newLasVersion))

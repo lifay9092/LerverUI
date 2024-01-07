@@ -24,7 +24,7 @@ object TreeViewCache {
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
 
     /*k=TreeView的hascode, v=id和children属性委托 */
-    val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>>>>()
+    val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>?>>>()
     var DATA_TYPE = DataType.LIST
 
     enum class DataType {
@@ -112,7 +112,7 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
 @JvmName("RegisterByTree")
 inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
-    childrenProp: KProperty1<V, List<V>>,
+    childrenProp: KProperty1<V, List<V>?>,
     init: Boolean = false,
     noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
     noinline getInitDataCall: () -> List<V>
@@ -221,8 +221,8 @@ fun <V, B> TreeView<V>.initList(
     }
 }
 
-inline fun <reified V, reified B> TreeView<V>.treeProps(): Pair<KProperty1<V, B>, KProperty1<V, List<V>>> {
-    return TREE_HELP_MAP[treeId] as Pair<KProperty1<V, B>, KProperty1<V, List<V>>>
+inline fun <reified V, reified B> TreeView<V>.treeProps(): Pair<KProperty1<V, B>, KProperty1<V, List<V>?>> {
+    return TREE_HELP_MAP[treeId] as Pair<KProperty1<V, B>, KProperty1<V, List<V>?>>
 }
 
 /**
@@ -231,32 +231,35 @@ inline fun <reified V, reified B> TreeView<V>.treeProps(): Pair<KProperty1<V, B>
 fun <V, B> TreeView<V>.initTree(
     panTreeItem: TreeItem<V>,
     idProp: KProperty1<V, B>,
-    childrenProp: KProperty1<V, List<V>>,
+    childrenProp: KProperty1<V, List<V>?>,
     filterFunc: ((V) -> Boolean)? = null,
     imgCall: ((TreeItem<*>) -> Unit)?
 ) {
     //获取子节点
     val datas = childrenProp.get(panTreeItem.value)
-    val childtren = datas.map {
-        val item = TreeItem(it)
-        item.treeViewId = panTreeItem.treeViewId
-        if (imgCall != null) {
-            imgCall(item)
+    if (datas != null) {
+        val childtren = datas.map {
+            val item = TreeItem(it)
+            item.treeViewId = panTreeItem.treeViewId
+            if (imgCall != null) {
+                imgCall(item)
+            }
+            initTree(item, idProp, childrenProp, filterFunc, imgCall)
+            val busiId = idProp.get(it)
+            ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = item
+            item
+        }.filter {
+            if (filterFunc == null || filterFunc(it.value)) {
+                return@filter true
+            }
+            it.children.isNotEmpty()
         }
-        initTree(item, idProp, childrenProp, filterFunc, imgCall)
-        val busiId = idProp.get(it)
-        ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = item
-        item
-    }.filter {
-        if (filterFunc == null || filterFunc(it.value)) {
-            return@filter true
+        //添加子节点
+        if (childtren.isNotEmpty()) {
+            panTreeItem.children.addAll(childtren)
         }
-        it.children.isNotEmpty()
     }
-    //添加子节点
-    if (childtren.isNotEmpty()) {
-        panTreeItem.children.addAll(childtren)
-    }
+
 }
 
 /**
@@ -382,7 +385,7 @@ fun <V> TreeItem<V>.CacheBusiIdMap() {
         val busiId = props.first.get(value)
         ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = this
     } else {
-        val props = TREE_HELP_MAP[this.treeViewId] as Pair<KProperty1<V, Any>, KProperty1<V, List<V>>>
+        val props = TREE_HELP_MAP[this.treeViewId] as Pair<KProperty1<V, Any>, KProperty1<V, List<V>?>>
         val busiId = props.first.get(value)
         ITEM_BUSI_TO_TREEITEM_MAP[busiId.toString()] = this
     }

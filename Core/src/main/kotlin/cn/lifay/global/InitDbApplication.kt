@@ -14,7 +14,7 @@ class InitDbApplication() : BaseApplication() {
         val dbName = GlobeStartUp.DB_NAME;
         val dbLoadView = DbLoadView(indexStage, dbName)
         primaryStage!!.apply {
-            title = "${indexStage.title} 更新脚本"
+            title = "${indexStage.title} 更新脚本程序"
             scene = Scene(dbLoadView)
             if (indexStage.icons.size > 0) {
                 icons.add(indexStage.icons[0])
