@@ -10,13 +10,13 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 
 ---
 
-### 使用方式，通过Maven引入
+### 使用方式1，通过Maven引入
 
 ```
 <dependency>
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Core</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.27-SNAPSHOT</version>
 </dependency>
 
 <repositories>
@@ -25,6 +25,13 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
         <url>http://www.lifay.cn:8081/repository/maven-public/</url>
     </repository>
 </repositories>
+```
+
+### 使用方式2，下载源码编译
+
+```
+1.需要jdk17和kotlin环境
+2.Parent模块clean install
 ```
 
 **一.常用操作**

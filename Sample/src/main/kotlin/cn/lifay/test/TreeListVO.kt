@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleStringProperty
  * @author lifay
  * @date 2023/2/20 17:44
  **/
-class TreeTestVO(
+class TreeListVO(
     var id: String,
     var parentId: String,
     var name: String,

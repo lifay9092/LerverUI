@@ -92,7 +92,7 @@ abstract class DataFormUI<T : Any>(
     abstract fun updateData(entity: T): Boolean
 
     private fun saveFunc() {
-        asyncTaskLoading(super.ROOT_PANE.scene.window, "保存中") {
+        asyncTaskLoading(getWindow(), "保存中") {
             try {
                 saveBtn.disable()
                 //检查

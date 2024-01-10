@@ -5,10 +5,12 @@ import cn.lifay.ui.tree.TreeViewCache.ITEM_BUSI_TO_TREEITEM_MAP
 import cn.lifay.ui.tree.TreeViewCache.ITEM_KEYWORD_MAP
 import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.ui.tree.TreeViewCache.LIST_HELP_MAP
+import cn.lifay.ui.tree.TreeViewCache.TREE_CHECKBOX_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_DATA_CALL_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_HELP_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_IMG_CALL_MAP
 import cn.lifay.ui.tree.TreeViewCache.TREE_TO_ITEM_MAP
+import javafx.scene.control.CheckBoxTreeItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import kotlin.reflect.KProperty1
@@ -20,11 +22,15 @@ object TreeViewCache {
     /* treeViewId=获取图标的函数 */
     val TREE_IMG_CALL_MAP = HashMap<String, (TreeItem<*>) -> Unit>()
 
-    /*k=TreeView的hascode, v=id和父id属性委托 */
+    /*k=TreeView的hascode, v=id和父id属性委托 适合List数据*/
     val LIST_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, *>>>()
 
-    /*k=TreeView的hascode, v=id和children属性委托 */
+    /*k=TreeView的hascode, v=id和children属性委托  适合Tree数据*/
     val TREE_HELP_MAP = HashMap<String, Pair<KProperty1<*, *>, KProperty1<*, List<*>?>>>()
+
+    /* treeViewId=CheckBox标识 */
+    val TREE_CHECKBOX_MAP = HashMap<String, Boolean>()
+
     var DATA_TYPE = DataType.LIST
 
     enum class DataType {
@@ -83,13 +89,18 @@ var <T> TreeItem<T>.keywordStr: String
 
 
 /**
- * 通过集合类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
+ * 通过集合列表类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
+ * getInitDataCall：
+ *         val test1 = TreeListVO("3", "2", "4", SimpleStringProperty("3"))
+ *         val test2 = TreeListVO("2", "1", "2", SimpleStringProperty("2"))
+ *         val test3 = TreeListVO("4", "1", "4", SimpleStringProperty("4"))
  */
 @JvmName("RegisterByList")
 inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     parentProp: KProperty1<V, B>,
     init: Boolean = false,
+    checkBox: Boolean = false,
     noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
     noinline getInitDataCall: () -> List<V>,
 ) {
@@ -98,6 +109,7 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     DATA_TYPE = TreeViewCache.DataType.LIST
     LIST_HELP_MAP[treeId] = Pair(idProp, parentProp)
     TREE_DATA_CALL_MAP[treeId] = getInitDataCall
+    TREE_CHECKBOX_MAP[treeId] = checkBox
     imgCall?.let {
         TREE_IMG_CALL_MAP[treeId] = it as (TreeItem<*>) -> Unit
     }
@@ -107,19 +119,34 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
 }
 
 /**
- * 通过树类型的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
+ * 通过树类型嵌套的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
+ * getInitDataCall:
+ * listOf(
+ *                     TreeTreeVO(
+ *                         "1", "0", "1", arrayListOf(
+ *                             TreeTreeVO(
+ *                                 "2", "1", "2", arrayListOf(
+ *                                     TreeTreeVO("4", "2", "4", null)
+ *                                 )
+ *                             ),
+ *                             TreeTreeVO("3", "1", "3", null)
+ *                         )
+ *                     )
+ *                 )
  */
 @JvmName("RegisterByTree")
 inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
     idProp: KProperty1<V, B>,
     childrenProp: KProperty1<V, List<V>?>,
     init: Boolean = false,
+    checkBox: Boolean = false,
     noinline imgCall: ((TreeItem<V>) -> Unit)? = null,
     noinline getInitDataCall: () -> List<V>
 ) {
     DATA_TYPE = TreeViewCache.DataType.TREE
     TREE_HELP_MAP[treeId] = Pair(idProp, childrenProp)
     TREE_DATA_CALL_MAP[treeId] = getInitDataCall
+    TREE_CHECKBOX_MAP[treeId] = checkBox
     imgCall?.let {
         TREE_IMG_CALL_MAP[treeId] = it as (TreeItem<*>) -> Unit
     }
@@ -159,7 +186,7 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.RefreshTree(
     } else {
         val props = treeProps<V, B>()
         val childtren = datas.map {
-            val item = TreeItem(it)
+            val item = newTreeItem(treeId, it)
             item.treeViewId = treeId
             initTree(item, props.first, props.second, filterFunc, imgCall)
             item
@@ -194,7 +221,7 @@ fun <V, B> TreeView<V>.initList(
     val childtren = datas
         .filter { prop.first.get(panTreeItem.value!!) == prop.second.get(it) }
         .map {
-            val item = TreeItem(it)
+            val item = newTreeItem(treeId, it)
             item.treeViewId = treeId
             if (imgCall != null) {
                 imgCall(item)
@@ -239,7 +266,7 @@ fun <V, B> TreeView<V>.initTree(
     val datas = childrenProp.get(panTreeItem.value)
     if (datas != null) {
         val childtren = datas.map {
-            val item = TreeItem(it)
+            val item = newTreeItem(treeId, it)
             item.treeViewId = panTreeItem.treeViewId
             if (imgCall != null) {
                 imgCall(item)
@@ -260,6 +287,18 @@ fun <V, B> TreeView<V>.initTree(
         }
     }
 
+}
+
+/**
+ * 获取TreeItem实例，根据CheckBox标识返回,否则勾选框会失去联动效果
+ */
+fun <V> newTreeItem(treeId: String, it: V): TreeItem<V> {
+    val isCheckBox = TREE_CHECKBOX_MAP[treeId]
+    if (isCheckBox == true) {
+        return CheckBoxTreeItem(it)
+    } else {
+        return TreeItem(it)
+    }
 }
 
 /**

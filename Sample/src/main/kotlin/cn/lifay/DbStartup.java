@@ -11,10 +11,10 @@ public class DbStartup {
 
 
         GlobeStartUp.launch(() -> {
-            VBox pane = new VBox(22D);
+            var pane = new VBox(22D);
             pane.getChildren().add(new Button("dasdsadasd"));
 
-            Stage stage = new Stage();
+            var stage = new Stage();
             stage.setTitle("首页");
             stage.centerOnScreen();
             stage.setScene(new Scene(pane));

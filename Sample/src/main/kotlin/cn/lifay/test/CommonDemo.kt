@@ -17,8 +17,7 @@ class CommonDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobalResource.loadTheme()
-        val view =
-            BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
+        val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
 //        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
 //        val root = fxmlLoader.load<Pane>()
         val scene = Scene(view.ROOT_PANE)
