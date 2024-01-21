@@ -14,8 +14,12 @@ import javafx.scene.control.TextArea
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
+import java.util.function.Supplier
 
-class DbLoadView(val indexStage: Stage, val dbName: String) : VBox(20.0) {
+class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val afterDbInit: (() -> Unit)? = null) :
+    VBox(20.0) {
+
+    var indexStage: Stage? = null
 
     val targetBtn = Button("进入程序").apply {
         alignment = Pos.BOTTOM_RIGHT
@@ -63,7 +67,7 @@ class DbLoadView(val indexStage: Stage, val dbName: String) : VBox(20.0) {
 
     fun initDb() {
 
-        asyncTask() {
+        asyncTask {
             try {
                 val textChangeListener = ChangeListener { ob, old, now ->
                     if (now.isNotBlank()) {
@@ -91,6 +95,10 @@ class DbLoadView(val indexStage: Stage, val dbName: String) : VBox(20.0) {
                 DbManage.PROGRESS_PROPERTY.removeListener(progressChangeListener)
 
                 targetBtn.isDisable = false
+
+                afterDbInit?.let {
+                    it()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 val msg = "初始化API信息失败，请联系管理员:$e"
@@ -106,11 +114,35 @@ class DbLoadView(val indexStage: Stage, val dbName: String) : VBox(20.0) {
         }
     }
 
+    fun getStage(): Stage {
+        if (indexStage == null) {
+            throw Exception("请先初始化indexStage")
+        }
+        return indexStage!!
+    }
     private fun targetIndex() {
-
-
+        try {
+            indexStage = indexStageGet.get()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val msg = "初始化界面失败,请检查db脚本:${e.stackTraceToString()}"
+            LerverLog.error(msg)
+            platformRun {
+                if (alertConfirmation(
+                        "是否关闭程序?",
+                        "初始化界面失败,请检查db脚本和界面初始化是否冲突:${e.message}"
+                    )
+                ) {
+                    Platform.exit()
+                }
+            }
+            platformRun {
+                textArea.appendText(msg)
+            }
+            return
+        }
         scene.window.hide()
-        indexStage.show()
+        indexStage!!.show()
     }
 
 }

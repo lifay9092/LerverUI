@@ -168,6 +168,8 @@ object DbManage {
                 GetLastVersion()
                 output("更新完成")
             }
+        } else {
+            output("跳过更新,脚本目录不存在:$sqlDir")
         }
     }
 

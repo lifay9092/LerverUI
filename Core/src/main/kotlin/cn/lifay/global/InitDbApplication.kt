@@ -4,21 +4,21 @@ import cn.lifay.GlobeStartUp
 import cn.lifay.db.DbLoadView
 import javafx.application.Platform
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 
 class InitDbApplication() : BaseApplication() {
 
-
     override fun start(primaryStage: Stage?) {
-        val indexStage = GlobeStartUp.INDEX_STAGE_GET.get();
+
         val dbName = GlobeStartUp.DB_NAME;
-        val dbLoadView = DbLoadView(indexStage, dbName)
+        val dbLoadView = DbLoadView(GlobeStartUp.INDEX_STAGE_GET, dbName)
         primaryStage!!.apply {
-            title = "${indexStage.title} 更新脚本程序"
+            title = "脚本更新程序"
             scene = Scene(dbLoadView)
-            if (indexStage.icons.size > 0) {
-                icons.add(indexStage.icons[0])
-            }
+            icons.add(
+                Image("/data.png")
+            )
             setOnCloseRequest {
                 Platform.exit()
             }

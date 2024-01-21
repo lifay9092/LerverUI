@@ -1,8 +1,8 @@
 package cn.lifay.test
 
+import cn.lifay.global.BaseApplication
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
-import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
@@ -13,7 +13,7 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class CommonDemo : Application() {
+class CommonDemo : BaseApplication() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobalResource.loadTheme()

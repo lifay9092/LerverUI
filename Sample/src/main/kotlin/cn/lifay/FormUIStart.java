@@ -1,7 +1,6 @@
 package cn.lifay;
 
 import cn.lifay.test.FormUITest;
-import javafx.application.Application;
 
 /**
  * StartFormUITest TODO
@@ -12,6 +11,6 @@ import javafx.application.Application;
 public class FormUIStart {
 
     public static void main(String[] args) {
-        Application.launch(FormUITest.class);
+        FormUITest.run();
     }
 }

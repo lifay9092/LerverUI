@@ -385,5 +385,10 @@ class CommonDemoView : BaseView<AnchorPane>() {
         copyToClipboard("测试复制的文字")
     }
 
+    fun curdTest(actionEvent: ActionEvent) {
+        val userManage = UserManage()
+        userManage.show()
+    }
+
 
 }

@@ -38,5 +38,6 @@
         <Button layoutX="124.0" layoutY="412.0" mnemonicParsing="false" onAction="#taskAction" text="耗时操作"/>
         <Button layoutX="124.0" layoutY="534.0" mnemonicParsing="false" onAction="#copyText" text="复制文本"/>
         <TreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
+        <Button layoutX="124.0" layoutY="145.0" mnemonicParsing="false" onAction="#curdTest" text="CURD"/>
     </children>
 </AnchorPane>
