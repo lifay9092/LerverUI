@@ -1,4 +1,4 @@
-# LerverUI简介
+## LerverUI简介
 
 LerverUI是一个基于javaFX框架封装了部分UI组件、常用操作的框架,语言采用 [Kotlin](https://book.kotlincn.net/text/getting-started.html)。
 
@@ -10,13 +10,15 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 
 ---
 
-### 使用方式1，通过Maven引入
+## 使用方式
+
+### 通过Maven引入
 
 ```
 <dependency>
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Core</artifactId>
-    <version>1.28-SNAPSHOT</version>
+    <version>1.29-SNAPSHOT</version>
 </dependency>
 
 <repositories>
@@ -27,29 +29,88 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 </repositories>
 ```
 
-### 使用方式2，下载源码编译
+### 下载源码编译
 
 ```
 1.需要jdk17和kotlin环境
 2.Parent模块clean install
 ```
 
-**一.常用操作**
+## 快速入门
+
+1.XXXApplication继承BaseApplication
+
+```
+class XXXApplication : BaseApplication() {
+
+}
+```
+
+2.启动
+
+```
+//默认启动（不带db组件-sqlite数据库）
+GlobeStartUp.launch(XXXApplication.class);
+
+//以db组件的方式启动（函数体内为程序初始界面）
+GlobeStartUp.launch(() -> {
+    var pane = new VBox(22D);
+    pane.getChildren().add(new Button("dasdsadasd"));
+
+    var stage = new Stage();
+    stage.setTitle("首页");
+    stage.centerOnScreen();
+    stage.setScene(new Scene(pane));
+    return stage;
+});
+```
+
+3.新建一个CommonDemoView(控制器视图)继承BaseView
+
+```
+class CommonDemoView : BaseView<AnchorPane>() {
+    
+    @FXML
+    var rootPane = AnchorPane()
+
+    override fun rootPane(): AnchorPane {
+        return rootPane
+    }
+
+}
+```
+
+4.创建控制器视图实例示例代码
+
+```
+    val view = BaseView.createView<CommonDemoView, AnchorPane>(XXXApplication::class.java.getResource("demo.fxml"))
+    val scene = Scene(view.ROOT_PANE)
+    primaryStage.title = "Hello World"
+    primaryStage.scene = scene
+    primaryStage.show()
+```
+
+## 常用操作
 
 1.初始化样式主题
 
 ```
-//默认PrimerLight
-GlobalResource.loadTheme()
 
-//指定PrimerDark
+//通过启动类继承BaseApplication指定theme
+abstract class BaseApplication(
+    theme: Theme = PrimerLight(),
+    logPrefix: String = "client",
+    logPath: String = System.getProperty("user.dir") + File.separator + "logs"
+)
+
+//通过GlobalResource实时设置样式主题
 GlobalResource.loadTheme(PrimerDark())
 ```
 
-2.为窗体指定图标（图标默认路径：/icon.png，即将icon.png放在resources目录下）
+2.为窗体指定图标（图标默认路径：/icon.png，即将icon.png放在resources目录下，会自动引入）
 
 ```
-//为stage指定图标（如果是框架创建的stage，一般已经默认设置了）
+//为stage指定图标（如果是通过框架创建的stage，一般已经默认设置了）
 GlobalResource.loadIcon(stage)
 
 //自定义图标路径
@@ -92,7 +153,7 @@ asyncDelayTask(500) {
 7.异步执行耗时操作,同时有加载图标提示
 
 ```
-asyncTaskLoading(ROOT_PANE.scene.window, "保存中") {
+asyncTaskLoading(getWindow(), "保存中") {
     try {
         //后台操作
     } catch (e: Exception) {
@@ -133,49 +194,12 @@ alertError(
 copyToClipboard("文字")
 ```
 
-**二.消息总线**
+## 视图容器
 
-> 消息总线一般是为了解决跨界面无耦合回调执行操作，并且可以多界面同时触发
+> 视图=Controller，BaseView 内置封装了便捷功能
 
-```
-使用方法：
-
-1.为事件定义枚举类ID，实现EventBusId
-
-enum class DemoId : EventBusId {
-    RELOAD_UI,
-    CHAT,
-}
-
-2.订阅注册：将来会被触发执行的匿名函数
-
-//DefaultEvent为内置无参事件传输DTO
-EventBus.subscribe(DemoId.RELOAD_UI, DefaultEvent::class) {
-    platformRun {
-        tableView.refresh()
-    }
-}
-//TextEvent为内置事件传输DTO，包含一个String类型参数
-EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
-    platformRun {
-        user1.appendText("${it.text}\n")
-    }
-}
-//其他的BodyEvent是传递实体参数
-
-3.发布消息
-
-EventBus.publish(DefaultEvent(DemoId.RELOAD_UI))
-
-EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
-```
-
-**一.视图容器**
-
-> 基础Controller容器：BaseView 内置封装了便捷功能
 ![message](doc/message.png)
 ![notification](doc/notification.png)
-![baseview](doc/baseview.png)
 
 1.视图类定义（1）
 
@@ -239,7 +263,7 @@ primaryStage.title = "Hello World"
 primaryStage.scene = scene
 primaryStage.show()
 
-//(3)直接创建Stage
+//(3)直接创建Stage窗口
 val stage = createViewStage<BaseViewDemoView2, AnchorPane>(
     "窗口标题",
     BaseViewDemo::class.java.getResource("baseViewDemo.fxml"),
@@ -250,7 +274,44 @@ stage.show()
 
 ---
 
-**二.表单视图**
+## 消息总线
+
+> 消息总线一般是为了解决跨界面无耦合回调执行操作，并且可以多界面同时触发
+
+```
+使用方法：
+
+1.为事件定义枚举类ID，实现EventBusId
+
+enum class DemoId : EventBusId {
+    RELOAD_UI,
+    CHAT,
+}
+
+2.订阅注册：将来会被触发执行的匿名函数
+
+//DefaultEvent为内置无参事件传输DTO
+EventBus.subscribe(DemoId.RELOAD_UI, DefaultEvent::class) {
+    platformRun {
+        tableView.refresh()
+    }
+}
+//TextEvent为内置事件传输DTO，包含一个String类型参数
+EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
+    platformRun {
+        user1.appendText("${it.text}\n")
+    }
+}
+//其他的BodyEvent是传递实体参数
+
+3.发布消息
+
+EventBus.publish(DefaultEvent(DemoId.RELOAD_UI))
+
+EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
+```
+
+## 表单视图
 
 > 自动绑定实体类、组合表单元素和基础操作功能
 
@@ -400,7 +461,7 @@ class UserManage : CurdUI<UserData>("用户管理", buildElements = {
 }
 ```
 
-*三.树视图*
+## 树视图
 
 > 考虑到树有很多应用场景，业务过程中产生很多冗余代码
 
@@ -457,5 +518,31 @@ rootTreeItem.children[0].DeleteThis()
 
 //删除当前TreeItem的子节点
 rootTreeItem.DeleteChildItem { it.id == "4" }
+
+```
+
+CheckBox树视图定义,cellFactory = CheckBoxTreeCell.forTreeView(),Register指定checkBox=true
+
+```
+    @FXML
+    var treeTree = TreeView<TreeNodeDTO>()
+
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+
+        val rootTreeItem = CheckBoxTreeItem(
+            TreeNodeDTO("0", "-1", "根节点", "ss", ArrayList<TreeNodeDTO>(), GloabaUtil.TYPE_ROOT, 0)
+        )
+        treeTree.apply {
+            root = rootTreeItem
+            Styles.toggleStyleClass(this, Styles.DENSE)
+            cellFactory = CheckBoxTreeCell.forTreeView()
+            Register(TreeNodeDTO::id, TreeNodeDTO::children, true, true) {
+                val treeNodeDTOs = tudo()
+                treeNodeDTOs ?: emptyList()
+            }
+        }
+        
+
+    }
 
 ```

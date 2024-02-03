@@ -2,15 +2,13 @@ package cn.lifay.db
 
 import atlantafx.base.theme.Styles
 import cn.lifay.extension.*
+import cn.lifay.global.GlobalConfig
 import cn.lifay.logutil.LerverLog
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.control.Button
-import javafx.scene.control.Label
-import javafx.scene.control.ProgressBar
-import javafx.scene.control.TextArea
+import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
@@ -54,13 +52,26 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
             label
         )
     }
+    val autoTarget = "true" == GlobalConfig.ReadProperties("db.auto_target", "false")
+    val checkBox = CheckBox("初始化后自动跳转")
 
     init {
         prefHeight = 650.0
         prefWidth = 750.0
 
-        children.addAll(textArea, progressBarPane, targetBtn)
-
+        children.addAll(textArea, progressBarPane, HBox(10.0).apply {
+            children.addAll(checkBox, targetBtn)
+        })
+        println("autoTarget:$autoTarget")
+        checkBox.apply {
+            isSelected = autoTarget
+            this.selectedProperty().addListener { observableValue, old, new ->
+                if (autoTarget != new) {
+                    GlobalConfig.WriteProperties("db.auto_target", checkBox.isSelected.toString())
+                    println("upt")
+                }
+            }
+        }
         targetBtn.isDisable = true
         initDb()
     }
@@ -69,6 +80,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
 
         asyncTask {
             try {
+                //添加消息文本、进度条绑定
                 val textChangeListener = ChangeListener { ob, old, now ->
                     if (now.isNotBlank()) {
                         platformRun {
@@ -88,16 +100,25 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
                 }
                 DbManage.PROGRESS_PROPERTY.addListener(progressChangeListener)
 
+                //执行db初始化
                 DbManage.Init(dbName)
 
-
+                //解除绑定
                 DbManage.TEXT_PROPERTY.removeListener(textChangeListener)
                 DbManage.PROGRESS_PROPERTY.removeListener(progressChangeListener)
 
+                //善后
                 targetBtn.isDisable = false
 
                 afterDbInit?.let {
                     it()
+                }
+
+                //自动跳转到主界面
+                if (checkBox.isSelected) {
+                    platformRun {
+                        targetIndex()
+                    }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

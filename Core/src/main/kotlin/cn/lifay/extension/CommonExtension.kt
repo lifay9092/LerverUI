@@ -1,5 +1,6 @@
 package cn.lifay.extension
 
+import cn.lifay.global.GlobalResource
 import java.io.File
 
 //转小写驼峰
@@ -56,7 +57,7 @@ fun File.notExistCreate(): File {
 }
 
 fun main() {
-    val testFilePath = System.getProperty("user.dir") + File.separator + "pom.xml"
+    val testFilePath = GlobalResource.USER_DIR + "pom.xml"
     val testFile = File(testFilePath)
 
     println("fileMainName: ${testFilePath.fileMainName()}")

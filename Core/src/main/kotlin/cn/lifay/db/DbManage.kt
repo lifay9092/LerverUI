@@ -2,6 +2,9 @@ package cn.lifay.db
 
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
+import cn.lifay.global.DbEntity
+import cn.lifay.global.GlobalConfig
+import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -18,7 +21,6 @@ import org.ktorm.support.sqlite.insertOrUpdate
 import java.io.File
 import java.io.FileFilter
 import java.math.BigDecimal
-import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -54,45 +56,45 @@ object DbManage {
     const val WRAP = "\n"
     fun Init(DB_NAME: String = "db.db") {
 
-        try {//获取db配置文件
-            val userDir = System.getProperty("user.dir")
-            val dbConfigPath = "${userDir + File.separator}db.config"
-            val dbConfigFile = File(dbConfigPath)
-            if (!dbConfigFile.exists()) {
-                output("db.config 不存在...")
-                //拷贝db.db
-    //            val resourceAsStream = cn.lifay.db.DbManage.javaClass.getResourceAsStream("/db/db.db")
-    //            if (resourceAsStream == null) {
-    //                throw LerverUIException("失败")
-    //            }
-                val dbPath = userDir + File.separator + DB_NAME
-    //            resourceAsStream.use {
-    //                File(dbPath).writeBytes(it.readAllBytes())
-    //            }
-                //配置数据库连接文件:db.config
-                val jdbcUrl = "jdbc:sqlite:${dbPath}".replace("\\", "/")
-                val text = """
-                        url = ${jdbcUrl}
-                        user =
-                        password =
-                    """.trimIndent()
-                dbConfigFile.writeText(text, Charset.forName("utf-8"))
-                InitDataBase(jdbcUrl, "", "")
-            } else {
-                output("db.config 已存在...")
-                dbConfigFile.inputStream().use {
-                    val properties = Properties()
-                    properties.load(it)
-                    val url =
-                        properties.getProperty(
-                            "url",
-                            "jdbc:sqlite:${(userDir + File.separator).replace("\\", "/") + DB_NAME}"
-                        )
-                    val user = properties.getProperty("user", "")
-                    val password = properties.getProperty("password", "")
-                    InitDataBase(url, user, password)
+        try {
+            var dbEntity: DbEntity? = null
+            val defaultDbPath = GlobalResource.USER_DIR + DB_NAME
+            //获取db配置文件
+            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.config"
+            val lerverConfigFile = File(lerverConfigPath)
+            if (!lerverConfigFile.exists()) {
+                val dbConfigPath = "${GlobalResource.USER_DIR}db.config"
+                val dbConfigFile = File(dbConfigPath)
+                if (dbConfigFile.exists()) {
+                    output("从db.config迁移...")
+                    dbConfigFile.inputStream().use {
+                        val properties = Properties()
+                        properties.load(it)
+                        val url = properties.getProperty("url", "")
+                        val user = properties.getProperty("user", "")
+                        val password = properties.getProperty("password", "")
+
+                        if (url.isBlank()) {
+                            val jdbcUrl = "jdbc:sqlite:${defaultDbPath}".replace("\\", "/")
+                            dbEntity = DbEntity(jdbcUrl, user, password)
+                        } else {
+                            dbEntity = DbEntity(url, user, password)
+                        }
+                    }
+                    GlobalConfig.WriteDbConfig(dbEntity!!)
+                } else {
+                    output("lerver.config 不存在...")
+                    //配置数据库连接文件:lerver.config
+                    val jdbcUrl = "jdbc:sqlite:${defaultDbPath}".replace("\\", "/")
+                    dbEntity = DbEntity(jdbcUrl, "", "")
+                    GlobalConfig.WriteDbConfig(dbEntity!!)
                 }
+
+            } else {
+                dbEntity = GlobalConfig.ReadDbConfig(DB_NAME)
             }
+            InitDataBase(dbEntity!!)
+
         } catch (e: Exception) {
             LerverLog.error(e)
         }
@@ -106,18 +108,16 @@ object DbManage {
     }
 
     fun InitDataBase(
-        url: String,
-        user: String,
-        password: String,
+        dbEntity: DbEntity,
         logger: Logger = ConsoleLogger(threshold = LogLevel.DEBUG)
     ) {
         database = Database.connect(
-            url = url,
-            user = user,
-            password = password,
+            url = dbEntity.url,
+            user = dbEntity.user,
+            password = dbEntity.password,
             logger = logger
         )
-        output("dbUrl:${url + WRAP + WRAP}")
+        output("dbUrl:${dbEntity.url + WRAP + WRAP}")
 
         /*更新版本脚本*/
         //db最后一次版本
@@ -127,7 +127,7 @@ object DbManage {
         }
         val lastVersionNo = lastVersion.toInt()
         //脚本目录
-        val sqlDir = File("${System.getProperty("user.dir") + File.separator}scripts")
+        val sqlDir = File("${GlobalResource.USER_DIR}scripts")
         if (sqlDir.exists()) {
             var newLasVersion = lastVersion
             val sqlFiles = sqlDir.listFiles(FileFilter { it.isFile && it.name.endsWith(".sql") })

@@ -1,16 +1,17 @@
 package cn.lifay.chooser
 
+import cn.lifay.global.GlobalConfig
+import cn.lifay.global.GlobalResource
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import java.io.File
 
-private var COMMON_CHOOSER_PATH: String = System.getProperty("user.dir")
-private val KEY_CHOOSER_PATH_MAP = HashMap<String, String>()
+private var COMMON_CHOOSER_PATH: String = GlobalResource.USER_DIR
 
 fun DirectoryChooser.getInitFile(key: String? = null): File {
     if (key != null) {
-        if (KEY_CHOOSER_PATH_MAP.containsKey(key)) {
-            return File(KEY_CHOOSER_PATH_MAP[key]!!)
+        if (GlobalConfig.ContainsKey(key)) {
+            return File(GlobalConfig.ReadProperties(key))
         }
     }
     return File(COMMON_CHOOSER_PATH)
@@ -18,8 +19,8 @@ fun DirectoryChooser.getInitFile(key: String? = null): File {
 
 fun FileChooser.getInitFile(key: String? = null): File {
     if (key != null) {
-        if (KEY_CHOOSER_PATH_MAP.containsKey(key)) {
-            return File(KEY_CHOOSER_PATH_MAP[key]!!)
+        if (GlobalConfig.ContainsKey(key)) {
+            return File(GlobalConfig.ReadProperties(key))
         }
     }
     return File(COMMON_CHOOSER_PATH)
@@ -32,7 +33,7 @@ object ChooserExtension {
             return
         }
         if (key != null) {
-            KEY_CHOOSER_PATH_MAP[key] = path
+            GlobalConfig.WriteProperties(key, path)
         } else {
             COMMON_CHOOSER_PATH = path
         }
@@ -40,10 +41,11 @@ object ChooserExtension {
 
     fun getInitFile(key: String? = null): File {
         if (key != null) {
-            if (KEY_CHOOSER_PATH_MAP.containsKey(key)) {
-                return File(KEY_CHOOSER_PATH_MAP[key]!!)
+            if (GlobalConfig.ContainsKey(key)) {
+                return File(GlobalConfig.ReadProperties(key))
             }
         }
         return File(COMMON_CHOOSER_PATH)
     }
+
 }

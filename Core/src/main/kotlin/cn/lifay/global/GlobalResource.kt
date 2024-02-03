@@ -8,6 +8,7 @@ import javafx.stage.Screen
 import javafx.stage.Stage
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
+import java.io.File
 
 /**
  * GlobalResource 全局资源类
@@ -40,6 +41,8 @@ object GlobalResource {
      * 主题
      */
     private var THEME_STYLE: Theme = PrimerLight()
+
+    val USER_DIR = System.getProperty("user.dir") + File.separator
 
     /**
      * 表单宽度
