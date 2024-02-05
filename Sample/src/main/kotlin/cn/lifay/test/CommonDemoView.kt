@@ -21,6 +21,9 @@ import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
+import javafx.scene.paint.Color
+import org.kordamp.ikonli.feather.Feather
+import org.kordamp.ikonli.javafx.FontIcon
 import java.net.URL
 import java.util.*
 
@@ -59,10 +62,20 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var sendText = TextArea()
 
     @FXML
+    lateinit var sendBtn: Button
+
+    @FXML
     var user1 = TextArea()
 
     @FXML
     var user2 = TextArea()
+
+    @FXML
+    lateinit var copyBtn: Button
+
+    @FXML
+    lateinit var testTbBtn: Button
+
     override fun rootPane(): AnchorPane {
         return rootPane
     }
@@ -233,6 +246,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     TableTestVO("222", "2222", SimpleStringProperty("222"), SimpleDoubleProperty(0.0))
                 )
             }
+        }
+
+        testTbBtn.graphic = FontIcon("mdal-adb")
+            .customStyle(16, Color.RED)
+        copyBtn.graphic = FontIcon(Feather.COPY)
+            .customStyle(18, Color.LIGHTSKYBLUE)
+        sendBtn.graphic = FontIcon().apply {
+            style =
+                "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
         }
 
         EventBus.subscribe(DemoId.CHAT, TextEvent::class) {

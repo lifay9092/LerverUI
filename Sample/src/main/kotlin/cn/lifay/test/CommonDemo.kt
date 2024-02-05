@@ -1,6 +1,6 @@
 package cn.lifay.test
 
-import atlantafx.base.theme.PrimerDark
+import atlantafx.base.theme.PrimerLight
 import cn.lifay.global.BaseApplication
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
@@ -16,7 +16,7 @@ import java.io.File
  * @date 2023/1/9 16:07
  */
 class CommonDemo : BaseApplication(
-    theme = PrimerDark(),
+    theme = PrimerLight(),
     configPath = GlobalResource.USER_DIR + "test" + File.separator + "cc.config",
     logPrefix = "test"
 ) {

@@ -14,7 +14,8 @@
         <SplitMenuButton fx:id="splitMenuBtn" layoutX="124.0" layoutY="366.0" />
         <TableView fx:id="tableView" layoutX="290.0" layoutY="484.0" prefHeight="223.0" prefWidth="719.0">
         </TableView>
-        <Button layoutX="124.0" layoutY="480.0" mnemonicParsing="false" onAction="#tableText" text="测试表格" />
+        <Button fx:id="testTbBtn" layoutX="124.0" layoutY="480.0" mnemonicParsing="false" onAction="#tableText"
+                text="测试表格"/>
         <TreeView fx:id="treeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0"/>
         <Button layoutX="885.0" layoutY="66.0" mnemonicParsing="false" onAction="#treeTest" text="测试树" />
         <Button layoutX="885.0" layoutY="98.0" mnemonicParsing="false" onAction="#treeTestAdd1" text="添加1" />
@@ -27,7 +28,7 @@
          <children>
              <Label text="发送消息"/>
              <TextArea fx:id="sendText" prefHeight="200.0" prefWidth="200.0"/>
-             <Button mnemonicParsing="false" onAction="#chat" text="发送"/>
+             <Button fx:id="sendBtn" mnemonicParsing="false" onAction="#chat" text="发送"/>
              <Separator prefHeight="44.0" prefWidth="288.0"/>
              <Label text="接受者1"/>
              <TextArea fx:id="user1" prefHeight="200.0" prefWidth="200.0"/>
@@ -36,7 +37,12 @@
          </children>
       </VBox>
         <Button layoutX="124.0" layoutY="412.0" mnemonicParsing="false" onAction="#taskAction" text="耗时操作"/>
-        <Button layoutX="124.0" layoutY="534.0" mnemonicParsing="false" onAction="#copyText" text="复制文本"/>
+        <Button fx:id="copyBtn" layoutX="124.0" layoutY="534.0" mnemonicParsing="false" onAction="#copyText"
+                text="复制文本">
+            <!--            <graphic>-->
+            <!--                <FontIcon iconLiteral="" iconSize="128" iconColor="red"/>-->
+            <!--            </graphic>-->
+        </Button>
         <TreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
         <Button layoutX="124.0" layoutY="145.0" mnemonicParsing="false" onAction="#curdTest" text="CURD"/>
     </children>

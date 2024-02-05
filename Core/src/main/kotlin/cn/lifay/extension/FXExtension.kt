@@ -206,6 +206,25 @@ fun Button.icon(icon: Ikon): Button {
 }
 
 /**
+ * 自定义icon的样式
+ *    testTbBtn.graphic = FontIcon("mdal-adb")
+ *       .customStyle(16, Color.RED)
+ *    copyBtn.graphic = FontIcon(Feather.COPY)
+ *        .customStyle(18,Color.LIGHTSKYBLUE)
+ *    sendBtn.graphic = FontIcon().apply {
+ *        style = "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
+ *    }
+ */
+fun FontIcon.customStyle(size: Int = 16, color: Color = Color.web("#242c2c")): FontIcon {
+    appendStyle("-fx-icon-size: ${size}px;")
+    appendStyle("-fx-icon-color: ${color.toWeb()};")
+    if (this.iconLiteral.isNotBlank()) {
+        appendStyle("-fx-icon-code: ${this.iconLiteral};")
+    }
+    return this
+}
+
+/**
  * 文本框变色 例如：Styles.STATE_DANGER
  * @param pseudoClass 颜色
  * @author lifay
