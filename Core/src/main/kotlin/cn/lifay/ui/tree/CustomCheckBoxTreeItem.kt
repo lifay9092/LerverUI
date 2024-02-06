@@ -19,7 +19,7 @@ class CustomCheckBoxTreeItem<T : Any> @JvmOverloads constructor(
 
     private var CHECK_BOX_SELECTION_CHANGED_EVENT: EventType<out Event>? = null
     private var stateChangeListener: ChangeListener<Boolean?>? = null
-    private var selected: BooleanProperty? = null
+    private var selected: BooleanProperty = SimpleBooleanProperty(false)
     private var indeterminate: BooleanProperty? = null
     private var independent: BooleanProperty? = null
     private var updateLock = false
@@ -95,7 +95,7 @@ class CustomCheckBoxTreeItem<T : Any> @JvmOverloads constructor(
         return selected!!.value
     }
 
-    fun selectedProperty(): BooleanProperty? {
+    fun selectedProperty(): BooleanProperty {
         return selected
     }
 

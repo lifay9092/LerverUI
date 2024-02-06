@@ -52,7 +52,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var treeView = TreeView<TreeListVO>()
 
     @FXML
-    var customTree = TreeView<Person>()
+    var customTree = CustomTreeView<Person>()
 
     @FXML
     var checkTreeView = TreeView<TreeTreeVO>()
@@ -255,8 +255,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
-        val customTreeItem = CheckBoxTreeItem<Person>(Person(0,"根节点",false)).apply {
-            selectedProperty().addListener { observableValue, old, new ->
+        val customTreeItem = CustomCheckBoxTreeItem<Person>(Person(0,"根节点",false)).apply {
+            selectedProperty()!!.addListener { observableValue, old, new ->
                 println("old:$old new:$new")
             }
         }
@@ -277,8 +277,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
 //            println("old:${old} new:${new}")
 //            observableValue.
 //        }
-        // 添加一个ListChangeListener来监听列表的变化
-        // 添加一个ListChangeListener来监听列表的变化
+        // 添加一个ListChangeListener来监听列表的变化,变化时取出所有变更值，计算父item_id(基于属性引用)，根据索引（item_id）拿到TreeItem进行相应的变更
+        // 树型(children)列表兼容：
         list.addListener { c: ListChangeListener.Change<out Person?> ->
             while (c.next()) {
                 if (c.wasPermutated()) {
@@ -297,8 +297,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 val root = customTree.root
                 root.children.clear()
                 val items = c.list.map {
-                    CheckBoxTreeItem(it!!).apply {
-                        selectedProperty().addListener { observableValue, old, new ->
+                    CustomCheckBoxTreeItem(it!!).apply {
+                        selectedProperty()!!.addListener { observableValue, old, new ->
                             println("old:$old new:$new")
                         }
                     }
