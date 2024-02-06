@@ -9,8 +9,10 @@ import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -26,6 +28,8 @@ import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.javafx.FontIcon
 import java.net.URL
 import java.util.*
+import kotlin.collections.ArrayList
+
 
 /**
  * @ClassName DemoView
@@ -46,6 +50,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var treeView = TreeView<TreeListVO>()
+
+    @FXML
+    var customTree = TreeView<Person>()
 
     @FXML
     var checkTreeView = TreeView<TreeTreeVO>()
@@ -248,6 +255,14 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
+        val customTreeItem = CheckBoxTreeItem<Person>(Person(0,"根节点",false)).apply {
+            selectedProperty().addListener { observableValue, old, new ->
+                println("old:$old new:$new")
+            }
+        }
+        customTree.root = customTreeItem
+        customTree.cellFactory = CheckBoxTreeCell.forTreeView()
+
         testTbBtn.graphic = FontIcon("mdal-adb")
             .customStyle(16, Color.RED)
         copyBtn.graphic = FontIcon(Feather.COPY)
@@ -256,6 +271,44 @@ class CommonDemoView : BaseView<AnchorPane>() {
             style =
                 "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
         }
+
+        /*测试*/
+//        list.addListener { observableValue, old, new ->
+//            println("old:${old} new:${new}")
+//            observableValue.
+//        }
+        // 添加一个ListChangeListener来监听列表的变化
+        // 添加一个ListChangeListener来监听列表的变化
+        list.addListener { c: ListChangeListener.Change<out Person?> ->
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    println("列表元素顺序已更改")
+                } else if (c.wasUpdated()) {
+                    println("列表元素已更新")
+                } else if (c.wasAdded()) {
+                    println("在索引 " + c.from + " 插入了元素: " + c.list[c.from])
+                } else if (c.wasRemoved()) {
+                    println("在索引 " + c.from + " 删除了元素: " + c.removed)
+                }
+                else if (c.wasReplaced()) {
+                    println("在索引 " + c.from + " wasReplaced了元素: ")
+                }
+                println(c.list)
+                val root = customTree.root
+                root.children.clear()
+                val items = c.list.map {
+                    CheckBoxTreeItem(it!!).apply {
+                        selectedProperty().addListener { observableValue, old, new ->
+                            println("old:$old new:$new")
+                        }
+                    }
+                }.toList()
+                root.children.addAll(items)
+            }
+        }
+        list.addAll(Person(1,"1",false),
+            Person(2,"2",false),
+            Person(3,"3",false))
 
         EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
             platformRun {
@@ -268,23 +321,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
     }
+    val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
     fun treeTest(actionEvent: ActionEvent) {
         println("测试树")
         rootTreeItem.value.name = "测试修改"
         println(rootTreeItem.children[0].treeViewId)
         rootTreeItem.children[0].value = TreeListVO("5", "1", "5", SimpleStringProperty("5"))
-        // rootItemProperties.value.apply {
-        //      value.name = "测试"
-        //      children[0].value.name = "修改了"
-//            children.add(
-//                TreeItem(TreeTestVO("5", "1","5", SimpleStringProperty("5")))
-//            )
-        //  }
-        // testItemProperties.value.apply {
-        //      value.name = "fffffffffff"
-        //    }
     }
+
 
     fun formTest(actionEvent: ActionEvent?) {
         // UserForm userForm = new UserForm("测试",User.class);
@@ -377,6 +422,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         val treeItem = treeView.GetItemByBusiId("add1")
         treeItem?.UpdateItem(TreeListVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
         println(treeItem?.value)
+
     }
 
     fun treeTestDel1(actionEvent: ActionEvent) {
@@ -410,6 +456,34 @@ class CommonDemoView : BaseView<AnchorPane>() {
     fun curdTest(actionEvent: ActionEvent) {
         val userManage = UserManage()
         userManage.show()
+    }
+
+    fun customTreeTestAdd(actionEvent: ActionEvent) {
+//        list.add(Person(5,"5",false))
+        val id = UUID.randomUUID().toString()
+        val datas = ArrayList<Person>()
+        for (i in 1..100){
+
+            datas.add(Person(100 + i,"${id}_$i",false))
+        }
+        list.addAll(
+            datas
+        )
+    }
+
+    fun customTreeTestUpt(actionEvent: ActionEvent) {
+        list[0].name = "6"
+
+    }
+
+    fun customTreeTestDel(actionEvent: ActionEvent) {
+        list.removeIf { it.id == 5 }
+
+    }
+
+    fun customTreeTestReplace(actionEvent: ActionEvent) {
+        list[1] = Person(7,"7",false)
+
     }
 
 

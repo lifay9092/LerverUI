@@ -87,13 +87,23 @@ var <T> TreeItem<T>.keywordStr: String
     }
 */
 
-
 /**
  * 通过集合列表类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
- * getInitDataCall：
- *         val test1 = TreeListVO("3", "2", "4", SimpleStringProperty("3"))
- *         val test2 = TreeListVO("2", "1", "2", SimpleStringProperty("2"))
- *         val test3 = TreeListVO("4", "1", "4", SimpleStringProperty("4"))
+ * @param idProp id属性引用
+ * @param parentProp parentId属性引用
+ * @param init 是否注册后立即初始化
+ * @param checkBox 构建勾选框的树
+ * @param imgCall 获取树元素的图标
+ * imgCall = {
+ *                 if ("GROUP" == it.value.type) {
+ *                     it.graphic = FontIcon(Feather.FOLDER)
+ *                 }
+ *             }
+ * @param getInitDataCall 获取初始化数据的回调函数
+ *        val test1 = TreeListVO("3", "2", "4", SimpleStringProperty("3"))
+ *        val test2 = TreeListVO("2", "1", "2", SimpleStringProperty("2"))
+ *        val test3 = TreeListVO("4", "1", "4", SimpleStringProperty("4"))
+ *        listOf(test1,test2,test3)
  */
 @JvmName("RegisterByList")
 inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
@@ -120,7 +130,17 @@ inline fun <reified V : Any, reified B : Any> TreeView<V>.Register(
 
 /**
  * 通过树类型嵌套的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
- * getInitDataCall:
+ * @param idProp id属性引用
+ * @param childrenProp children属性引用
+ * @param init 是否注册后立即初始化
+ * @param checkBox 构建勾选框的树
+ * @param imgCall 获取树元素的图标
+ * imgCall = {
+ *                 if ("GROUP" == it.value.type) {
+ *                     it.graphic = FontIcon(Feather.FOLDER)
+ *                 }
+ *             }
+ * @param getInitDataCall 获取初始化数据的回调函数
  * listOf(
  *                     TreeTreeVO(
  *                         "1", "0", "1", arrayListOf(
@@ -295,7 +315,11 @@ fun <V, B> TreeView<V>.initTree(
 fun <V> newTreeItem(treeId: String, it: V): TreeItem<V> {
     val isCheckBox = TREE_CHECKBOX_MAP[treeId]
     if (isCheckBox == true) {
-        return CheckBoxTreeItem(it)
+        return CheckBoxTreeItem(it).apply {
+            expandedProperty().addListener { observableValue, old, new ->
+                println("newTreeItem expanded:$new")
+            }
+        }
     } else {
         return TreeItem(it)
     }
