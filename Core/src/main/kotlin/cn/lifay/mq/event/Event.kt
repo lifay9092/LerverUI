@@ -1,9 +1,8 @@
 /* SPDX-License-Identifier: MIT */
 package cn.lifay.mq.event
 
-import cn.lifay.mq.EventBusId
 
-abstract class Event protected constructor(val id: EventBusId) {
+abstract class Event protected constructor(val id: String) {
 
 //    companion object {
 //        fun <E : Event?> publish(event: E) {

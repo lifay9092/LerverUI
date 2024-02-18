@@ -10,6 +10,7 @@ class TreeTreeVO(
     var id: String,
     var parentId: String,
     var name: String,
+    var leaf: Boolean = false,
     var children: ArrayList<TreeTreeVO>?
 ) {
     override fun toString(): String {

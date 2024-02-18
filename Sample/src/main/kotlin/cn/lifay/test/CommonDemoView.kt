@@ -28,7 +28,6 @@ import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.javafx.FontIcon
 import java.net.URL
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 /**
@@ -52,7 +51,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var treeView = TreeView<TreeListVO>()
 
     @FXML
-    var customTree = CustomTreeView<Person>()
+//    var customTree  = CustomTreeView<Person>() as TreeView<Person>
+    //  var customTree  = CustomTreeView<Person>()
+    var customTree = TestTreeViewKT<Person, Int>()
 
     @FXML
     var checkTreeView = TreeView<TreeTreeVO>()
@@ -130,10 +131,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
         // rootItemProperties.value = root
         // testItemProperties.value = treeItem2
+
         treeView.apply {
             root = rootTreeItem
             isShowRoot = true
-            Register(TreeListVO::id, TreeListVO::parentId, true) {
+            RegisterByList(
+                TreeNodeListProp(TreeListVO::id, TreeListVO::parentId),
+                checkBox = false, init = true
+            ) {
+                println("treeView initDataCall...")
                 listOf(test1, test2, test3)
             }
             setOnMouseClicked {
@@ -164,13 +170,27 @@ class CommonDemoView : BaseView<AnchorPane>() {
                             }
                         })
                     }
+                } else if (it.clickCount == 2) {
+                    val selectedItem = this.selectionModel.selectedItem
+                    selectedItem?.let {
+                        val value = selectedItem.value
+                        if (selectedItem.CanLoadChildren()) {
+                            asyncTask {
+                                val id = UUID.randomUUID().toString()
+                                selectedItem.AddChildren(
+                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
+                                )
+                            }
+                        }
+                    }
+
                 }
 
             }
         }
 
         rootCheckTreeItem = CheckBoxTreeItem<TreeTreeVO>().apply {
-            value = TreeTreeVO("0", "", "0", null)
+            value = TreeTreeVO("0", "", "0", false, null)
             this.isExpanded = true
             addEventHandler(
                 TreeItem.valueChangedEvent(),
@@ -186,29 +206,32 @@ class CommonDemoView : BaseView<AnchorPane>() {
             root = rootCheckTreeItem
             isShowRoot = true
             cellFactory = CheckBoxTreeCell.forTreeView()
-            Register(TreeTreeVO::id, TreeTreeVO::children, true, true) {
+            RegisterByTree(
+                TreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
+                true, true
+            ) {
+                println("checkTreeView initDataCall...")
                 listOf(
                     TreeTreeVO(
-                        "1", "0", "1", arrayListOf(
+                        "1", "0", "1", false, arrayListOf(
                             TreeTreeVO(
-                                "2", "1", "2", arrayListOf(
-                                    TreeTreeVO("4", "2", "4", null)
+                                "2", "1", "2", false, arrayListOf(
+                                    TreeTreeVO("4", "2", "4", true, null)
                                 )
                             ),
-                            TreeTreeVO("3", "1", "3", null)
+                            TreeTreeVO("3", "1", "3", true, null)
                         )
                     )
                 )
             }
-
         }
 
-        keywordText.textProperty().addListener { observableValue, s, s2 ->
-            if (s2.isNullOrBlank()) {
+        keywordText.textProperty().addListener { observableValue, old, new ->
+            if (old == new) {
                 return@addListener
             }
-            treeView.RefreshTree<TreeListVO, String>(filterFunc = {
-                it.name.contains(s2)
+            treeView.FilterTree<TreeListVO, String>(filterFunc = {
+                new.isBlank() || (new.isNotBlank() && it.name.contains(new))
             })
         }
         tableView.apply {
@@ -256,20 +279,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
         }
 
         val customTreeItem = CustomCheckBoxTreeItem<Person>(Person(0,"根节点",false)).apply {
-            selectedProperty()!!.addListener { observableValue, old, new ->
+            selectedProperty().addListener { observableValue, old, new ->
                 println("old:$old new:$new")
             }
         }
-        customTree.root = customTreeItem
-        customTree.cellFactory = CheckBoxTreeCell.forTreeView()
-
-        testTbBtn.graphic = FontIcon("mdal-adb")
-            .customStyle(16, Color.RED)
-        copyBtn.graphic = FontIcon(Feather.COPY)
-            .customStyle(18, Color.LIGHTSKYBLUE)
-        sendBtn.graphic = FontIcon().apply {
-            style =
-                "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
+        customTree.apply {
+            root = customTreeItem
+            cellFactory = CheckBoxTreeCell.forTreeView()
         }
 
         /*测试*/
@@ -297,8 +313,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 val root = customTree.root
                 root.children.clear()
                 val items = c.list.map {
-                    CustomCheckBoxTreeItem(it!!).apply {
-                        selectedProperty()!!.addListener { observableValue, old, new ->
+                    CheckBoxTreeItem(it!!).apply {
+                        selectedProperty().addListener { observableValue, old, new ->
                             println("old:$old new:$new")
                         }
                     }
@@ -309,6 +325,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
         list.addAll(Person(1,"1",false),
             Person(2,"2",false),
             Person(3,"3",false))
+
+        testTbBtn.graphic = FontIcon("mdal-adb")
+            .customStyle(16, Color.RED)
+        copyBtn.graphic = FontIcon(Feather.COPY)
+            .customStyle(18, Color.LIGHTSKYBLUE)
+        sendBtn.graphic = FontIcon().apply {
+            style =
+                "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
+        }
 
         EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
             platformRun {
@@ -410,6 +435,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     fun treeTestAdd1(actionEvent: ActionEvent) {
         rootTreeItem.children[0].AddChildren(TreeListVO("add1", "5", "add1", SimpleStringProperty("add1")))
+        rootCheckTreeItem.children[0].children[1].children.add(CheckBoxTreeItem(TreeTreeVO("8", "3", "8", true, null)))
     }
 
     fun treeTestAdd2(actionEvent: ActionEvent) {
@@ -418,6 +444,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
 
     fun treeTestUpt(actionEvent: ActionEvent) {
+        CustomTreeItem<Person>("111").children
+
         rootTreeItem.children[0].UpdateItem(TreeListVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
         val treeItem = treeView.GetItemByBusiId("add1")
         treeItem?.UpdateItem(TreeListVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
@@ -435,7 +463,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     fun chat(actionEvent: ActionEvent) {
-        EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
+        EventBus.publish(TextEvent(DemoId.CHAT.toString(), sendText.text))
     }
 
     fun taskAction() {
@@ -484,6 +512,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
     fun customTreeTestReplace(actionEvent: ActionEvent) {
         list[1] = Person(7,"7",false)
 
+    }
+
+    fun clearTreeCache(actionEvent: ActionEvent) {
+        treeView.ClearCache()
+        checkTreeView.ClearCache()
+        customTree.ClearCache()
     }
 
 
