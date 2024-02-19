@@ -141,6 +141,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
         }
         return indexStage!!
     }
+
     private fun targetIndex() {
         try {
             indexStage = indexStageGet.get()

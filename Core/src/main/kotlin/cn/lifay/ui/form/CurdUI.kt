@@ -32,9 +32,9 @@ import java.util.*
  *@Author lifay
  *@Date 2023/8/19 22:50
  **/
-abstract class CurdUI<T : Any,E : BaseTable<T>>(
+abstract class CurdUI<T : Any, E : BaseTable<T>>(
     title: String,
-    buildElements: CurdUI<T,E>.() -> Unit,
+    buildElements: CurdUI<T, E>.() -> Unit,
 ) : BaseView<VBox>() {
 
     private val stage = Stage().apply {
@@ -105,7 +105,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
 
     init {
 
-       // println("CurdUI init")
+        // println("CurdUI init")
         try {
             buildElements()
 
@@ -334,7 +334,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
 
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-      //  println("CurdUI initialize")
+        //  println("CurdUI initialize")
         super.initialize(p0, p1)
 
         //  initNotificationPane()
@@ -356,7 +356,7 @@ abstract class CurdUI<T : Any,E : BaseTable<T>>(
      * @param keyword 关键字
      * @return f-ObjectBaseTable s-关键字匹配逻辑
      */
-    abstract fun pageInit(keyword:String): Pair<EntitySequence<T, E>,((E) -> ColumnDeclaring<Boolean>)?>
+    abstract fun pageInit(keyword: String): Pair<EntitySequence<T, E>, ((E) -> ColumnDeclaring<Boolean>)?>
 
     /**
      * 保存数据函数

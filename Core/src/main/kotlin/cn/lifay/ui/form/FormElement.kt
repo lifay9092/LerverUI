@@ -40,19 +40,20 @@ abstract class FormElement<T : Any, R : Any>(
 
     //用户可自定义元素值为空时的填充值
     var fillValue: R? = null
-//    var disableFlag = SimpleBooleanProperty(_isDisable)
+
+    //    var disableFlag = SimpleBooleanProperty(_isDisable)
     fun init() {
-    //  println("$label FormElement init")
-    alignment = Pos.CENTER_LEFT
-    val l = Label(label).textFillColor("#606266")
-    l.padding = Insets(5.0, 10.0, 5.0, 10.0)
-    children.add(l)
-    padding = Insets(5.0, 10.0, 5.0, 10.0)
-    node = registerGraphic()
+        //  println("$label FormElement init")
+        alignment = Pos.CENTER_LEFT
+        val l = Label(label).textFillColor("#606266")
+        l.padding = Insets(5.0, 10.0, 5.0, 10.0)
+        children.add(l)
+        padding = Insets(5.0, 10.0, 5.0, 10.0)
+        node = registerGraphic()
 //        node.disableProperty().bind(disableFlag)
 //        disableFlag.value = _isDisable
-    children.add(node)
-}
+        children.add(node)
+    }
 
     /**
      *  注册输入值控件实例
@@ -262,7 +263,7 @@ abstract class FormElement<T : Any, R : Any>(
                 col.cellValueFactory = PropertyValueFactory(getPropName())
             }
         }
-       // println(col.toString())
+        // println(col.toString())
         return col
     }
 

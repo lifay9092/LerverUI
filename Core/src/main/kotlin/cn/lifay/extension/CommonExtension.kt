@@ -4,7 +4,7 @@ import cn.lifay.global.GlobalResource
 import java.io.File
 
 //转小写驼峰
-fun String.toCamelCase(symbol:Char = '_'):String{
+fun String.toCamelCase(symbol: Char = '_'): String {
 
     return if (this.contains(symbol)) {
         val length: Int = this.length
@@ -35,7 +35,7 @@ fun String.fileMainName(): String {
 
 fun String.fileExtName(): String {
     val srcFileName = this.substring(this.lastIndexOf(File.separator))
-    return srcFileName.substring(srcFileName.lastIndexOf(".") + 1,srcFileName.length)
+    return srcFileName.substring(srcFileName.lastIndexOf(".") + 1, srcFileName.length)
 }
 
 fun File.mainName(): String {
@@ -45,7 +45,7 @@ fun File.mainName(): String {
 
 fun File.extName(): String {
     val srcFileName = absolutePath.substring(absolutePath.lastIndexOf(File.separator))
-    return srcFileName.substring(srcFileName.lastIndexOf(".") + 1,srcFileName.length)
+    return srcFileName.substring(srcFileName.lastIndexOf(".") + 1, srcFileName.length)
 }
 
 fun File.notExistCreate(): File {

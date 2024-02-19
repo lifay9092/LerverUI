@@ -90,11 +90,11 @@ open class TableEditCell<T, R> : TableCell<T, R>() {
         }
         textField!!.setOnKeyReleased { var1x: KeyEvent ->
             if (var1x.code == KeyCode.ENTER) {
-             //   println("enter")
+                //   println("enter")
                 commitEdit(textField!!.text as R)
             }
             if (var1x.code == KeyCode.ESCAPE) {
-            //    println("esc")
+                //    println("esc")
                 cancelEdit()
                 var1x.consume()
             }

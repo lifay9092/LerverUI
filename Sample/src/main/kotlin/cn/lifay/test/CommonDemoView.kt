@@ -48,15 +48,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var rootPane = AnchorPane()
 
     @FXML
-    var treeView = TreeView<TreeListVO>()
+    var treeView = LerverTreeView<TreeListVO, String>()
 
     @FXML
-//    var customTree  = CustomTreeView<Person>() as TreeView<Person>
-    //  var customTree  = CustomTreeView<Person>()
-    var customTree = TestTreeViewKT<Person, Int>()
+    var customTree = LerverTreeView<Person, Int>()
 
     @FXML
-    var checkTreeView = TreeView<TreeTreeVO>()
+    var checkTreeView = LerverTreeView<TreeTreeVO, String>()
 //    val rootItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
     //  val testItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
 
@@ -111,13 +109,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
         val treeItem3 = TreeItem(TreeListVO("4", "1", "4", SimpleStringProperty("4")))
         treeItem2.children.add(treeItem3)
 
-        val test1 = TreeListVO("3", "2", "4", SimpleStringProperty("3"))
-        val test2 = TreeListVO("2", "1", "2", SimpleStringProperty("2"))
-        val test3 = TreeListVO("4", "1", "4", SimpleStringProperty("4"))
-
 
         rootTreeItem = TreeItem<TreeListVO>().apply {
-            value = TreeListVO("1", "", "4", SimpleStringProperty("1"))
+            value = TreeListVO("1", "", "左上1", SimpleStringProperty("1"))
             this.isExpanded = true
             addEventHandler(
                 TreeItem.valueChangedEvent(),
@@ -125,9 +119,11 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     println(it.newValue)
                 }
             )
-
-
         }
+
+        val test1 = TreeListVO("3", "2", "左上3", SimpleStringProperty("左上3"))
+        val test2 = TreeListVO("2", "1", "左上2", SimpleStringProperty("左上2"))
+        val test3 = TreeListVO("4", "1", "左上4", SimpleStringProperty("左上4"))
 
         // rootItemProperties.value = root
         // testItemProperties.value = treeItem2
@@ -136,7 +132,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             root = rootTreeItem
             isShowRoot = true
             RegisterByList(
-                TreeNodeListProp(TreeListVO::id, TreeListVO::parentId),
+                LerverTreeNodeListProp(TreeListVO::id, TreeListVO::parentId),
                 checkBox = false, init = true
             ) {
                 println("treeView initDataCall...")
@@ -174,7 +170,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     val selectedItem = this.selectionModel.selectedItem
                     selectedItem?.let {
                         val value = selectedItem.value
-                        if (selectedItem.CanLoadChildren()) {
+                        if (selectedItem.AllowLoadChildren()) {
                             asyncTask {
                                 val id = UUID.randomUUID().toString()
                                 selectedItem.AddChildren(
@@ -189,6 +185,16 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
+        keywordText.textProperty().addListener { observableValue, old, new ->
+            if (old == new) {
+                return@addListener
+            }
+            treeView.FilterTree {
+                new.isBlank() || (new.isNotBlank() && it.name.contains(new))
+            }
+        }
+
+        /*勾选树*/
         rootCheckTreeItem = CheckBoxTreeItem<TreeTreeVO>().apply {
             value = TreeTreeVO("0", "", "0", false, null)
             this.isExpanded = true
@@ -198,16 +204,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     println(it.newValue)
                 }
             )
-
-
         }
-
         checkTreeView.apply {
             root = rootCheckTreeItem
             isShowRoot = true
             cellFactory = CheckBoxTreeCell.forTreeView()
             RegisterByTree(
-                TreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
+                LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
                 true, true
             ) {
                 println("checkTreeView initDataCall...")
@@ -226,14 +229,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
-        keywordText.textProperty().addListener { observableValue, old, new ->
-            if (old == new) {
-                return@addListener
-            }
-            treeView.FilterTree<TreeListVO, String>(filterFunc = {
-                new.isBlank() || (new.isNotBlank() && it.name.contains(new))
-            })
-        }
         tableView.apply {
             isEditable = true
             columns.addAll(
@@ -278,7 +273,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
-        val customTreeItem = CustomCheckBoxTreeItem<Person>(Person(0,"根节点",false)).apply {
+        val customTreeItem = CheckBoxTreeItem(Person(0, "根节点", false)).apply {
             selectedProperty().addListener { observableValue, old, new ->
                 println("old:$old new:$new")
             }
@@ -305,26 +300,17 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     println("在索引 " + c.from + " 插入了元素: " + c.list[c.from])
                 } else if (c.wasRemoved()) {
                     println("在索引 " + c.from + " 删除了元素: " + c.removed)
-                }
-                else if (c.wasReplaced()) {
+                } else if (c.wasReplaced()) {
                     println("在索引 " + c.from + " wasReplaced了元素: ")
                 }
                 println(c.list)
-                val root = customTree.root
-                root.children.clear()
-                val items = c.list.map {
-                    CheckBoxTreeItem(it!!).apply {
-                        selectedProperty().addListener { observableValue, old, new ->
-                            println("old:$old new:$new")
-                        }
-                    }
-                }.toList()
-                root.children.addAll(items)
             }
         }
-        list.addAll(Person(1,"1",false),
-            Person(2,"2",false),
-            Person(3,"3",false))
+        list.addAll(
+            Person(1, "1", false),
+            Person(2, "2", false),
+            Person(3, "3", false)
+        )
 
         testTbBtn.graphic = FontIcon("mdal-adb")
             .customStyle(16, Color.RED)
@@ -346,6 +332,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
     }
+
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
     fun treeTest(actionEvent: ActionEvent) {
@@ -444,7 +431,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
 
     fun treeTestUpt(actionEvent: ActionEvent) {
-        CustomTreeItem<Person>("111").children
 
         rootTreeItem.children[0].UpdateItem(TreeListVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
         val treeItem = treeView.GetItemByBusiId("add1")
@@ -490,9 +476,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
 //        list.add(Person(5,"5",false))
         val id = UUID.randomUUID().toString()
         val datas = ArrayList<Person>()
-        for (i in 1..100){
+        for (i in 1..100) {
 
-            datas.add(Person(100 + i,"${id}_$i",false))
+            datas.add(Person(100 + i, "${id}_$i", false))
         }
         list.addAll(
             datas
@@ -510,14 +496,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     fun customTreeTestReplace(actionEvent: ActionEvent) {
-        list[1] = Person(7,"7",false)
+        list[1] = Person(7, "7", false)
 
     }
 
     fun clearTreeCache(actionEvent: ActionEvent) {
-        treeView.ClearCache()
-        checkTreeView.ClearCache()
-        customTree.ClearCache()
+
     }
 
 

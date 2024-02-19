@@ -43,7 +43,7 @@ abstract class DataFormUI<T : Any>(
     private var saveBtn: BaseButton<BaseFormUI<T>>
 
     init {
-     //   println("DataFormUI init isUpdate:${_isUpdate}")
+        //   println("DataFormUI init isUpdate:${_isUpdate}")
         if (_isUpdate) {
             saveBtn = BaseButton(Button("更新").stylePrimary().icon(Feather.EDIT)) {
                 updateFunc()

@@ -96,8 +96,8 @@ object EventBus {
             //println(eventFuncs?.size)
             eventFuncs?.forEach {
                 asyncTask {
-                   // println(it.reflect())
-                   it(event)
+                    // println(it.reflect())
+                    it(event)
                 }
             }
         }

@@ -1,4 +1,4 @@
-import cn.lifay.ui.tree.TestTreeViewKT
+import cn.lifay.ui.tree.LerverTreeView
 
 //package cn.lifay.ui.tree
 //
@@ -39,10 +39,7 @@ object TreeViewCache {
 
     /*数据缓存*/
     // treeItem的hascode=TreeViewId
-    val ITEM_TO_TREE_MAP = HashMap<Int, TestTreeViewKT<*,*>>()
-
-    // TreeViewId=treeItem的hascode数组
-    val TREE_TO_ITEM_MAP = HashMap<String, ArrayList<Int>>()
+    val ITEM_TO_TREE_MAP = HashMap<Int, LerverTreeView<*, *>>()
 
     // value业务ID=treeItem 辅助提供ID直接查询
 //    val ITEM_BUSI_TO_TREEITEM_MAP = HashMap<String, TreeItem<*>>()
@@ -50,7 +47,6 @@ object TreeViewCache {
 
     // TreeViewId=数据节点,用来缓存TreeItem数据和筛选后迅速还原,TreeView数据变更后进行刷新
 //    val TREE_DATA_NODE_LIST_MAP = HashMap<String, TempDataNode<*>>()
-
 
 
 }

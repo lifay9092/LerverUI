@@ -24,7 +24,7 @@ class DelegateProp<T : Any, R : Any>(
         val declaredField = obj!!::class.java.getDeclaredField(fieldName)
         declaredField.isAccessible = true
         val get = declaredField.get(obj)
-       // println("反射值:$get")
+        // println("反射值:$get")
         return get as R?
     }
 

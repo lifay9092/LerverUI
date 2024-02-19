@@ -95,6 +95,7 @@ class GlobeLog(
     }
 
 }
+
 object LerverLog {
 
     private lateinit var GLOBE_LOG: GlobeLog

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import cn.lifay.ui.tree.TestTreeViewKT?>
+<?import cn.lifay.ui.tree.LerverTreeView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -16,7 +16,7 @@
         </TableView>
         <Button fx:id="testTbBtn" layoutX="955.0" layoutY="455.0" mnemonicParsing="false" onAction="#tableText"
                 text="测试表格"/>
-        <TreeView fx:id="treeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0" />
+        <LerverTreeView fx:id="treeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0"/>
         <Button layoutX="885.0" layoutY="66.0" mnemonicParsing="false" onAction="#treeTest" text="测试树" />
         <Button layoutX="885.0" layoutY="98.0" mnemonicParsing="false" onAction="#treeTestAdd1" text="添加1" />
         <Button layoutX="885.0" layoutY="133.0" mnemonicParsing="false" onAction="#treeTestAdd2" text="添加2" />
@@ -40,9 +40,9 @@
         <Button fx:id="copyBtn" layoutX="42.0" layoutY="285.0" mnemonicParsing="false" onAction="#copyText"
                 text="复制文本">
         </Button>
-        <TreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0" />
+        <LerverTreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
         <Button layoutX="139.0" layoutY="110.0" mnemonicParsing="false" onAction="#curdTest" text="CURD"/>
-        <TestTreeViewKT fx:id="customTree" layoutX="24.0" layoutY="331.0" prefHeight="426.0" prefWidth="253.0"/>
+        <LerverTreeView fx:id="customTree" layoutX="24.0" layoutY="331.0" prefHeight="426.0" prefWidth="253.0"/>
         <Button layoutX="290.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestAdd" text="监听-添加"/>
         <Button layoutX="290.0" layoutY="444.0" mnemonicParsing="false" onAction="#customTreeTestUpt" text="监听-修改"/>
         <Button layoutX="379.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestDel" text="监听-删除"/>
