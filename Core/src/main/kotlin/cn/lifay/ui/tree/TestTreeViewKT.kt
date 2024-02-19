@@ -6,6 +6,7 @@ import cn.lifay.mq.event.DefaultEvent
 import javafx.scene.control.CheckBoxTreeItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import kotlin.reflect.KProperty1
 
 class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
     constructor()
@@ -15,7 +16,7 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
 
     var DATA_TYPE = DataType.LIST
     var TREE_NODE_LIST_PROP: TreeNodeListProp<T, P>? = null
-    var TREE_NODE_TREE_PROP: TreeNodeTreeProp<T, Collection<T>>? = null
+    var TREE_NODE_TREE_PROP: TreeNodeTreeProp<T, P>? = null
 
     var TREE_DATA_CALL: (() -> List<T>)? = null
     var TREE_IMG_CALL: ((TreeItem<T>) -> Unit)? = null
@@ -95,7 +96,6 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
         val datas = initDatas()
         //清除旧item的数据和缓存
         this.root.children.clear()
-        clearTreeItemMap(treeId)
 
         this.root.treeViewId = treeId
         //重载
@@ -103,8 +103,7 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
             initList(this.root as TreeItem, datas, filterFunc)
         } else {
             val childtren = datas.map {
-                val item = newTreeItem(treeId, it)
-                item.treeViewId = treeId
+                val item = newTreeItem( it)
                 initTree(item, filterFunc)
                 item
             }.filter {
@@ -124,34 +123,29 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
     /**
      * 过滤树,临时处理,节点数据不会被清理
      */
-    inline fun <reified V : Any, reified B : Any> TreeView<V>.FilterTree(
-        noinline filterFunc: ((V) -> Boolean)? = null
+    fun FilterTree(
+         filterFunc: ((T) -> Boolean)? = null
     ) {
         println("FilterTree")
         //根据缓存数据函数获取数据
-        val tempRootDataNode = TreeViewCache.TREE_DATA_NODE_LIST_MAP[treeId]
         //清除旧item的数据和缓存
         this.root.children.clear()
-        clearTreeItemMap(treeId)
         TreeViewCache.TREE_TO_BUSI_TO_MAP[this.treeId] = arrayListOf()
 
         this.root.treeViewId = treeId
-        val imgCall = TreeViewCache.TREE_IMG_CALL_MAP[treeId]
 
         //组织树数据
-        val idProp = when (TreeViewCache.TREE_DATE_TYPE_MAP[treeId]) {
-            TreeViewCache.DataType.LIST -> {
-                listProps<V, B>().first
+        val idProp = when (DATA_TYPE) {
+            DataType.LIST -> {
+                TREE_NODE_LIST_PROP!!.idProp
             }
-
             else -> {
-                treeProps<V, B>().first
+                TREE_NODE_TREE_PROP!!.idProp
             }
         }
-        val childtren = tempRootDataNode!!.children?.map {
-            val item = newTreeItem(treeId, it.entity as V)
-            item.treeViewId = treeId
-            initFilterTree(item, idProp, it.children, filterFunc, imgCall)
+        val childtren = TREE_ROOT_NODE_DATA.children?.map {
+            val item = newTreeItem(it.entity)
+            initFilterTree(item, idProp, it.children, filterFunc)
             item
         }?.filter {
             if (filterFunc == null || filterFunc(it.value)) {
@@ -166,6 +160,38 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
         this.root.children.addAll(childtren)
     }
 
+/**
+ * 将子元素列表添加到指定item下（递归）
+ */
+fun initFilterTree(
+    panTreeItem: TreeItem<T>,
+    idProp: KProperty1<T, P>,
+    tempDataNodeChildren: Collection<TempDataNode<T>>?,
+    filterFunc: ((T) -> Boolean)? = null
+) {
+    //获取子节点
+    if (tempDataNodeChildren != null) {
+        val newChildtren = tempDataNodeChildren.map { empDataNode ->
+            val item = newTreeItem(empDataNode.entity)
+            loadImg(item)
+            empDataNode.children?.let {
+                initFilterTree(item, idProp, it, filterFunc)
+            }
+            item.CacheBusiIdMap(idProp)
+            item
+        }.filter {
+            if (filterFunc == null || filterFunc(it.value)) {
+                return@filter true
+            }
+            it.children.isNotEmpty()
+        }
+        //添加子节点
+        if (newChildtren.isNotEmpty()) {
+            panTreeItem.children.addAll(newChildtren)
+        }
+    }
+}
+
     /**
      * 将子元素列表添加到指定item下（递归）
      */
@@ -179,8 +205,7 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
             .filter {
                 TREE_NODE_LIST_PROP!!.idProp.get(panTreeItem.value!!) == TREE_NODE_LIST_PROP!!.parentIdProp.get(it)
             }.map {
-                val item = newTreeItem(treeId, it)
-                item.treeViewId = treeId
+                val item = newTreeItem(it)
                 TREE_IMG_CALL?.let { it1 -> it1(item) }
 
                 initList(item, datas, filterFunc)
@@ -203,6 +228,9 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
             // panTreeItem.keywordStr = panTreeItem.value.toString()
         }
     }
+    fun loadImg(treeItem: TreeItem<*>){
+        TREE_IMG_CALL?.let { it(treeItem as TreeItem<T>) }
+    }
 
     /**
      * 将子元素列表添加到指定item下（递归）
@@ -215,8 +243,7 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
         val datas = TREE_NODE_TREE_PROP!!.childrenProp.get(panTreeItem.value)
         if (datas != null) {
             val childtren = datas.map {
-                val item = newTreeItem(treeId, it)
-                item.treeViewId = panTreeItem.treeViewId
+                val item = newTreeItem(it)
                 TREE_IMG_CALL?.let { it1 -> it1(item) }
 
                 initTree(item, filterFunc)
@@ -240,10 +267,16 @@ class TestTreeViewKT<T : Any, P : Any> : TreeView<T> {
      * 获取TreeItem实例，根据CheckBox标识返回,否则勾选框会失去联动效果
      */
     fun newTreeItem(it: T): TreeItem<T> {
-        if (TREE_CHECKBOX == true) {
-            return CheckBoxTreeItem(it)
+        return if (TREE_CHECKBOX == true) {
+            CheckBoxTreeItem(it).apply {
+                this.treeViewId = treeId
+                this.treeView = this@TestTreeViewKT
+            }
         } else {
-            return TreeItem(it)
+            TreeItem(it).apply {
+                this.treeViewId = treeId
+                this.treeView = this@TestTreeViewKT
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package cn.lifay.ui.tree
 
+import TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.EventBusId
 import cn.lifay.mq.event.DefaultEvent
@@ -56,20 +57,55 @@ enum class TreeBusId : EventBusId {
 
 }
 
+/**
+ * 获取 TreeItem 的自定义树id
+ */
+var <T> TreeItem<T>.treeViewId: String
+    get() {
+        return ITEM_TO_TREE_MAP[this.hashCode()]!!.treeId
+    }
+    set(value) {
+//        ITEM_TO_TREE_MAP[this.hashCode()] = value
+//        var ints = TREE_TO_ITEM_MAP[value]
+//        if (ints == null) {
+//            ints = arrayListOf()
+//        }
+//        ints.add(this.hashCode())
+//        TREE_TO_ITEM_MAP[value] = ints
+
+    }
+
+/**
+ * 获取 TreeItem 的自定义树id
+ */
+var <T> TreeItem<T>.treeView: TestTreeViewKT<*,*>
+    get() {
+        return ITEM_TO_TREE_MAP[this.hashCode()]!!
+    }
+    set(value) {
+        ITEM_TO_TREE_MAP[this.hashCode()] = value
+//        var ints = TREE_TO_ITEM_MAP[value]
+//        if (ints == null) {
+//            ints = arrayListOf()
+//        }
+//        ints.add(this.hashCode())
+//        TREE_TO_ITEM_MAP[value] = ints
+
+    }
 
 /**
  * 判断当前节点是否可以进行加载子节点操作
  * true 未指定leaf属性，或者leaf=false,并且children为空
  * false 指定了leaf并且leaf=true
  */
-fun <T : Any> CustomTreeItemBase<T>.CanLoadChildren(): Boolean {
+fun <T : Any> TreeItem<T>.CanLoadChildren(): Boolean {
     if (children.isNotEmpty()) {
         return false
     }
-    val leafProp = when (TreeViewCache.TREE_DATE_TYPE_MAP[this.treeViewId]) {
-        TreeViewCache.DataType.LIST -> TreeViewCache.TREE_NODE_LIST_PROP_MAP[this.treeViewId]!!.leafProp
-        TreeViewCache.DataType.TREE -> TreeViewCache.TREE_NODE_TREE_PROP_MAP[this.treeViewId]!!.leafProp
-        null -> TreeViewCache.TREE_NODE_LIST_PROP_MAP[this.treeViewId]!!.leafProp
+    val treeView = ITEM_TO_TREE_MAP[this.hashCode()]!!
+    val leafProp = when (treeView.DATA_TYPE) {
+        DataType.LIST -> treeView.TREE_NODE_LIST_PROP!!.leafProp
+        DataType.TREE -> treeView.TREE_NODE_TREE_PROP!!.leafProp
     }
     if (leafProp != null) {
         val isLeaf = (leafProp as KProperty1<T, Boolean>).get(this.value!!)
@@ -95,11 +131,13 @@ fun <T> TreeView<T>.ClearCache() {
 /**
  * 更新item下的子元素
  */
-fun <T : Any> CustomTreeItemBase<T>.UpdateChild(
+fun <T : Any> TreeItem<T>.UpdateChild(
     data: T
 ) {
-    if (TreeViewCache.TREE_DATE_TYPE_MAP[this.treeViewId] == TreeViewCache.DataType.LIST) {
-        val idProp = TreeViewCache.TREE_NODE_LIST_PROP_MAP[this.treeViewId]!!.idProp as KProperty1<T, *>
+    val treeView = ITEM_TO_TREE_MAP[this.hashCode()]!!
+    val dataType = treeView.DATA_TYPE
+    if (dataType == DataType.LIST) {
+        val idProp = treeView.TREE_NODE_LIST_PROP!!.idProp as KProperty1<T, *>
         for (child in children) {
             if (idProp.get(child.value) == idProp.get(data)) {
                 child.value = data
@@ -108,7 +146,7 @@ fun <T : Any> CustomTreeItemBase<T>.UpdateChild(
             }
         }
     } else {
-        val idProp = TreeViewCache.TREE_NODE_TREE_PROP_MAP[this.treeViewId]!!.idProp as KProperty1<T, *>
+        val idProp = treeView.TREE_NODE_TREE_PROP!!.idProp as KProperty1<T, *>
         for (child in children) {
             if (idProp.get(child.value) == idProp.get(data)) {
                 child.value = data
@@ -126,14 +164,14 @@ fun <T : Any> CustomTreeItemBase<T>.UpdateChild(
 /**
  * 为item添加子元素
  */
-fun <T> TreeItem<T>.AddChildren(
+fun <T : Any> TreeItem<T>.AddChildren(
     vararg datas: T
 ) {
-    val imgCall = TreeViewCache.TREE_IMG_CALL_MAP[this.treeViewId]
+    val treeView = ITEM_TO_TREE_MAP[this.hashCode()]!!
     for (data in datas) {
         //获取子节点
         val child = TreeItem(data)
-        imgCall?.let { it(child) }
+        treeView.loadImg(child)
         child.treeViewId = this.treeViewId
         child.CacheBusiIdMap()
         //添加子节点
@@ -150,11 +188,12 @@ fun <T> TreeItem<T>.AddChildren(
 fun <T> TreeItem<T>.AddChildrenList(
     datas: List<T>
 ) {
-    val imgCall = TreeViewCache.TREE_IMG_CALL_MAP[this.treeViewId]
+    val treeView = this.treeView
     for (data in datas) {
         //获取子节点
         val child = TreeItem(data)
-        imgCall?.let { it(child) }
+        treeView.loadImg(child)
+
         child.treeViewId = this.treeViewId
         child.CacheBusiIdMap()
         //添加子节点
@@ -172,8 +211,8 @@ fun <T> TreeItem<T>.UpdateItem(
     data: T
 ) {
     this.value = data
-    val imgCall = TreeViewCache.TREE_IMG_CALL_MAP[this.treeViewId]
-    imgCall?.let { it(this) }
+    val treeView = this.treeView
+    treeView.loadImg(this)
     CacheBusiIdMap()
 
     EventBus.publish(DefaultEvent("${TreeBusId.REFRESH_NODE_LIST}_${this.treeViewId}"))
