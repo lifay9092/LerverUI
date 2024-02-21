@@ -1,9 +1,9 @@
 package cn.lifay.ui.tree
 
-import TreeViewCache.ITEM_TO_TREE_MAP
 import cn.lifay.extension.asyncTask
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.BodyEvent
+import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import javafx.scene.control.CheckBoxTreeItem
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView

@@ -1,7 +1,5 @@
-import cn.lifay.ui.tree.LerverTreeView
+package cn.lifay.ui.tree
 
-//package cn.lifay.ui.tree
-//
 //import cn.lifay.extension.asyncTask
 //import cn.lifay.mq.EventBus
 //import cn.lifay.mq.event.DefaultEvent
