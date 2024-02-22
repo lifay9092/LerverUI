@@ -52,15 +52,12 @@ class LerverTreeTempNode<T : Any>(
 
 enum class LerverTreeBusId : EventBusId {
 
-    REFRESH_NODE_LIST,
-
     ITEM_UPT,
     ITEM_UPT_CHILD,
 
     ITEM_ADD_LIST,
 
     ITEM_DEL,
-
 }
 
 /* TreeItem操作事件实体类*/
@@ -254,7 +251,7 @@ fun <T : Any> TreeItem<T>.DeleteChildItem(
         EventBus.publish(
             BodyEvent(
                 "${LerverTreeBusId.ITEM_DEL}_${this.treeViewId}",
-                LerverTreeItemEventCodeBody(items.map { hashCode() })
+                LerverTreeItemEventCodeBody(items.map { it.hashCode() })
             )
         )
     }

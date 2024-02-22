@@ -38,20 +38,28 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     val BUSI_ID_LIST = ArrayList<String>()
 
     // TreeViewId=数据节点,用来缓存TreeItem数据和筛选后迅速还原,TreeView数据变更后进行刷新
-    lateinit var TREE_ROOT_NODE_DATA: LerverTreeTempNode<T>
+    var TREE_ROOT_NODE_DATA: LerverTreeTempNode<T>? = null
 
     private var IS_REGISTER_EVENT = false
 
-    init {
-    }
-
-    val lc = """
-        通过注册方法注入必要参数
-        1.初始化数据：通过注入函数，可随时加载，用于展示和刷新树 -- 缓存函数，随时调用
-        2.数据过滤：注入过滤函数，对当前的树进行过滤 -- 需要对原数据提供备份和还原功能
-        3.
-    """.trimIndent()
-
+    /**
+     * 通过集合列表类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
+     * @param idProp id属性引用
+     * @param parentProp parentId属性引用
+     * @param init 是否注册后立即初始化
+     * @param checkBox 构建勾选框的树
+     * @param imgCall 获取树元素的图标
+     * imgCall = {
+     *                 if ("GROUP" == it.value.type) {
+     *                     it.graphic = FontIcon(Feather.FOLDER)
+     *                 }
+     *             }
+     * @param getInitDataCall 获取初始化数据的回调函数
+     *        val test1 = TreeListVO("3", "2", "4", SimpleStringProperty("3"))
+     *        val test2 = TreeListVO("2", "1", "2", SimpleStringProperty("2"))
+     *        val test3 = TreeListVO("4", "1", "4", SimpleStringProperty("4"))
+     *        listOf(test1,test2,test3)
+     */
     fun RegisterByList(
         treeNodeTreeProp: LerverTreeNodeListProp<T, P>,
         checkBox: Boolean = false,
@@ -77,6 +85,32 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
         }
     }
 
+    /**
+     * 通过树类型嵌套的数据源，注册当前TreeView视图,id和children属性、获取数据的函数
+     * @param idProp id属性引用
+     * @param childrenProp children属性引用
+     * @param init 是否注册后立即初始化
+     * @param checkBox 构建勾选框的树
+     * @param imgCall 获取树元素的图标
+     * imgCall = {
+     *                 if ("GROUP" == it.value.type) {
+     *                     it.graphic = FontIcon(Feather.FOLDER)
+     *                 }
+     *             }
+     * @param getInitDataCall 获取初始化数据的回调函数
+     * listOf(
+     *                     TreeTreeVO(
+     *                         "1", "0", "1", arrayListOf(
+     *                             TreeTreeVO(
+     *                                 "2", "1", "2", arrayListOf(
+     *                                     TreeTreeVO("4", "2", "4", null)
+     *                                 )
+     *                             ),
+     *                             TreeTreeVO("3", "1", "3", null)
+     *                         )
+     *                     )
+     *                 )
+     */
     fun RegisterByTree(
         treeNodeTreeProp: LerverTreeNodeTreeProp<T, P>,
         checkBox: Boolean = false,
@@ -113,6 +147,14 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
         return TREE_DATA_CALL!!.invoke()
     }
 
+    /**
+     * 重新传入初始化数据的函数
+     */
+    fun ResetInitDataCall(
+         getInitDataCall: () -> List<T>
+    ) {
+        TREE_DATA_CALL = getInitDataCall
+    }
     /**
      * 重新加载树,相当于新建树节点,数据将被全部清理！！,可重新传入初始化数据的函数
      */
@@ -163,9 +205,39 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
                     it.body?.let {
                         val itemEventListBody = it as LerverTreeItemEventListBody<T>
                         addChildren(itemEventListBody.code, itemEventListBody.list)
+                        refreshNodeList()
                     }
                 }
-
+                EventBus.subscribe(
+                    "${LerverTreeBusId.ITEM_UPT}_${treeId}",
+                    BodyEvent::class
+                ) {
+                    it.body?.let {
+                        val itemEventValueBody = it as LerverTreeItemEventValueBody<T>
+                        updateItem(itemEventValueBody.code, itemEventValueBody.value)
+                        refreshNodeList()
+                    }
+                }
+                EventBus.subscribe(
+                    "${LerverTreeBusId.ITEM_UPT_CHILD}_${treeId}",
+                    BodyEvent::class
+                ) {
+                    it.body?.let {
+                        val itemEventValueBody = it as LerverTreeItemEventValueBody<T>
+                        updateChild(itemEventValueBody.code, itemEventValueBody.value)
+                        refreshNodeList()
+                    }
+                }
+                EventBus.subscribe(
+                    "${LerverTreeBusId.ITEM_DEL}_${treeId}",
+                    BodyEvent::class
+                ) {
+                    it.body?.let {
+                        val itemEventCodeBody = it as LerverTreeItemEventCodeBody
+                        delete(itemEventCodeBody.codes)
+                        refreshNodeList()
+                    }
+                }
                 IS_REGISTER_EVENT = true
             }
         }
@@ -178,7 +250,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     fun FilterTree(
         filterFunc: ((T) -> Boolean)? = null
     ) {
-        println("FilterTree")
+//        println("FilterTree")
         //根据缓存数据函数获取数据
         //清除旧item的数据和缓存
         this.root.children.clear()
@@ -194,7 +266,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
                 TREE_NODE_TREE_PROP!!.idProp
             }
         }
-        val childtren = TREE_ROOT_NODE_DATA.children?.map {
+        val childtren = TREE_ROOT_NODE_DATA!!.children?.map {
             val item = createTreeItem(it.entity)
             initFilterTree(item, idProp, it.children, filterFunc)
             item
@@ -332,7 +404,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
      */
     private fun initTreeItem(treeItem: TreeItem<T>) {
         val code = treeItem.hashCode()
-        println("initTreeItem code:$code ${treeItem}")
+//        println("initTreeItem code:$code ${treeItem}")
         ITEM_CODE_TO_TREEITEM_MAP[code] = treeItem
         ITEM_CODE_LIST.add(code)
 
@@ -386,14 +458,14 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
      */
     private fun refreshNodeList() {
         asyncTask {
-            println("正在刷新节点数据集:${treeId}")
+//            println("正在刷新节点数据集:${treeId}")
             val rootDataNode = LerverTreeTempNode(root.value)
             rootDataNode.children = root.children.map {
                 treeItemToNode(it)
             }.toList()
             TREE_ROOT_NODE_DATA = rootDataNode
 
-            println(rootDataNode)
+//            println(rootDataNode)
         }
     }
 
@@ -417,7 +489,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
         code: Int,
         datas: List<T>
     ) {
-        println("addChildren code:$code")
+//        println("addChildren code:$code")
         val treeItem = ITEM_CODE_TO_TREEITEM_MAP[code]!!
         for (data in datas) {
             //获取子节点
@@ -472,32 +544,45 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     }
 
     /**
-     * 删除当前item元素
+     * 删除item元素
      */
     private fun delete(
         codes: List<Int>,
     ) {
+        val idProp =if (DATA_TYPE == LerverTreeDataType.LIST) TREE_NODE_LIST_PROP!!.idProp else TREE_NODE_TREE_PROP!!.idProp
+        val list = ArrayList<TreeItem<T>>()
         for (code in codes) {
             ITEM_CODE_TO_TREEITEM_MAP[code]?.let { item ->
-                item.parent?.children?.let {
-                    val code = item.hashCode()
+                //递归获取所有code和业务ID
+                getDeepChildItems(item,list)
+                list.add(item)
 
-                    val idProp =
-                        if (DATA_TYPE == LerverTreeDataType.LIST) TREE_NODE_LIST_PROP!!.idProp else TREE_NODE_TREE_PROP!!.idProp
-                    val busyId = idProp.get(item.value).toString()
-
-                    it.remove(item)
-
-                    ITEM_CODE_LIST.remove(code)
-                    ITEM_CODE_TO_TREEITEM_MAP.remove(code)
-                    ITEM_TO_TREE_MAP.remove(code)
-
-                    ITEM_BUSI_TO_TREEITEM_MAP.remove(busyId)
-                    BUSI_ID_LIST.remove(busyId)
-
-                }
             }
+        }
+
+        list.forEach { item ->
+            val code = item.hashCode()
+            val busyId = idProp.get(item.value).toString()
+
+            ITEM_CODE_LIST.remove(code)
+            ITEM_CODE_TO_TREEITEM_MAP.remove(code)
+            ITEM_TO_TREE_MAP.remove(code)
+
+            ITEM_BUSI_TO_TREEITEM_MAP.remove(busyId)
+            BUSI_ID_LIST.remove(busyId)
+
+            item.parent?.children?.remove(item)
+//            println("删除了:$item")
         }
     }
 
+
+    private fun getDeepChildItems(treeItem: TreeItem<T>,list : ArrayList<TreeItem<T>>) {
+        treeItem.children?.let { children ->
+            for (child in children) {
+                getDeepChildItems(child,list)
+                list.add(child)
+            }
+        }
+    }
 }
