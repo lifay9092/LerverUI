@@ -139,7 +139,7 @@ fun <T : Any> TreeItem<T>.AddChildren(
         BodyEvent(
             "${LerverTreeBusId.ITEM_ADD_LIST}_${this.treeViewId}",
             LerverTreeItemEventListBody(hashCode(), datas.toList())
-        )
+        ),false
     )
 }
 
@@ -153,7 +153,7 @@ fun <T : Any> TreeItem<T>.AddChildrenList(
         BodyEvent(
             "${LerverTreeBusId.ITEM_ADD_LIST}_${this.treeViewId}",
             LerverTreeItemEventListBody(hashCode(), datas)
-        )
+        ),false
     )
 }
 
@@ -167,7 +167,7 @@ fun <T : Any> TreeItem<T>.UpdateItem(
         BodyEvent(
             "${LerverTreeBusId.ITEM_UPT}_${this.treeViewId}",
             LerverTreeItemEventValueBody(hashCode(), data)
-        )
+        ),false
     )
 }
 
@@ -221,7 +221,7 @@ fun <T : Any> TreeItem<T>.UpdateChild(
         BodyEvent(
             "${LerverTreeBusId.ITEM_UPT_CHILD}_${this.treeViewId}",
             LerverTreeItemEventValueBody(hashCode(), data)
-        )
+        ),false
     )
 }
 
@@ -233,7 +233,7 @@ fun <T : Any> TreeItem<T>.DeleteThis() {
         BodyEvent(
             "${LerverTreeBusId.ITEM_DEL}_${this.treeViewId}",
             LerverTreeItemEventCodeBody(listOf(hashCode()))
-        )
+        ),false
     )
 }
 
@@ -252,7 +252,7 @@ fun <T : Any> TreeItem<T>.DeleteChildItem(
             BodyEvent(
                 "${LerverTreeBusId.ITEM_DEL}_${this.treeViewId}",
                 LerverTreeItemEventCodeBody(items.map { it.hashCode() })
-            )
+            ),false
         )
     }
 }

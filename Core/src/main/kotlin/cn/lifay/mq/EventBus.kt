@@ -84,7 +84,9 @@ object EventBus {
      * @param event 事件体
      * @author lifay
      */
-    fun <T : Event> publish(event: T) {
+    fun <T : Event> publish(
+        event: T,
+        isAsync :Boolean = true) {
         Objects.requireNonNull(event)
         val idStr = event.id
         if (SUBSCRIBERS_TYPE.containsKey(idStr)) {
@@ -95,8 +97,12 @@ object EventBus {
             val eventFuncs = SUBSCRIBERS_FUNC[idStr]
             //println(eventFuncs?.size)
             eventFuncs?.forEach {
-                asyncTask {
-                    // println(it.reflect())
+                if (isAsync) {
+                    asyncTask {
+                        // println(it.reflect())
+                        it(event)
+                    }
+                } else {
                     it(event)
                 }
             }

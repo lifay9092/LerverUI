@@ -6,7 +6,7 @@
 
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Parent</artifactId>
-    <version>1.30-SNAPSHOT</version>
+    <version>1.33-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>Core</module>
@@ -114,8 +114,6 @@
     <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
 
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

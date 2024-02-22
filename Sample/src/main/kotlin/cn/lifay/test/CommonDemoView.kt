@@ -142,41 +142,100 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 if (it.button == MouseButton.SECONDARY) {
                     //右键
                     contextMenu = ContextMenu().apply {
-                        items.add(MenuItem("根节点下添加").apply {
+                        items.add(MenuItem("添加子节点").apply {
                             setOnAction {
+                                println("添加子节点")
                                 val selectedItem = treeView.selectionModel.selectedItem
+                                val id1 = UUID.randomUUID().toString()
+                                val id2 = UUID.randomUUID().toString()
                                 selectedItem.AddChildren(
                                     TreeListVO(
-                                        "根节点下节点1",
-                                        "6",
-                                        "根节点下节点1",
-                                        SimpleStringProperty("根节点下节点1")
+                                        id1,
+                                        selectedItem.value.id,
+                                        id1,
+                                        SimpleStringProperty(id1)
                                     )
                                 )
                                 selectedItem.AddChildrenList(
                                     listOf(
                                         TreeListVO(
-                                            "根节点下节点2",
-                                            "6",
-                                            "根节点下节点2",
-                                            SimpleStringProperty("根节点下节点2")
+                                            id2,
+                                            selectedItem.value.id,
+                                            id2,
+                                            SimpleStringProperty(id2)
                                         )
                                     )
                                 )
                             }
                         })
+                        items.add(MenuItem("更新节点").apply {
+                            setOnAction {
+                                println("更新节点")
+                                val selectedItem = treeView.selectionModel.selectedItem
+                                val id = UUID.randomUUID().toString()
+                                selectedItem.UpdateItem(
+                                    TreeListVO(
+                                        id,
+                                        selectedItem.value.parentId,
+                                        id,
+                                        SimpleStringProperty(id)
+                                    )
+                                )
+                            }
+                        })
+                        items.add(MenuItem("根据主键更新子节点").apply {
+                            setOnAction {
+                                println("根据主键更新子节点")
+                                TextInputDialog().apply {
+                                    headerText = "输入主键"
+                                    contentText = null
+                                    setOnCloseRequest {
+                                        println(editor.text)
+                                        val selectedItem = treeView.selectionModel.selectedItem
+                                        if (selectedItem.children.isNotEmpty()) {
+                                            selectedItem.UpdateChild(
+                                                TreeListVO(
+                                                    editor.text,
+                                                    selectedItem.value.id,
+                                                    "${editor.text}_修改了",
+                                                    SimpleStringProperty(editor.text)
+                                                )
+                                            )
+                                        }
+                                    }
+                                    show()
+                                }
+                            }
+                        })
+                        items.add(MenuItem("删除节点").apply {
+                            this.setOnAction {
+                                println("删除节点")
+                                val selectedItem = treeView.selectionModel.selectedItem
+                                selectedItem.DeleteThis()
+                            }
+                        })
+                        items.add(MenuItem("删除子节点").apply {
+                            this.setOnAction {
+                                println("删除子节点")
+                                val selectedItem = treeView.selectionModel.selectedItem
+                                if (selectedItem.children.isNotEmpty()) {
+                                    selectedItem.DeleteChildItem { true }
+                                }
+                            }
+                        })
+
                     }
                 } else if (it.clickCount == 2) {
                     val selectedItem = this.selectionModel.selectedItem
                     selectedItem?.let {
                         val value = selectedItem.value
                         if (selectedItem.AllowLoadChildren()) {
-                            asyncTask {
-                                val id = UUID.randomUUID().toString()
-                                selectedItem.AddChildren(
-                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
-                                )
-                            }
+//                            asyncTask {
+//                                val id = UUID.randomUUID().toString()
+//                                selectedItem.AddChildren(
+//                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
+//                                )
+//                            }
                         }
                     }
 
@@ -281,6 +340,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         customTree.apply {
             root = customTreeItem
             cellFactory = CheckBoxTreeCell.forTreeView()
+
         }
 
         /*测试*/
