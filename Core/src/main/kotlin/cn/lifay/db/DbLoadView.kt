@@ -60,6 +60,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
         prefWidth = 750.0
 
         children.addAll(textArea, progressBarPane, HBox(10.0).apply {
+            setMargin(this, Insets(0.0, 0.0, 0.0, 20.0))
             children.addAll(checkBox, targetBtn)
         })
         println("autoTarget:$autoTarget")

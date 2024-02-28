@@ -16,6 +16,10 @@ data class UserData(
     var type: SelectTypeEnum?,
     var child: Boolean,
     var sex: String,
+    var s1: String = "s1",
+    var s2: String = "s2",
+    var s3: String = "s3",
+    var s4: String = "s4",
 ) {
 
     override fun toString(): String {

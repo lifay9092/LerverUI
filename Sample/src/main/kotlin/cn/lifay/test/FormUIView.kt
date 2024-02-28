@@ -46,16 +46,29 @@ class FormUIView : Initializable{
 
             //定义和添加元素
             val nameElement =
-                TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值") {
+                TextElement("名称1111111:", UserData::name, isTextArea = true, primary = false, initValue = "初始值") {
                     isDisable = true
                     isEditable = false
                 }
             addElements(
                 TextElement("ID:", UserData::id, true) {},
                 nameElement,
-                SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList()),
+                SelectElement("类型2222222:", UserData::type, SelectTypeEnum.values().toList()),
                 CheckElement("是否未成年:", UserData::child),
-                RadioElement("性别:", UserData::sex, listOf("男", "女"))
+                RadioElement("性别222222:", UserData::sex, listOf("男", "女")),
+//                TextElement("S1名称1111111:", UserData::s1) {
+//                    isEditable = false
+//                },
+//                TextElement("S2名称1111111:", UserData::s2) {
+//                    isEditable = false
+//                },
+//                TextElement("S3名称1111111:", UserData::s3) {
+//                    isEditable = false
+//                },
+//                TextElement("S4名称1111111:", UserData::s4) {
+//                    isEditable = false
+//                },
+
             )
 
             //添加按钮和操作

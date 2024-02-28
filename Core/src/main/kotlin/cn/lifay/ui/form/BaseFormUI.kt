@@ -153,7 +153,8 @@ open class BaseFormUI<T : Any>(
      */
     private fun uiInit() {
         this.root.apply {
-            prefWidth = GlobalResource.FormWidth()
+//            prefWidth = 1000.0
+//            prefWidth = GlobalResource.FormWidth()
 //            prefHeight = 120.0 * elements.size
         }
         stage.initModality(Modality.APPLICATION_MODAL)

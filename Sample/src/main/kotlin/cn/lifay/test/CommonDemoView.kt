@@ -230,12 +230,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     selectedItem?.let {
                         val value = selectedItem.value
                         if (selectedItem.AllowLoadChildren()) {
-//                            asyncTask {
-//                                val id = UUID.randomUUID().toString()
-//                                selectedItem.AddChildren(
-//                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
-//                                )
-//                            }
+                            asyncTask {
+                                val id = UUID.randomUUID().toString()
+                                selectedItem.AddChildren(
+                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
+                                )
+                            }
                         }
                     }
 
@@ -270,7 +270,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             cellFactory = CheckBoxTreeCell.forTreeView()
             RegisterByTree(
                 LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
-                true, true
+                false, true
             ) {
                 println("checkTreeView initDataCall...")
                 listOf(
