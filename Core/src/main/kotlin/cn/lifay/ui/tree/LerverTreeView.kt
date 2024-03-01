@@ -161,7 +161,6 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     fun RefreshTree(
         filterFunc: ((T) -> Boolean)? = null
     ) {
-        asyncTask {
             //println("RefreshTree")
 
             //根据初始化数据函数获取数据
@@ -240,7 +239,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
                 }
                 IS_REGISTER_EVENT = true
             }
-        }
+
     }
 
 
