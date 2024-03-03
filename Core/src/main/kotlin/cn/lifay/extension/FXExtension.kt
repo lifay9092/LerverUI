@@ -20,6 +20,7 @@ import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
 import java.io.File
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -37,22 +38,18 @@ fun checkParam(name: String, value: Any?): Boolean {
     return true
 }
 
-
 /**
  * 异步执行耗时操作
  * @author lifay
  * @return
  */
 inline fun asyncTask(
+    context: CoroutineContext = Dispatchers.Default,
     crossinline block: () -> Unit
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        try {
-            //执行任务
-            block()
-        } catch (e: LerverUIException) {
-            e.printStackTrace()
-        }
+): Job {
+    return CoroutineScope(context).launch {
+        //执行任务
+        block()
     }
 }
 
