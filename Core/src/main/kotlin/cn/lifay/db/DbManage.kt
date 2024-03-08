@@ -60,7 +60,7 @@ object DbManage {
             var dbEntity: DbEntity? = null
             val defaultDbPath = GlobalResource.USER_DIR + DB_NAME
             //获取db配置文件
-            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.config"
+            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.properties"
             val lerverConfigFile = File(lerverConfigPath)
             if (!lerverConfigFile.exists()) {
                 val dbConfigPath = "${GlobalResource.USER_DIR}db.config"
@@ -83,7 +83,7 @@ object DbManage {
                     }
                     GlobalConfig.WriteDbConfig(dbEntity!!)
                 } else {
-                    output("lerver.config 不存在...")
+                    output("lerver.properties 不存在...")
                     //配置数据库连接文件:lerver.config
                     val jdbcUrl = "jdbc:sqlite:${defaultDbPath}".replace("\\", "/")
                     dbEntity = DbEntity(jdbcUrl, "", "")

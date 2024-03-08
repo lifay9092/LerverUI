@@ -35,7 +35,7 @@ object GlobalConfig {
         return if (CONFIG_MAP.containsKey(key)) {
             CONFIG_MAP[key]!!
         } else {
-            ""
+            defaultValue
         }
     }
 

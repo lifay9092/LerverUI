@@ -80,7 +80,8 @@ data class LerverTreeItemEventListBody<T>(
  */
 var <T> TreeItem<T>.treeViewId: String
     get() {
-        return ITEM_TO_TREE_MAP[this.hashCode()]!!.treeId
+        //println(this.hashCode())
+        return treeView.treeId
     }
     set(value) {
 //        ITEM_TO_TREE_MAP[this.hashCode()] = value
@@ -101,6 +102,7 @@ var <T> TreeItem<T>.treeView: LerverTreeView<*, *>
         return ITEM_TO_TREE_MAP[this.hashCode()]!!
     }
     set(value) {
+//        println("${this.hashCode()} set了 treeId:${value.id}")
         ITEM_TO_TREE_MAP[this.hashCode()] = value
     }
 

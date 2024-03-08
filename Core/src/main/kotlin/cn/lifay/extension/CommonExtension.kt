@@ -1,6 +1,8 @@
 package cn.lifay.extension
 
 import cn.lifay.global.GlobalResource
+import cn.lifay.logutil.LerverLog
+import cn.lifay.logutil.LogLevelEnum
 import java.io.File
 
 //转小写驼峰
@@ -56,6 +58,54 @@ fun File.notExistCreate(): File {
     return this
 }
 
+fun formatTime(ms: Long): String {
+    if (ms == 0.toLong()) {
+        return "0毫秒"
+    }
+    val ss = 1000
+    val mi = ss * 60
+    val hh = mi * 60
+    val dd = hh * 24
+    val day = ms / dd
+    val hour = (ms - day * dd) / hh
+    val minute = (ms - day * dd - hour * hh) / mi
+    val second = (ms - day * dd - hour * hh - minute * mi) / ss
+    val milliSecond = ms - day * dd - hour * hh - minute * mi - second * ss
+    val sb = StringBuffer()
+    if (day > 0) {
+        sb.append(day.toString() + "天")
+    }
+    if (hour > 0) {
+        sb.append(hour.toString() + "小时")
+    }
+    if (minute > 0) {
+        sb.append(minute.toString() + "分")
+    }
+    if (second > 0) {
+        sb.append(second.toString() + "秒")
+    }
+    if (milliSecond > 0) {
+        sb.append(milliSecond.toString() + "毫秒")
+    }
+    return sb.toString()
+}
+
+fun <T : Any> execTimeLogNotNull(head: String, logLevelEnum: LogLevelEnum = LogLevelEnum.DEBUG, block: () -> T): T {
+    val old = System.currentTimeMillis()
+    val result = block()
+
+    LerverLog.log("[${head}] 耗时: ${formatTime(System.currentTimeMillis() - old)}", logLevelEnum)
+    return result
+}
+
+fun <T : Any> execTimeLog(head: String, logLevelEnum: LogLevelEnum = LogLevelEnum.DEBUG, block: () -> T?): T? {
+    val old = System.currentTimeMillis()
+    val result = block()
+
+    LerverLog.log("[${head}] 耗时: ${formatTime(System.currentTimeMillis() - old)}", logLevelEnum)
+    return result
+}
+
 fun main() {
     val testFilePath = GlobalResource.USER_DIR + "pom.xml"
     val testFile = File(testFilePath)
@@ -66,5 +116,5 @@ fun main() {
     println("fileExtName: ${testFilePath.fileExtName()}")
     println("extName: ${testFile.extName()}")
 
-
+    println(formatTime(4535345))
 }

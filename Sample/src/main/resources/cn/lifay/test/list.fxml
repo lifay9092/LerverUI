@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-
-
-<?import javafx.scene.control.TableView?>
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.ListViewView">
+<AnchorPane fx:id="rootPane" prefHeight="702.0" prefWidth="732.0" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.ListViewView">
    <children>
-      <ListView fx:id="dataList" layoutX="167.0" layoutY="113.0" prefHeight="200.0" prefWidth="200.0" />
-      <TableView fx:id="tableList" layoutX="167.0" layoutY="313.0" prefHeight="200.0" prefWidth="200.0" />
+      <ListView fx:id="dataList" layoutX="21.0" layoutY="26.0" prefHeight="200.0" prefWidth="549.0"/>
+      <TableView fx:id="tableList" layoutX="21.0" layoutY="257.0" prefHeight="405.0" prefWidth="549.0"/>
+      <Button layoutX="612.0" layoutY="257.0" mnemonicParsing="false" text="添加测试" onAction="#addTest"/>
+      <Button layoutX="612.0" layoutY="299.0" mnemonicParsing="false" text="修改测试" onAction="#uptTest"/>
+      <Button layoutX="612.0" layoutY="339.0" mnemonicParsing="false" text="删除测试" onAction="#delTest"/>
    </children>
 </AnchorPane>

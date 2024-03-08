@@ -11,6 +11,7 @@ import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.image.Image
 import javafx.scene.input.*
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -405,7 +406,6 @@ inline fun alertDetail(
     isExpanded: Boolean = false,
     vararg buttonTypes: ButtonType?
 ): Optional<ButtonType> {
-
     val alert = Alert(alertType, head, *buttonTypes).apply {
         this.title = title
         dialogPane.expandableContent = VBox().apply {
@@ -463,4 +463,43 @@ fun copyToClipboard(files: MutableList<File>) {
     val clipboardContent = ClipboardContent()
     clipboardContent.putFiles(files)
     clipboard.setContent(clipboardContent)
+}
+
+/**
+ * 递归地获取树状集合中所有子节点（children）中符合某个条件的所有数据，使用深度优先搜索（DFS）遍历整个树
+ */
+fun <T> findMatchingTreeItemChildren(node: TreeItem<T>, condition: (T) -> Boolean): List<TreeItem<T>> {
+    // 基准情况：如果节点没有子节点，返回一个空列表
+    if (node.children.isEmpty()) return emptyList()
+
+    // 递归情况：先查找当前节点的子节点中符合条件的，然后再递归查找所有子节点的子节点
+    return node.children.filter { condition.invoke(it.value) } +
+            node.children.flatMap { findMatchingTreeItemChildren(it, condition) }
+}
+
+
+/**
+ * 生成倒排旋转文字
+ * rowSize = 每行的文字数量
+ */
+fun markLeftTabGroup(text: String, rowSize: Int): HBox {
+    val split = text.toCharArray().toList()
+    val textList = split.chunked(rowSize)
+
+    //组装
+    val hBox = HBox()
+    val vBox = VBox()
+    for ((index, chars) in textList.withIndex()) {
+        val label = Label(chars.joinToString("")).apply {
+            styleClass.addAll(
+                Styles.TEXT_BOLD,
+                Styles.TEXT_MUTED
+            )
+        }
+        vBox.children.add(label)
+    }
+    hBox.children.addAll(
+        vBox
+    )
+    return hBox
 }

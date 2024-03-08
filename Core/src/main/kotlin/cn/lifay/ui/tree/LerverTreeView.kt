@@ -9,6 +9,10 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import kotlin.reflect.KProperty1
 
+/**
+ * T = 实体类的类型
+ * P = 实体类中ID、PARENT_ID属性的类型
+ */
 class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     constructor()
     constructor(treeItem: TreeItem<T>?) : super(treeItem)
@@ -77,12 +81,18 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
 
         TREE_CHECKBOX = checkBox
 
+
         imgCall?.let {
             TREE_IMG_CALL = it
         }
         if (init) {
             RefreshTree()
         }
+        //添加到缓存
+        this.root.treeViewId = treeId
+        this.root.treeView = this
+        initTreeItem(this.root)
+
     }
 
     /**
@@ -122,8 +132,6 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
         if (TREE_DATA_CALL != null) {
             throw Exception("TreeView已经注册过,请勿重复注册")
         }
-        //添加到缓存
-        this.root.treeViewId = treeId
 
         DATA_TYPE = LerverTreeDataType.TREE
         TREE_NODE_TREE_PROP = treeNodeTreeProp
@@ -134,10 +142,13 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
         imgCall?.let {
             TREE_IMG_CALL = it
         }
-
         if (init) {
             RefreshTree()
         }
+        //添加到缓存
+        this.root.treeViewId = treeId
+        this.root.treeView = this
+        initTreeItem(this.root)
     }
 
     /**
@@ -454,13 +465,17 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     /*
         刷新缓存节点数据
      */
+    @Synchronized
     private fun refreshNodeList() {
         asyncTask {
-//            println("正在刷新节点数据集:${treeId}")
-            val rootDataNode = LerverTreeTempNode(root.value)
-            rootDataNode.children = root.children.map {
-                treeItemToNode(it)
-            }.toList()
+            // println("正在刷新节点数据集:${treeId}")
+//            val rootDataNode = LerverTreeTempNode(root.value)
+//            val newChildren = root.children.map {
+//                treeItemToNode(it)
+//            }.toList()
+//            rootDataNode.children = newChildren
+//
+            val rootDataNode = copyDataToDestination(root)
             TREE_ROOT_NODE_DATA = rootDataNode
 
 //            println(rootDataNode)
@@ -473,13 +488,48 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     private fun treeItemToNode(treeItem: TreeItem<T>): LerverTreeTempNode<T> {
         val dataNode = LerverTreeTempNode(treeItem.value)
         if (treeItem.children.isNotEmpty()) {
-            dataNode.children = treeItem.children.map {
+            val newChildren = treeItem.children.map {
                 treeItemToNode(it)
             }.toList()
+            dataNode.children = newChildren
         }
         return dataNode
     }
 
+    fun copyDataToDestination(source: TreeItem<T>): LerverTreeTempNode<T> {
+        val destinationChildren = source.children.map { copyDataToDestination(it) }
+        return LerverTreeTempNode(source.value, destinationChildren)
+    }
+
+//
+//    private fun refreshNodeList() {
+//        asyncTask {
+//            val rootDataNode = createRootDataNode(root.value)
+//            TREE_ROOT_NODE_DATA = rootDataNode
+//        }
+//    }
+//
+//    private fun createRootDataNode(value: T): LerverTreeTempNode<T> {
+//        val rootDataNode = LerverTreeTempNode(value)
+//        rootDataNode.children = createChildNodes(rootDataNode.children).toList()
+//        return rootDataNode
+//    }
+//
+//    private fun createChildNodes(children: List<TreeItem<T>>): List<LerverTreeTempNode<T>> {
+//        return children.mapNotNull { child ->
+//            if (child.children.isNotEmpty()) {
+//                val newNode = treeItemToNode(child)
+//                newNode.children = createChildNodes(child.children)
+//                newNode
+//            } else {
+//                null
+//            }
+//        }
+//    }
+
+//    private fun treeItemToNode(treeItem: TreeItem<T>): LerverTreeTempNode<T> {
+//        return LerverTreeTempNode(treeItem.value)
+//    }
     /**
      * 为item添加子元素
      */
@@ -489,14 +539,27 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     ) {
 //        println("addChildren code:$code")
         val treeItem = ITEM_CODE_TO_TREEITEM_MAP[code]!!
-        for (data in datas) {
-            //获取子节点
-            val child = createTreeItem(data)
+//        for (data in datas) {
+//            //获取子节点
+//            val child = createTreeItem(data)
+//            //添加子节点
+//            treeItem.children.add(child)
+//        }
+        //重载
+        if (DATA_TYPE == LerverTreeDataType.LIST) {
+            initList(treeItem, datas)
+        } else {
+            val childtren = datas.map {
+                val item = createTreeItem(it)
+                initTree(item)
+                item
+            }
             //添加子节点
-            treeItem.children.add(child)
+            if (childtren.isNotEmpty()) {
+                treeItem.children.addAll(childtren)
+            }
         }
         treeItem.isExpanded = true
-
     }
 
     /**

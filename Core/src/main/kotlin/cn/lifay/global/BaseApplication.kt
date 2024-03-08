@@ -7,7 +7,7 @@ import javafx.application.Application
 
 abstract class BaseApplication(
     theme: Theme = PrimerLight(),
-    configPath: String = GlobalResource.USER_DIR + "lerver.config",
+    configPath: String = GlobalResource.USER_DIR + "lerver.properties",
     logPrefix: String = "client",
     logPath: String = GlobalResource.USER_DIR + "logs"
 ) : Application() {

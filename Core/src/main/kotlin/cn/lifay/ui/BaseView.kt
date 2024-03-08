@@ -4,7 +4,6 @@ import atlantafx.base.theme.Styles
 import atlantafx.base.util.Animations
 import cn.lifay.extension.asyncDelayTask
 import cn.lifay.extension.backgroundColor
-import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
@@ -136,11 +135,11 @@ abstract class BaseView<R : Pane>() : Initializable {
             val scene = Scene(view.getRoot())
             return Stage().apply {
                 this.title = title
-                this.isResizable = false
-                centerOnScreen()
+//                this.isResizable = false
+//                centerOnScreen()
                 this.scene = scene
                 this.setOnCloseRequest { closeFunc?.let { it() } }
-                this.bindEscKey()
+//                this.bindEscKey()
                 GlobalResource.loadIcon(this)
             }
         }
