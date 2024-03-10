@@ -153,6 +153,12 @@ fun Color.toWeb(): String {
     return String.format("#%02X%02X%02X", red, green, blue)
 }
 
+fun iconButton(ikon: Ikon): Button {
+    return Button(null, FontIcon(ikon)).apply {
+        styleClass.add(Styles.BUTTON_ICON)
+    }
+}
+
 fun Button.styleInfo(): Button {
     //this.backgroundColor("#5264AE")
     // this.textFill = Color.WHITE

@@ -1,6 +1,7 @@
 package cn.lifay.db
 
 import atlantafx.base.theme.Styles
+import cn.lifay.GlobeStartUp
 import cn.lifay.extension.*
 import cn.lifay.global.GlobalConfig
 import cn.lifay.logutil.LerverLog
@@ -52,7 +53,13 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
             label
         )
     }
-    val autoTarget = "true" == GlobalConfig.ReadProperties("db.auto_target", "false")
+    val autoTarget =
+        if (!GlobeStartUp.IS_SHOW_STAGE) {
+            true
+        } else {
+            "true" == GlobalConfig.ReadProperties("db.auto_target", "false")
+        }
+
     val checkBox = CheckBox("初始化后自动跳转")
 
     init {

@@ -13,7 +13,6 @@ abstract class BaseApplication(
 ) : Application() {
 
     init {
-        println("初始化")
         GlobalConfig.InitLerverConfigPath(configPath)
         LerverLog.InitLog(logPrefix, logPath)
         GlobalResource.loadTheme(theme)

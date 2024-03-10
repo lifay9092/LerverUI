@@ -22,7 +22,11 @@ class InitDbApplication() : BaseApplication() {
             setOnCloseRequest {
                 Platform.exit()
             }
-            show()
+            if (GlobeStartUp.IS_SHOW_STAGE) {
+                show()
+            } else {
+
+            }
         }
 
     }

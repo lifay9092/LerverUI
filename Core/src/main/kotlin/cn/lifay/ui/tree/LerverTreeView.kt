@@ -182,7 +182,10 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
             //清除旧item的数据
             this.root.apply {
                 children.clear()
+                //添加到缓存
                 treeViewId = treeId
+                treeView = this@LerverTreeView
+                initTreeItem(this)
             }
 
             //重载

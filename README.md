@@ -18,7 +18,7 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 <dependency>
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Core</artifactId>
-    <version>1.38-SNAPSHOT</version>
+    <version>1.39-SNAPSHOT</version>
 </dependency>
 
 <repositories>

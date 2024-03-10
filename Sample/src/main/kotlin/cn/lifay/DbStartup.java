@@ -10,8 +10,8 @@ public class DbStartup {
     public static void main(String[] args) {
 
 
-        GlobeStartUp.launch(() -> {
-            var pane = new VBox(22D);
+        GlobeStartUp.launch(false, () -> {
+            var pane = new VBox(42D);
             pane.getChildren().add(new Button("dasdsadasd"));
 
             var stage = new Stage();
