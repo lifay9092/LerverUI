@@ -4,6 +4,7 @@ import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import cn.lifay.logutil.LogLevelEnum
 import java.io.File
+import kotlin.reflect.KMutableProperty1
 
 //转小写驼峰
 fun String.toCamelCase(symbol: Char = '_'): String {
@@ -106,6 +107,43 @@ fun <T : Any> execTimeLog(head: String, logLevelEnum: LogLevelEnum = LogLevelEnu
     return result
 }
 
+/**
+ * 递归地获取树状集合中所有子节点（children）中符合某个条件的所有数据，使用深度优先搜索（DFS）遍历整个树
+ */
+fun <T : Any,V : List<T>> findMatchingTreeChildren(node: T, childrenProp: KMutableProperty1<T, V?>, condition: (T) -> Boolean): List<T> {
+    // 基准情况：如果节点没有子节点，返回一个空列表
+    val children = childrenProp(node)
+    if (children.isNullOrEmpty()) return emptyList()
+
+    // 递归情况：先查找当前节点的子节点中符合条件的，然后再递归查找所有子节点的子节点
+    return children.filter { condition.invoke(it) } +
+            children.flatMap { findMatchingTreeChildren(it,childrenProp, condition) }
+}
+//
+///**
+// * 递归地获取树状集合中所有子节点（children）中符合某个条件的所有数据，使用深度优先搜索（DFS）遍历整个树
+// */
+//fun <T : Any,V : Collection<T>> findMatchingTreeChildren11(node: T, childrenProp: KMutableProperty1<T, V?>, condition: (T) -> Boolean): List<T> {
+//    // 基准情况：如果节点没有子节点，返回一个空列表
+//    val children = childrenProp(node)
+//    if (children.isNullOrEmpty()) return emptyList()
+//
+//    // 递归情况：先查找当前节点的子节点中符合条件的，然后再递归查找所有子节点的子节点
+//    return children.filter { condition.invoke(it) } +
+//            children.flatMap { findMatchingTreeChildren11(it,childrenProp, condition) }
+//}
+//fun <T : Any> findMatchingTreeChildren22(node: T, childrenProp: KMutableProperty1<T, ArrayList<T>?>, condition: (T) -> Boolean): List<T> {
+//    // 基准情况：如果节点没有子节点，返回一个空列表
+//    val children = childrenProp(node)
+//    if (children.isNullOrEmpty()) return arrayListOf()
+//
+//    // 递归情况：先查找当前节点的子节点中符合条件的，然后再递归查找所有子节点的子节点
+//    return children.filter { condition.invoke(it) } +
+//            children.flatMap { findMatchingTreeChildren22(it,childrenProp, condition) }
+//}
+
+
+
 fun main() {
     val testFilePath = GlobalResource.USER_DIR + "pom.xml"
     val testFile = File(testFilePath)
@@ -117,4 +155,5 @@ fun main() {
     println("extName: ${testFile.extName()}")
 
     println(formatTime(4535345))
+
 }

@@ -273,6 +273,19 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 false, true
             ) {
                 println("checkTreeView initDataCall...")
+
+//                findMatchingTreeChildren(TreeTreeVO(
+//                    "1", "0", "1", false, arrayListOf(
+//                        TreeTreeVO(
+//                            "2", "1", "2", false, arrayListOf(
+//                                TreeTreeVO("4", "2", "4", true, null)
+//                            )
+//                        ),
+//                        TreeTreeVO("3", "1", "3", true, null)
+//                    )
+//                ),TreeTreeVO::children){
+//                    true
+//                }
                 listOf(
                     TreeTreeVO(
                         "1", "0", "1", false, arrayListOf(

@@ -483,6 +483,18 @@ fun <T> findMatchingTreeItemChildren(node: TreeItem<T>, condition: (T) -> Boolea
             node.children.flatMap { findMatchingTreeItemChildren(it, condition) }
 }
 
+/**
+ * 递归地获取树状集合中所有子节点（children）中符合某个条件的所有数据，使用深度优先搜索（DFS）遍历整个树
+ */
+fun <T> findMatchingTreeItemChildrenByTreeItem(node: TreeItem<T>, condition: (TreeItem<T>) -> Boolean): List<TreeItem<T>> {
+    // 基准情况：如果节点没有子节点，返回一个空列表
+    if (node.children.isEmpty()) return emptyList()
+
+    // 递归情况：先查找当前节点的子节点中符合条件的，然后再递归查找所有子节点的子节点
+    return node.children.filter { condition.invoke(it) } +
+            node.children.flatMap { findMatchingTreeItemChildrenByTreeItem(it, condition) }
+}
+
 
 /**
  * 生成倒排旋转文字
