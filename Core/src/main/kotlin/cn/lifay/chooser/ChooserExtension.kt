@@ -6,7 +6,8 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import java.io.File
 
-private var COMMON_CHOOSER_PATH: String = GlobalResource.USER_DIR
+private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
+private var COMMON_CHOOSER_PATH: String = GlobalConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, GlobalResource.USER_DIR)
 
 fun DirectoryChooser.getInitFile(key: String? = null): File {
     if (key != null) {
@@ -36,6 +37,7 @@ object ChooserExtension {
             GlobalConfig.WriteProperties(key, path)
         } else {
             COMMON_CHOOSER_PATH = path
+            GlobalConfig.WriteProperties(COMMON_CHOOSER_PATH_KEY, path)
         }
     }
 
