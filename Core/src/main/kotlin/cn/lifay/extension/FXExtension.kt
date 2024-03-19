@@ -521,3 +521,25 @@ fun markLeftTabGroup(text: String, rowSize: Int): HBox {
     )
     return hBox
 }
+
+
+/**
+ * 快速创建菜单
+ * createMenuItem(
+ *                     "Undo", Feather.CORNER_DOWN_LEFT, new KeyCodeCombination(KeyCode.Z, CONTROL_DOWN)
+ *                 )
+ */
+fun createMenuItem(
+    text: String,
+    graphic: Ikon? = null,
+    accelerator: KeyCombination? = null
+): MenuItem {
+    val item = MenuItem(text)
+    if (graphic != null) {
+        item.graphic = FontIcon(graphic)
+    }
+    if (accelerator != null) {
+        item.accelerator = accelerator
+    }
+    return item
+}
