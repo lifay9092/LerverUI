@@ -62,7 +62,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
     lateinit var rootCheckTreeItem: CheckBoxTreeItem<TreeTreeVO>
 
     @FXML
-    var tableView = TableView<TableTestVO>()
+    var tableView = LerverTableView<TableTestVO, String>()
 
     @FXML
     var sendText = TextArea()
@@ -303,14 +303,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
         tableView.apply {
             isEditable = true
+            Register(TableTestVO::id)
             columns.addAll(
                 TableColumn<TableTestVO, String>("普通").apply {
-                    this.cellValueFactory = PropertyValueFactory("text")
+                    this.cellValueFactory = PropertyValueFactory("id")
                     setCellFactory {
                         object : TableEditCell<TableTestVO, String>() {}
                     }
                     setOnEditCommit { t: TableColumn.CellEditEvent<TableTestVO, String> ->
-                        (t.tableView.items[t.tablePosition.row] as TableTestVO).text = t.newValue
+                        (t.tableView.items[t.tablePosition.row] as TableTestVO).id = t.newValue
                     }
                     prefWidth = 150.0
                 },
@@ -486,11 +487,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     fun tableText(actionEvent: ActionEvent) {
-        tableView.items[0].text = "33333"
-        tableView.items[0].info = "777777777"
-        tableView.items[0].msg.value = "33333"
-        tableView.items[0].processBar.value = 0.5
-        tableView.items[1].msg.value = "4444444444"
+        tableView.UpdateItem(
+            "111",
+            TableTestVO("111", "33333", SimpleStringProperty("33333"), SimpleDoubleProperty(0.1))
+        )
+        tableView.UpdateItem("222", TableTestVO::msg, "444444444")
+        tableView.UpdateItem("222", TableTestVO::processBar, 0.5)
+
     }
 
     fun treeTestAdd1(actionEvent: ActionEvent) {
