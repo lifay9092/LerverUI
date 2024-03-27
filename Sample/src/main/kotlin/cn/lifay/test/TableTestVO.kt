@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleStringProperty
  * @date 2023/2/20 17:44
  **/
 class TableTestVO(
-    var text: String,
+    var id: String,
     var info: String,
     var msg: SimpleStringProperty,
     var processBar: SimpleDoubleProperty

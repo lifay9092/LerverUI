@@ -1,53 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import cn.lifay.ui.table.LerverTableView?>
 <?import cn.lifay.ui.tree.LerverTreeView?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <AnchorPane fx:id="rootPane" prefHeight="771.0" prefWidth="1342.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.CommonDemoView">
-    <children>
-        <Button layoutX="42.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单"/>
-        <Button layoutX="42.0" layoutY="169.0" mnemonicParsing="false" onAction="#info" text="信息提示"/>
-        <Button layoutX="132.0" layoutY="169.0" mnemonicParsing="false" onAction="#warn" text="警告提示"/>
-        <Button layoutX="42.0" layoutY="207.0" mnemonicParsing="false" onAction="#detail" text="详细提示"/>
-        <Button layoutX="132.0" layoutY="207.0" mnemonicParsing="false" onAction="#error" text="错误提示"/>
-        <SplitMenuButton fx:id="splitMenuBtn" layoutX="42.0" layoutY="247.0"/>
-        <TableView fx:id="tableView" layoutX="290.0" layoutY="484.0" prefHeight="223.0" prefWidth="719.0">
-        </TableView>
-        <Button fx:id="testTbBtn" layoutX="955.0" layoutY="455.0" mnemonicParsing="false" onAction="#tableText"
-                text="测试表格"/>
-        <LerverTreeView fx:id="treeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0"/>
-        <Button layoutX="885.0" layoutY="66.0" mnemonicParsing="false" onAction="#treeTest" text="测试树" />
-        <Button layoutX="885.0" layoutY="98.0" mnemonicParsing="false" onAction="#treeTestAdd1" text="添加1" />
-        <Button layoutX="885.0" layoutY="133.0" mnemonicParsing="false" onAction="#treeTestAdd2" text="添加2" />
-        <Button layoutX="885.0" layoutY="169.0" mnemonicParsing="false" onAction="#treeTestUpt" text="修改" />
-        <Button layoutX="885.0" layoutY="207.0" mnemonicParsing="false" onAction="#treeTestDel1" text="删除1" />
-        <Button layoutX="885.0" layoutY="247.0" mnemonicParsing="false" onAction="#treeTestDel2" text="删除2" />
-        <TextField fx:id="keywordText" layoutX="428.0" layoutY="33.0" />
-      <VBox alignment="TOP_CENTER" layoutX="1037.0" layoutY="33.0" prefHeight="714.0" prefWidth="288.0">
-         <children>
-             <Label text="发送消息" />
-             <TextArea fx:id="sendText" prefHeight="200.0" prefWidth="200.0" />
-             <Button fx:id="sendBtn" mnemonicParsing="false" onAction="#chat" text="发送" />
-             <Separator prefHeight="44.0" prefWidth="288.0" />
-             <Label text="接受者1" />
-             <TextArea fx:id="user1" prefHeight="200.0" prefWidth="200.0" />
-             <Label alignment="CENTER" contentDisplay="CENTER" text="接受者2" />
-             <TextArea fx:id="user2" prefHeight="200.0" prefWidth="200.0" />
-         </children>
-      </VBox>
-        <Button layoutX="132.0" layoutY="247.0" mnemonicParsing="false" onAction="#taskAction" text="耗时操作"/>
-        <Button fx:id="copyBtn" layoutX="42.0" layoutY="285.0" mnemonicParsing="false" onAction="#copyText"
-                text="复制文本">
-        </Button>
-        <LerverTreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
-        <Button layoutX="139.0" layoutY="110.0" mnemonicParsing="false" onAction="#curdTest" text="CURD"/>
-        <LerverTreeView fx:id="customTree" layoutX="24.0" layoutY="331.0" prefHeight="426.0" prefWidth="253.0"/>
-        <Button layoutX="290.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestAdd" text="监听-添加"/>
-        <Button layoutX="290.0" layoutY="444.0" mnemonicParsing="false" onAction="#customTreeTestUpt" text="监听-修改"/>
-        <Button layoutX="379.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestDel" text="监听-删除"/>
-        <Button layoutX="379.0" layoutY="444.0" mnemonicParsing="false" onAction="#customTreeTestReplace"
-                text="监听-替换"/>
-        <Button layoutX="887.0" layoutY="297.0" mnemonicParsing="false" onAction="#clearTreeCache" text="清理Tree缓存"/>
-    </children>
+    <Button layoutX="42.0" layoutY="110.0" mnemonicParsing="false" onAction="#formTest" text="动态表单"/>
+    <Button layoutX="42.0" layoutY="169.0" mnemonicParsing="false" onAction="#info" text="信息提示"/>
+    <Button layoutX="132.0" layoutY="169.0" mnemonicParsing="false" onAction="#warn" text="警告提示"/>
+    <Button layoutX="42.0" layoutY="207.0" mnemonicParsing="false" onAction="#detail" text="详细提示"/>
+    <Button layoutX="132.0" layoutY="207.0" mnemonicParsing="false" onAction="#error" text="错误提示"/>
+    <SplitMenuButton fx:id="splitMenuBtn" layoutX="42.0" layoutY="247.0"/>
+    <LerverTableView fx:id="tableView" layoutX="290.0" layoutY="484.0" prefHeight="223.0" prefWidth="515.0">
+    </LerverTableView>
+    <LerverTreeView fx:id="treeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0"/>
+    <Button layoutX="885.0" layoutY="66.0" mnemonicParsing="false" onAction="#treeTest" text="测试树"/>
+    <Button layoutX="885.0" layoutY="98.0" mnemonicParsing="false" onAction="#treeTestAdd1" text="添加1"/>
+    <Button layoutX="885.0" layoutY="133.0" mnemonicParsing="false" onAction="#treeTestAdd2" text="添加2"/>
+    <Button layoutX="885.0" layoutY="169.0" mnemonicParsing="false" onAction="#treeTestUpt" text="修改"/>
+    <Button layoutX="885.0" layoutY="207.0" mnemonicParsing="false" onAction="#treeTestDel1" text="删除1"/>
+    <Button layoutX="885.0" layoutY="247.0" mnemonicParsing="false" onAction="#treeTestDel2" text="删除2"/>
+    <TextField fx:id="keywordText" layoutX="428.0" layoutY="33.0"/>
+    <VBox alignment="TOP_CENTER" layoutX="1037.0" layoutY="33.0" prefHeight="714.0" prefWidth="288.0">
+        <children>
+            <Label text="发送消息"/>
+            <TextArea fx:id="sendText" prefHeight="200.0" prefWidth="200.0"/>
+            <Button fx:id="sendBtn" mnemonicParsing="false" onAction="#chat" text="发送"/>
+            <Separator prefHeight="44.0" prefWidth="288.0"/>
+            <Label text="接受者1"/>
+            <TextArea fx:id="user1" prefHeight="200.0" prefWidth="200.0"/>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="接受者2"/>
+            <TextArea fx:id="user2" prefHeight="200.0" prefWidth="200.0"/>
+        </children>
+    </VBox>
+    <Button layoutX="132.0" layoutY="247.0" mnemonicParsing="false" onAction="#taskAction" text="耗时操作"/>
+    <Button fx:id="copyBtn" layoutX="42.0" layoutY="285.0" mnemonicParsing="false" onAction="#copyText" text="复制文本">
+    </Button>
+    <LerverTreeView fx:id="checkTreeView" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
+    <Button layoutX="139.0" layoutY="110.0" mnemonicParsing="false" onAction="#curdTest" text="CURD"/>
+    <LerverTreeView fx:id="customTree" layoutX="24.0" layoutY="331.0" prefHeight="426.0" prefWidth="253.0"/>
+    <Button layoutX="290.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestAdd" text="监听-添加"/>
+    <Button layoutX="290.0" layoutY="444.0" mnemonicParsing="false" onAction="#customTreeTestUpt" text="监听-修改"/>
+    <Button layoutX="379.0" layoutY="409.0" mnemonicParsing="false" onAction="#customTreeTestDel" text="监听-删除"/>
+    <Button layoutX="379.0" layoutY="444.0" mnemonicParsing="false" onAction="#customTreeTestReplace" text="监听-替换"/>
+    <Button layoutX="887.0" layoutY="297.0" mnemonicParsing="false" onAction="#clearTreeCache" text="清理Tree缓存"/>
+    <Button layoutX="580.0" layoutY="409.0" mnemonicParsing="false" onAction="#tableTestAdd" text="表格-添加"/>
+    <Button fx:id="testTbBtn" layoutX="698.0" layoutY="409.0" mnemonicParsing="false" onAction="#tableTestUpt"
+            text="表格-修改"/>
+    <Button layoutX="809.0" layoutY="409.0" mnemonicParsing="false" onAction="#tableTestDel" text="表格-删除"/>
+    <Button layoutX="931.0" layoutY="409.0" mnemonicParsing="false" onAction="#tableTestClear" text="表格-清空"/>
+    <LerverTableView fx:id="tableViewJava" layoutX="809.0" layoutY="484.0" prefHeight="223.0" prefWidth="224.0"/>
+    <Button layoutX="698.0" layoutY="449.0" mnemonicParsing="false" onAction="#tableTestUptJava" text="java表格-修改"/>
 </AnchorPane>

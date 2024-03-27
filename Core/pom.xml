@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.lifay.LerverUI</groupId>
         <artifactId>Parent</artifactId>
-        <version>1.41-SNAPSHOT</version>
+        <version>1.42-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,27 +22,28 @@
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <plugins>
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <finalName>${project.artifactId}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
+            <!--   &lt;!&ndash;临时打胖包 用于SceneBuilder&ndash;&gt;
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-assembly-plugin</artifactId>
+                   <version>3.3.0</version>
+                   <configuration>
+                       <finalName>${project.artifactId}</finalName>
+                       <appendAssemblyId>false</appendAssemblyId>
+                       <descriptorRefs>
+                           <descriptorRef>jar-with-dependencies</descriptorRef>
+                       </descriptorRefs>
+                   </configuration>
+                   <executions>
+                       <execution>
+                           <id>make-assembly</id>
+                           <phase>package</phase>
+                           <goals>
+                               <goal>single</goal>
+                           </goals>
+                       </execution>
+                   </executions>
+               </plugin>-->
         </plugins>
     </build>
 </project>

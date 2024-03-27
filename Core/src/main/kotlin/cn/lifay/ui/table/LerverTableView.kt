@@ -1,11 +1,12 @@
 package cn.lifay.ui.table
 
-import cn.lifay.ui.DelegateProp
 import javafx.beans.property.Property
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.scene.control.TableView
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Function
+import kotlin.reflect.KFunction2
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 
@@ -26,13 +27,9 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
 
     // value业务ID=treeItem 辅助提供ID直接查询
     val ITEM_BUSI_TO_TABLEITEM_MAP = ConcurrentHashMap<P, T>()
-    val ITEM_BUSI_TO_INDEX_MAP = ConcurrentHashMap<P, Int>()
-
-    //业务ID列表
-    val BUSI_ID_LIST = ArrayList<String>()
 
     private var ID_PROP: KProperty1<T, P>? = null
-    private var ID_PROP_DELEGATE: DelegateProp<T, P>? = null
+    private var ID_PROP_FUNCTION: Function<T, P>? = null
 
     /**
      * 通过集合列表类型的数据源，注册当前TreeView视图,id和父id属性、获取数据的函数
@@ -58,71 +55,54 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
         }
         ID_PROP = idProp
 
-        val list = itemsProperty().get()
-        list.addListener(ListChangeListener<T> { c ->
-            println("onChanged : $c")
-            while (c.next()) {
-                println("f:${c.from}, t:${c.to}")
-                if (c.wasAdded()) {
-//                    println("wasAdded")
-                    val entity = list[c.from]
-                    ITEM_BUSI_TO_TABLEITEM_MAP[ID_PROP!!.get(entity)] = entity
-                } else if (c.wasRemoved()) {
-//                    println("wasRemoved")
-                    list.filter {
-                        !ITEM_BUSI_TO_TABLEITEM_MAP.containsKey(ID_PROP!!.get(it))
-                    }.forEach {
-                        ITEM_BUSI_TO_TABLEITEM_MAP.remove(ID_PROP!!.get(it))
-                    }
-                }
-            }
-        })
+        initListener()
     }
 
-    fun RegisterByDelegete(
-        idProp: DelegateProp<T, P>
+    fun RegisterByFunction(
+        idProp: Function<T, P>
     ) {
         //判断
         if (IS_REGISTER_EVENT) {
             throw Exception("TableView已经注册过,请勿重复注册")
         }
-        ID_PROP_DELEGATE = idProp
+        ID_PROP_FUNCTION = idProp
 
-        val list = itemsProperty().get()
-        list.addListener(ListChangeListener<T> { c ->
-            println("onChanged : $c")
-            while (c.next()) {
-                println("f:${c.from}, t:${c.to}")
-                if (c.wasAdded()) {
-//                    println("wasAdded")
-                    val entity = list[c.from]
-                    ITEM_BUSI_TO_TABLEITEM_MAP[ID_PROP_DELEGATE!!.getValue(entity)!!] = entity
-                } else if (c.wasRemoved()) {
-//                    println("wasRemoved")
-                    list.filter {
-                        !ITEM_BUSI_TO_TABLEITEM_MAP.containsKey(ID_PROP_DELEGATE!!.getValue(it)!!)
-                    }.forEach {
-                        ITEM_BUSI_TO_TABLEITEM_MAP.remove(ID_PROP_DELEGATE!!.getValue(it)!!)
-                    }
-                }
-            }
-        })
+        initListener()
     }
 
-//
-//    /**
-//     * 为主键值为p的对象更新整个实体值
-//     * tableView.UpdateItem("111",TableTestVO("111", "33333", SimpleStringProperty("33333"), SimpleDoubleProperty(0.1)))
-//     */
-//    @Synchronized
-//    fun UpdateItem(p:P,t: T){
-//        val index = items.indexOfFirst {
-//            p == ID_PROP!!.get(it)
-//        }
-//        if (index != -1) {
-//            items[index] = t
-//        }
-//    }
+    private fun initListener() {
+        val list = itemsProperty().get()
+        list.addListener(ListChangeListener<T> { c ->
+            //  println("onChanged : $c")
+            while (c.next()) {
+                //  println("f:${c.from}, t:${c.to}")
+                if (c.wasAdded()) {
+                    //     println("wasAdded")
+                    list.subList(c.from, c.to).forEach {
+                        ITEM_BUSI_TO_TABLEITEM_MAP[funGetPv(it)!!] = it
+                    }
+                } else if (c.wasRemoved()) {
+                    //   println("wasRemoved")
+
+                    if (list.isEmpty()) {
+                        ITEM_BUSI_TO_TABLEITEM_MAP.clear()
+                    } else {
+                        for (key in ITEM_BUSI_TO_TABLEITEM_MAP.keys()) {
+
+                            val c = list.find {
+                                key == funGetPv(it)
+                            }
+                            if (c == null) {
+                                ITEM_BUSI_TO_TABLEITEM_MAP.remove(key)
+                            }
+                        }
+                    }
+
+                }
+            }
+            //  println("map size:${ITEM_BUSI_TO_TABLEITEM_MAP.size}")
+        })
+    }
 
     /**
      * 为主键值为p的对象更新整个实体值
@@ -130,7 +110,7 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
      */
     @Synchronized
     fun UpdateItem(t: T) {
-        val oldEntity = ITEM_BUSI_TO_TABLEITEM_MAP[ID_PROP!!.get(t)]
+        val oldEntity = ITEM_BUSI_TO_TABLEITEM_MAP[funGetPv(t)]
         oldEntity?.let { o ->
             val index = items.indexOfFirst {
                 o == it
@@ -148,12 +128,23 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
      * tableView.UpdateItem("222",TableTestVO::processBar,0.5)
      */
     @Synchronized
+    @JvmName("UpdateItemKtProp")
     fun <V : Any> UpdateItem(p: P, propFunc: KMutableProperty1<T, out Property<V>>, v: V) {
         val oldEntity = ITEM_BUSI_TO_TABLEITEM_MAP[p]
         oldEntity?.let { o ->
             propFunc.get(o).value = v
         }
     }
+
+    @Synchronized
+    @JvmName("UpdateItemJavaProp")
+    fun <V : Any> UpdateItemBean(p: P, propFunc: KFunction2<T, V, Unit>, v: V) {
+        val oldEntity = ITEM_BUSI_TO_TABLEITEM_MAP[p]
+        oldEntity?.let { o ->
+            propFunc.invoke(o, v)
+        }
+    }
+
 //
 //    /**
 //     * 为主键值为p的对象更新某个绑定的属性值
@@ -169,5 +160,16 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
 //            propFunc.get(items[index]).value = v
 //        }
 //    }
+
+    private fun funGetPv(t: T): P? {
+        if (ID_PROP != null) {
+            return ID_PROP!!.get(t)
+        }
+        if (ID_PROP_FUNCTION == null) {
+            return null
+        }
+        return ID_PROP_FUNCTION!!.apply(t)
+
+    }
 
 }

@@ -6,6 +6,7 @@ import cn.lifay.logutil.LerverLog
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
+import cn.lifay.ui.table.LerverTableView
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
 import javafx.beans.binding.Bindings
@@ -64,6 +65,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var tableView = LerverTableView<TableTestVO, String>()
+
+    @FXML
+    var tableViewJava = LerverTableView<Person, Int>()
 
     @FXML
     var sendText = TextArea()
@@ -349,6 +353,29 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
+        tableViewJava.apply {
+            isEditable = false
+            RegisterByFunction(Person::getId)
+            columns.addAll(
+                TableColumn<Person, Int>("ID").apply {
+                    this.cellValueFactory = PropertyValueFactory("id")
+                    prefWidth = 150.0
+                },
+                TableColumn<Person, String>("名称").apply {
+                    this.cellValueFactory = PropertyValueFactory("name")
+                    prefWidth = 150.0
+                }
+            )
+
+            items.apply {
+                clear()
+                addAll(
+                    Person(111, "111", false),
+                    Person(222, "222", true)
+                )
+            }
+        }
+
         val customTreeItem = CheckBoxTreeItem(Person(0, "根节点", false)).apply {
             selectedProperty().addListener { observableValue, old, new ->
                 println("old:$old new:$new")
@@ -489,14 +516,39 @@ class CommonDemoView : BaseView<AnchorPane>() {
         )
     }
 
-    fun tableText(actionEvent: ActionEvent) {
+    fun tableTestAdd(actionEvent: ActionEvent) {
+        val id = UUID.randomUUID().toString()
+        tableView.items.add(
+            TableTestVO(id, id, SimpleStringProperty(id), SimpleDoubleProperty(0.3))
+        )
+
+    }
+
+    fun tableTestDel(actionEvent: ActionEvent) {
+        tableView.items.removeIf {
+            it.id == "111"
+        }
+
+    }
+
+    fun tableTestClear(actionEvent: ActionEvent) {
+        tableView.items.clear()
+    }
+
+    fun tableTestUpt(actionEvent: ActionEvent) {
         tableView.UpdateItem(
-            "111",
             TableTestVO("111", "33333", SimpleStringProperty("33333"), SimpleDoubleProperty(0.1))
         )
         tableView.UpdateItem("222", TableTestVO::msg, "444444444")
         tableView.UpdateItem("222", TableTestVO::processBar, 0.5)
 
+    }
+
+    fun tableTestUptJava(actionEvent: ActionEvent) {
+        tableViewJava.UpdateItem(
+            Person(111, "333", false)
+        )
+        tableViewJava.UpdateItemBean(222, Person::setName, "444444444")
     }
 
     fun treeTestAdd1(actionEvent: ActionEvent) {
