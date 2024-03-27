@@ -100,7 +100,7 @@ object LerverLog {
 
     private lateinit var GLOBE_LOG: GlobeLog
 
-    val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-DD HH:mm:ss")
+    val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss")
 
     fun isWindows(): Boolean = File.separator == "\\"
 

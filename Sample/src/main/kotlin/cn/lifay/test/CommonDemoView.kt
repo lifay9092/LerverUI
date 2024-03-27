@@ -2,6 +2,7 @@ package cn.lifay.test
 
 import cn.lifay.db.UserData
 import cn.lifay.extension.*
+import cn.lifay.logutil.LerverLog
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
@@ -87,6 +88,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        LerverLog.debug("纯纯粹粹")
+
         val observableArrayList = FXCollections.observableArrayList<TreeListVO>()
         splitMenuBtn.items.addAll(
             MenuItem("1111").apply {
