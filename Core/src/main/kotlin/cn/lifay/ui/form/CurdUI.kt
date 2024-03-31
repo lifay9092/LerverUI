@@ -462,7 +462,7 @@ abstract class CurdUI<T : Any, E : BaseTable<T>>(
 
     fun editForm(entity: T) {
         try {
-            val dataFormUI = object : DataFormUI<T>(true, buildFormUI = {
+            val dataFormUI = object : DataFormUI<T>(_isUpdate = true, buildFormUI = {
                 defaultEntity(entity)
                 addElements(elements)
                 addCustomButtons(*customButtons.toTypedArray())

@@ -1,12 +1,12 @@
 package cn.lifay.ui.table
 
+import cn.lifay.ui.DelegateProp
 import javafx.beans.property.Property
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.scene.control.TableView
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
-import kotlin.reflect.KFunction2
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 
@@ -136,30 +136,18 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
         }
     }
 
+    /**
+     * 为主键值为p的对象更新某个Bean的属性值
+     * UpdateItemBean(222, Person::setName, "444444444")
+     */
     @Synchronized
     @JvmName("UpdateItemJavaProp")
-    fun <V : Any> UpdateItemBean(p: P, propFunc: KFunction2<T, V, Unit>, v: V) {
+    fun <V : Any> UpdateItem(p: P, propFunc: DelegateProp<T, V>, v: V) {
         val oldEntity = ITEM_BUSI_TO_TABLEITEM_MAP[p]
         oldEntity?.let { o ->
-            propFunc.invoke(o, v)
+            propFunc.setValue(o, v)
         }
     }
-
-//
-//    /**
-//     * 为主键值为p的对象更新某个绑定的属性值
-//     * tableView.UpdateItem("222",TableTestVO::msg,"444444444")
-//     * tableView.UpdateItem("222",TableTestVO::processBar,0.5)
-//     */
-//    @Synchronized
-//    fun <V:Any> UpdateItem(p:P, propFunc: KMutableProperty1<T,out Property<V>>, v:V){
-//        val index = items.indexOfFirst {
-//            p == ID_PROP!!.get(it)
-//        }
-//        if (index != -1) {
-//            propFunc.get(items[index]).value = v
-//        }
-//    }
 
     private fun funGetPv(t: T): P? {
         if (ID_PROP != null) {

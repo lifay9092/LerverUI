@@ -395,15 +395,15 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     /**
      * 获取TreeItem实例，根据CheckBox标识返回,否则勾选框会失去联动效果
      */
-    private fun createTreeItem(it: T): TreeItem<T> {
+    private fun createTreeItem(item: T): TreeItem<T> {
         return if (TREE_CHECKBOX) {
-            CheckBoxTreeItem(it).apply {
+            CheckBoxTreeItem(item).apply {
                 this.treeViewId = treeId
                 this.treeView = this@LerverTreeView
                 initTreeItem(this)
             }
         } else {
-            TreeItem(it).apply {
+            TreeItem(item).apply {
                 this.treeViewId = treeId
                 this.treeView = this@LerverTreeView
                 initTreeItem(this)

@@ -96,8 +96,8 @@ class FormUIView : Initializable{
         val userForm = UserDataForm()
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.ROOT_PANE.apply {
-            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
-            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+//            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
+//            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
         }
         userForm.show()
     }
@@ -119,8 +119,8 @@ class FormUIView : Initializable{
     }
 
     fun formTest2(actionEvent: ActionEvent) {
-//        val personForm = PersonForm(Person(1, "111111", true))
-//        personForm.show()
+        val personForm = PersonForm(Person(1, "111111", true))
+        personForm.show()
     }
 
     fun formMsg(actionEvent: ActionEvent) {

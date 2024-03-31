@@ -1,11 +1,13 @@
 package cn.lifay.test
 
+import atlantafx.base.theme.Styles
 import cn.lifay.db.UserData
 import cn.lifay.extension.*
 import cn.lifay.logutil.LerverLog
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
+import cn.lifay.ui.DelegateProp
 import cn.lifay.ui.table.LerverTableView
 import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
@@ -270,14 +272,28 @@ class CommonDemoView : BaseView<AnchorPane>() {
                     println(it.newValue)
                 }
             )
+
         }
         checkTreeView.apply {
             root = rootCheckTreeItem
             isShowRoot = true
-            cellFactory = CheckBoxTreeCell.forTreeView()
+//            cellFactory = LerverCheckBoxTreeCell.forTreeView<TreeTreeVO>()
+            setCellFactory {
+
+//                LerverCheckBoxTreeCell()
+                LerverCheckBoxTreeCell<TreeTreeVO> {
+                    listOf(Label("name:${it?.value?.name}").apply {
+                        styleClass.addAll(
+                            Styles.TEXT,
+                            Styles.ACCENT
+                        )
+                    })
+                }
+            }
+//            cellFactory = CheckBoxTreeCell.forTreeView()
             RegisterByTree(
                 LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
-                false, true
+                true, true
             ) {
                 println("checkTreeView initDataCall...")
 
@@ -381,8 +397,15 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 println("old:$old new:$new")
             }
         }
+        customTreeItem.children.addAll(
+            TreeItem(Person(1, "1", false)),
+            TreeItem(Person(2, "2", true)),
+        )
         customTree.apply {
             root = customTreeItem
+//            setCellFactory {
+//                LerverCheckBoxTreeCell()
+//            }
             cellFactory = CheckBoxTreeCell.forTreeView()
 
         }
@@ -444,6 +467,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
         rootTreeItem.value.name = "测试修改"
         println(rootTreeItem.children[0].treeViewId)
         rootTreeItem.children[0].value = TreeListVO("5", "1", "5", SimpleStringProperty("5"))
+
+        val selects = findMatchingTreeItemChildrenByTreeItem(checkTreeView.root) {
+            val checkBoxTreeItem = it as CheckBoxTreeItem<TreeTreeVO>
+            checkBoxTreeItem.isSelected
+        }
+        println("selects:${selects.size}")
     }
 
 
@@ -548,7 +577,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
         tableViewJava.UpdateItem(
             Person(111, "333", false)
         )
-        tableViewJava.UpdateItemBean(222, Person::setName, "444444444")
+        tableViewJava.UpdateItem(222, DelegateProp("name"), "444444444")
+
     }
 
     fun treeTestAdd1(actionEvent: ActionEvent) {

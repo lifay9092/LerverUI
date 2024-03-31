@@ -70,7 +70,6 @@ open class BaseFormUI<T : Any>(
     protected var AFTER_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
 
     init {
-        // println("BaseFormUI init")
         try {
 
             BEFORE_FORM_INIT_CALL_LIST.forEach { it() }
@@ -80,13 +79,9 @@ open class BaseFormUI<T : Any>(
             uiInit()
             if (initDefaultEntity == null) {
                 val tc = ELEMENTS_LIST[0].tc
-//                println("tc:$tc")
                 val args = getElementInitValue()
-//                println("args:${args.contentToString()}")
-//                args.forEach { println(it) }
                 this.entity = tc!!.primaryConstructor!!.call(*args)
             } else {
-                //isUpdate = true
                 refreshForm(initDefaultEntity!!)
             }
             initNotificationPane()
@@ -133,7 +128,6 @@ open class BaseFormUI<T : Any>(
         return Array(ELEMENTS_LIST.size) {
             val element = ELEMENTS_LIST[it]
             val get = element.defaultValue()
-//            println("${element.label} = ${get}")
             get
         }
     }
@@ -152,11 +146,6 @@ open class BaseFormUI<T : Any>(
         界面初始化
      */
     private fun uiInit() {
-        this.root.apply {
-//            prefWidth = 1000.0
-//            prefWidth = GlobalResource.FormWidth()
-//            prefHeight = 120.0 * elements.size
-        }
         stage.initModality(Modality.APPLICATION_MODAL)
         GlobalResource.loadIcon(stage)
 

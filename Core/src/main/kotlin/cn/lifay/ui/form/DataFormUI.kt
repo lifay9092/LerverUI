@@ -35,9 +35,10 @@ import org.kordamp.ikonli.feather.Feather
  *@author lifay
  **/
 abstract class DataFormUI<T : Any>(
+    open val _title: String? = null,
     open val _isUpdate: Boolean = false,
     buildFormUI: BaseFormUI<T>.() -> Unit,
-) : BaseFormUI<T>(if (_isUpdate) "编辑" else "新增", buildFormUI) {
+) : BaseFormUI<T>(if (_title.isNullOrBlank()) if (_isUpdate) "编辑" else "新增" else _title, buildFormUI) {
 
     //    protected lateinit var elements: ObservableList<FormElement<T, *>>
     private var saveBtn: BaseButton<BaseFormUI<T>>

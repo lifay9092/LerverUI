@@ -1,6 +1,6 @@
 package cn.lifay.ui
 
-import kotlin.reflect.KClass
+import java.lang.reflect.Field
 
 
 /**
@@ -10,28 +10,24 @@ import kotlin.reflect.KClass
  **/
 class DelegateProp<T : Any, R : Any>(
     val fieldName: String,
-    val kClass: KClass<T>,
-    val rClass: KClass<R>
 ) {
-
-    companion object {
-        inline operator fun <reified T : Any, reified R : Any> invoke(fieldName: String) =
-            DelegateProp(fieldName, T::class, R::class)
-
-    }
-
     fun getValue(obj: T): R? {
-        val declaredField = obj!!::class.java.getDeclaredField(fieldName)
-        declaredField.isAccessible = true
+        val declaredField = getField(obj)
         val get = declaredField.get(obj)
-        // println("反射值:$get")
         return get as R?
     }
 
     fun setValue(obj: T, v: R?) {
-        val declaredField = obj!!::class.java.getDeclaredField(fieldName)
-        declaredField.isAccessible = true
+        val declaredField = getField(obj)
         declaredField.set(obj, v)
+    }
+
+    private fun getField(obj: T): Field {
+        val declaredField = obj::class.java.getDeclaredField(fieldName)
+        if (!declaredField.canAccess(obj)) {
+            declaredField.isAccessible = true
+        }
+        return declaredField
     }
 
 }
