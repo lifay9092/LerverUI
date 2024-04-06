@@ -24,7 +24,6 @@ import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.control.cell.CheckBoxTreeCell
 import javafx.scene.control.cell.ProgressBarTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
@@ -55,13 +54,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var rootPane = AnchorPane()
 
     @FXML
-    var treeView = LerverTreeView<TreeListVO, String>()
+    var leftTree = TreeView<Person>()
 
     @FXML
-    var customTree = LerverTreeView<Person, Int>()
+    var centerTreeView = LerverTreeView<TreeListVO, String>()
 
     @FXML
-    var checkTreeView = LerverTreeView<TreeTreeVO, String>()
+    var rightTreeView = LerverTreeView<TreeTreeVO, String>()
 //    val rootItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
     //  val testItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
 
@@ -140,7 +139,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         // rootItemProperties.value = root
         // testItemProperties.value = treeItem2
 
-        treeView.apply {
+        centerTreeView.apply {
             root = rootTreeItem
             isShowRoot = true
             RegisterByList(
@@ -157,7 +156,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("添加子节点").apply {
                             setOnAction {
                                 println("添加子节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 val id1 = UUID.randomUUID().toString()
                                 val id2 = UUID.randomUUID().toString()
                                 selectedItem.AddChildren(
@@ -183,7 +182,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("更新节点").apply {
                             setOnAction {
                                 println("更新节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 val id = UUID.randomUUID().toString()
                                 selectedItem.UpdateItem(
                                     TreeListVO(
@@ -203,7 +202,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                                     contentText = null
                                     setOnCloseRequest {
                                         println(editor.text)
-                                        val selectedItem = treeView.selectionModel.selectedItem
+                                        val selectedItem = centerTreeView.selectionModel.selectedItem
                                         if (selectedItem.children.isNotEmpty()) {
                                             selectedItem.UpdateChild(
                                                 TreeListVO(
@@ -222,14 +221,14 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("删除节点").apply {
                             this.setOnAction {
                                 println("删除节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 selectedItem.DeleteThis()
                             }
                         })
                         items.add(MenuItem("删除子节点").apply {
                             this.setOnAction {
                                 println("删除子节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 if (selectedItem.children.isNotEmpty()) {
                                     selectedItem.DeleteChildItem { true }
                                 }
@@ -260,7 +259,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             if (old == new) {
                 return@addListener
             }
-            treeView.FilterTree {
+            centerTreeView.FilterTree {
                 new.isBlank() || (new.isNotBlank() && it.name.contains(new))
             }
         }
@@ -277,57 +276,64 @@ class CommonDemoView : BaseView<AnchorPane>() {
             )
 
         }
-        checkTreeView.apply {
-            root = rootCheckTreeItem
-            isShowRoot = true
-//            cellFactory = LerverCheckBoxTreeCell.forTreeView<TreeTreeVO>()
-            setCellFactory {
+        /*      rightTreeView.apply {
+                  root = rootCheckTreeItem
+                  isShowRoot = true
+      //            cellFactory = LerverCheckBoxTreeCell.forTreeView<TreeTreeVO>()
+                  setCellFactory {
 
-//                LerverCheckBoxTreeCell()
-                LerverCheckBoxTreeCell<TreeTreeVO> {
-                    customFuncNodes(it)
-//                    listOf(Label("name:${it?.value?.name}").apply {
-//                        styleClass.addAll(
-//                            Styles.TEXT,
-//                            Styles.ACCENT
-//                        )
-//                    })
-                }
-            }
-//            cellFactory = CheckBoxTreeCell.forTreeView()
-            RegisterByTree(
-                LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
-                true, true
-            ) {
-                println("checkTreeView initDataCall...")
+      //                LerverCheckBoxTreeCell()
+                      LerverCheckBoxTreeCell<TreeTreeVO> {
+                          customRightFuncNodes(it)
+      //                    listOf(Label("name:${it?.value?.name}").apply {
+      //                        styleClass.addAll(
+      //                            Styles.TEXT,
+      //                            Styles.ACCENT
+      //                        )
+      //                    })
+                      }
+                  }
+      //            cellFactory = CheckBoxTreeCell.forTreeView()
+                  RegisterByTree(
+                      LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
+                      true, true
+                  ) {
+                      println("checkTreeView initDataCall...")
 
-//                findMatchingTreeChildren(TreeTreeVO(
-//                    "1", "0", "1", false, arrayListOf(
-//                        TreeTreeVO(
-//                            "2", "1", "2", false, arrayListOf(
-//                                TreeTreeVO("4", "2", "4", true, null)
-//                            )
-//                        ),
-//                        TreeTreeVO("3", "1", "3", true, null)
-//                    )
-//                ),TreeTreeVO::children){
-//                    true
-//                }
-                listOf(
-                    TreeTreeVO(
-                        "1", "0", "1", false, arrayListOf(
-                            TreeTreeVO(
-                                "2", "1", "2", false, arrayListOf(
-                                    TreeTreeVO("4", "2", "4", true, null)
-                                )
-                            ),
-                            TreeTreeVO("3", "1", "3", true, null)
-                        )
-                    )
-                )
-            }
-        }
-
+      //                findMatchingTreeChildren(TreeTreeVO(
+      //                    "1", "0", "1", false, arrayListOf(
+      //                        TreeTreeVO(
+      //                            "2", "1", "2", false, arrayListOf(
+      //                                TreeTreeVO("4", "2", "4", true, null)
+      //                            )
+      //                        ),
+      //                        TreeTreeVO("3", "1", "3", true, null)
+      //                    )
+      //                ),TreeTreeVO::children){
+      //                    true
+      //                }
+                      listOf(
+                          TreeTreeVO(
+                              "1", "0", "1", false, arrayListOf(
+                                  TreeTreeVO(
+                                      "2", "1", "2", false, arrayListOf(
+                                          TreeTreeVO("4", "2", "4", true, null)
+                                      )
+                                  ),
+                                  TreeTreeVO(
+                                      "3", "1", "3", true,
+                                      arrayListOf(
+                                          *(6..100).map {
+                                              TreeTreeVO(it.toString(), "3", it.toString(), true, null)
+                                          }.toTypedArray()
+                                      )
+                                  )
+                              )
+                          )
+                      )
+                  }
+              }
+      */
         tableView.apply {
             isEditable = true
             Register(TableTestVO::id)
@@ -396,22 +402,34 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
-        val customTreeItem = CheckBoxTreeItem(Person(0, "根节点", false)).apply {
+        val leftTreeItem = CheckBoxTreeItem(Person(0, "根节点", false)).apply {
             selectedProperty().addListener { observableValue, old, new ->
                 println("old:$old new:$new")
             }
-        }
-        customTreeItem.children.addAll(
-            TreeItem(Person(1, "1", false)),
-            TreeItem(Person(2, "2", true)),
-        )
-        customTree.apply {
-            root = customTreeItem
-//            setCellFactory {
-//                LerverCheckBoxTreeCell()
-//            }
-            cellFactory = CheckBoxTreeCell.forTreeView()
 
+        }
+        leftTreeItem.children.addAll(
+            CheckBoxTreeItem(Person(1, "1", false)),
+            CheckBoxTreeItem(Person(2, "2", true)).apply {
+                children.addAll(
+                    (6..100).map {
+                        CheckBoxTreeItem(Person(it, it.toString(), it % 2 == 1))
+                    }.toList()
+                )
+            },
+        )
+        leftTree.apply {
+            root = leftTreeItem
+            setCellFactory {
+                LerverCheckBoxTreeCell() {
+                    customLeftFuncNodes(it)
+                }
+            }
+//            cellFactory = CheckBoxTreeCell.forTreeView()
+//            cellFactory = TestCell.forTreeView()
+            this.selectionModel.selectedItemProperty().addListener { observableValue, old, new ->
+                println("选中中了:${new.value.name}")
+            }
         }
 
         /*测试*/
@@ -464,7 +482,30 @@ class CommonDemoView : BaseView<AnchorPane>() {
         }
     }
 
-    private fun customFuncNodes(treeItem: TreeItem<TreeTreeVO>?): List<Node> {
+
+    private fun customLeftFuncNodes(treeItem: TreeItem<Person>?): List<Node> {
+        if (treeItem == null) {
+            return emptyList()
+        }
+        val treeNode = treeItem.value
+        val nodes = java.util.ArrayList<Node>()
+        nodes.add(
+            Label(treeNode.name).apply {
+                this.alignment = Pos.CENTER_LEFT
+            })
+        nodes.add(Spacer())
+
+
+        nodes.add(Label("child:${treeNode.child}").apply {
+            styleClass.addAll(
+                Styles.TEXT,
+                Styles.ACCENT
+            )
+        })
+        return nodes
+    }
+
+    private fun customRightFuncNodes(treeItem: TreeItem<TreeTreeVO>?): List<Node> {
         if (treeItem == null) {
             return emptyList()
         }
@@ -475,16 +516,17 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 this.alignment = Pos.CENTER_LEFT
             })
         nodes.add(Spacer())
-
-
-        nodes.add(Label("taskStatus").apply {
-            styleClass.addAll(
-                Styles.TEXT,
-                Styles.ACCENT
-            )
-        })
+//
+//
+//        nodes.add(Label("taskStatus").apply {
+//            styleClass.addAll(
+//                Styles.TEXT,
+//                Styles.ACCENT
+//            )
+//        })
         return nodes
     }
+
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
     fun treeTest(actionEvent: ActionEvent) {
@@ -493,7 +535,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         println(rootTreeItem.children[0].treeViewId)
         rootTreeItem.children[0].value = TreeListVO("5", "1", "5", SimpleStringProperty("5"))
 
-        val selects = findMatchingTreeItemChildrenByTreeItem(checkTreeView.root) {
+        val selects = findMatchingTreeItemChildrenByTreeItem(rightTreeView.root) {
             val checkBoxTreeItem = it as CheckBoxTreeItem<TreeTreeVO>
             checkBoxTreeItem.isSelected
         }
@@ -619,7 +661,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
     fun treeTestUpt(actionEvent: ActionEvent) {
 
         rootTreeItem.children[0].UpdateItem(TreeListVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
-        val treeItem = treeView.GetItemByBusiId("add1")
+        val treeItem = centerTreeView.GetItemByBusiId("add1")
         treeItem?.UpdateItem(TreeListVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
         println(treeItem?.value)
 
@@ -650,6 +692,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     fun copyText(actionEvent: ActionEvent) {
+        println(Thread.currentThread().name)
+
         copyToClipboard("测试复制的文字")
     }
 

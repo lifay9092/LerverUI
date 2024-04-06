@@ -6,26 +6,27 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.CheckBox
+import javafx.scene.control.CheckBoxTreeItem
+import javafx.scene.control.TreeCell
+import javafx.scene.control.TreeItem
 import javafx.scene.layout.HBox
 import javafx.util.Callback
 import javafx.util.StringConverter
 
-class LerverCheckBoxTreeCell<T : Any> private constructor(
+abstract class LerverCheckBoxTreeCell<T : Any> private constructor(
     getSelectedProperty: Callback<TreeItem<T?>?, ObservableValue<Boolean>?>,
     converter: StringConverter<TreeItem<T?>?>,
     getIndeterminateProperty: Callback<TreeItem<T>, ObservableValue<Boolean>>?,
-    val customFuncNodes: ((TreeItem<T>?) -> List<Node>)? = null
 ) : TreeCell<T>() {
 
     private val checkBox = CheckBox().apply {
         alignment = Pos.CENTER
     }
 
-    //    private var hBox : HBox? = HBox(3.0).apply {
-//        alignment = Pos.CENTER_LEFT
-//    }
-    private var hBox: HBox? = null
+    private var hBox = HBox(3.0).apply {
+        alignment = Pos.TOP_LEFT
+    }
     private var booleanProperty: ObservableValue<Boolean>? = null
     private var indeterminateProperty: BooleanProperty? = null
 
@@ -52,22 +53,6 @@ class LerverCheckBoxTreeCell<T : Any> private constructor(
         converter: StringConverter<TreeItem<T?>?>
     ) : this(getSelectedProperty, converter, null)
 
-    constructor(
-        customFuncNodes: (TreeItem<T>?) -> List<Node>
-    ) : this(Callback<TreeItem<T?>?, ObservableValue<Boolean>?> { item: TreeItem<T?>? ->
-        if (item is CheckBoxTreeItem<*>) {
-            return@Callback (item as CheckBoxTreeItem<*>).selectedProperty()
-        }
-        null
-    }, object : StringConverter<TreeItem<T?>?>() {
-        override fun toString(treeItem: TreeItem<T?>?): String {
-            return if (treeItem?.value == null) "" else treeItem.value.toString()
-        }
-
-        override fun fromString(string: String?): TreeItem<T?>? {
-            return TreeItem(string as T?)
-        }
-    }, null, customFuncNodes)
 
     /* *************************************************************************
      *                                                                         *
@@ -143,77 +128,28 @@ class LerverCheckBoxTreeCell<T : Any> private constructor(
         return selectedStateCallbackProperty().get()
     }
 
-    /* *************************************************************************
-     *                                                                         *
-     * Static cell factories                                                   *
-     *                                                                         *
-     **************************************************************************/
-    companion object {
+    abstract fun customNodes(treeItem: TreeItem<T>): List<Node>?
 
-        fun <T : Any> forTreeView(): Callback<TreeView<T>, TreeCell<T>> {
-            val getSelectedProperty =
-                Callback<TreeItem<T?>?, ObservableValue<Boolean>?> { item: TreeItem<T?>? ->
-                    if (item is CheckBoxTreeItem<T?>) {
-                        return@Callback (item as CheckBoxTreeItem<T>).selectedProperty()
-                    }
-                    null
-                }
-            val lerverCheckBoxTreeCell = LerverCheckBoxTreeCell(
-                getSelectedProperty,
-                object : StringConverter<TreeItem<T?>?>() {
-                    override fun toString(treeItem: TreeItem<T?>?): String {
-                        return if (treeItem?.value == null) "" else treeItem.value.toString()
-                    }
-
-                    override fun fromString(string: String?): TreeItem<T?>? {
-                        return TreeItem(string as T?)
-                    }
-                }, null, null
-            )
-            return Callback { tree: TreeView<T>? ->
-                lerverCheckBoxTreeCell
-            }
-        }
-
-
-    }
-
-    private var isAdd: Boolean = false
-    /* *************************************************************************
-     *                                                                         *
-     * Public API                                                              *
-     *                                                                         *
-     **************************************************************************/
-    /** {@inheritDoc}  */
     override fun updateItem(item: T?, empty: Boolean) {
         super.updateItem(item, empty)
-//        println("updateItem...")
         if (item == null || empty) {
-//            hBox = null
             text = null
             setGraphic(null)
         } else {
-            if (hBox != null && graphic != null) return
-            if (hBox == null) {
-                //  println("hbox....")
-                hBox = HBox(3.0).apply {
-                    alignment = Pos.TOP_LEFT
-                }
-            }
             val c = getConverter()
-            val customNodes = if (customFuncNodes == null) emptyList() else customFuncNodes!!.invoke(treeItem)
-            if (customNodes.isNotEmpty()) {
+            val nodes = customNodes(treeItem)
+            if (!nodes.isNullOrEmpty()) {
                 text = null
-                hBox!!.children.setAll(checkBox, *customNodes.toTypedArray())
+                hBox.children.setAll(checkBox, *nodes.toTypedArray())
             } else {
                 if (item is Node) {
                     text = null
 
-                    hBox!!.children.setAll(checkBox, item as Node?)
+                    hBox.children.setAll(checkBox, item as Node?)
                 } else {
                     val s = c.toString(treeItem)
                     text = s
-                    hBox!!.children.setAll(checkBox)
+                    hBox.children.setAll(checkBox)
                 }
             }
             graphic = hBox
