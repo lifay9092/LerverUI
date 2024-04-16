@@ -52,4 +52,10 @@
     <Button layoutX="931.0" layoutY="409.0" mnemonicParsing="false" onAction="#tableTestClear" text="表格-清空"/>
     <LerverTableView fx:id="tableViewJava" layoutX="809.0" layoutY="484.0" prefHeight="223.0" prefWidth="224.0"/>
     <Button layoutX="698.0" layoutY="449.0" mnemonicParsing="false" onAction="#tableTestUptJava" text="java表格-修改"/>
+    <Button layoutX="290.0" layoutY="724.0" mnemonicParsing="false" text="选择文件" onAction="#OpenFileDialogTest"/>
+    <Button layoutX="388.0" layoutY="724.0" mnemonicParsing="false" text="选择多个文件"
+            onAction="#OpenMultipleFileDialogTest"/>
+    <Button layoutX="526.0" layoutY="724.0" mnemonicParsing="false" text="选择目录"
+            onAction="#OpenDirectoryDialogTest"/>
+    <Button layoutX="641.0" layoutY="724.0" mnemonicParsing="false" text="保存文件" onAction="#SaveFileDialogTest"/>
 </AnchorPane>

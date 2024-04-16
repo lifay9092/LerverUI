@@ -1,6 +1,7 @@
 package cn.lifay.extension
 
 import atlantafx.base.theme.Styles
+import cn.lifay.chooser.ChooserExtension
 import cn.lifay.exception.LerverUIException
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.LoadingUI
@@ -14,6 +15,9 @@ import javafx.scene.input.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import javafx.stage.DirectoryChooser
+import javafx.stage.FileChooser
+import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.Stage
 import javafx.stage.Window
 import kotlinx.coroutines.*
@@ -542,4 +546,140 @@ fun createMenuItem(
         item.accelerator = accelerator
     }
     return item
+}
+
+/**
+ * 打开选择文件窗口，并执行操作
+ */
+fun OpenFileDialog(
+    window: Window,
+    title: String,
+    initialDirectory: File? = null,
+    extensionFilters: List<ExtensionFilter>? = null,
+    handle: (File?) -> Unit
+) {
+    val fileChooser = FileChooser()
+    fileChooser.title = title
+    if (extensionFilters != null) {
+        fileChooser.extensionFilters.addAll(extensionFilters)
+    }
+    if (initialDirectory == null) {
+        val initFile = ChooserExtension.getInitFile()
+        if (!initFile.exists()) {
+            fileChooser.initialDirectory = File(System.getProperty("user.dir"))
+        } else {
+            if (initFile.isDirectory) {
+                fileChooser.initialDirectory = initFile
+            } else {
+                fileChooser.initialDirectory = initFile.parentFile
+            }
+        }
+    } else {
+        fileChooser.initialDirectory = initialDirectory
+    }
+    val file = fileChooser.showOpenDialog(window)
+    handle.invoke(file)
+    file.let {
+        ChooserExtension.updateInitChooserPath(it.absolutePath)
+    }
+}
+
+/**
+ * 打开选择文件窗口，并执行操作
+ */
+fun SaveFileDialog(
+    window: Window,
+    title: String,
+    initialDirectory: File? = null,
+    initialFileName: String? = null,
+    handle: (File?) -> Unit
+) {
+    val fileChooser = FileChooser()
+    fileChooser.title = title
+    if (initialFileName != null) {
+        fileChooser.initialFileName = initialFileName
+    }
+    if (initialDirectory == null) {
+        val initFile = ChooserExtension.getInitFile()
+        if (!initFile.exists()) {
+            fileChooser.initialDirectory = File(System.getProperty("user.dir"))
+        } else {
+            if (initFile.isDirectory) {
+                fileChooser.initialDirectory = initFile
+            } else {
+                fileChooser.initialDirectory = initFile.parentFile
+            }
+        }
+    } else {
+        fileChooser.initialDirectory = initialDirectory
+    }
+    val file = fileChooser.showSaveDialog(window)
+    handle.invoke(file)
+    file.let {
+        ChooserExtension.updateInitChooserPath(it.absolutePath)
+    }
+}
+
+/**
+ * 打开多个选择文件窗口，并执行操作
+ */
+fun OpenMultipleFileDialog(
+    window: Window,
+    title: String,
+    initialDirectory: File? = null,
+    extensionFilters: List<ExtensionFilter>? = null,
+    handle: (List<File>?) -> Unit
+) {
+    val fileChooser = FileChooser()
+    fileChooser.title = title
+    if (extensionFilters != null) {
+        fileChooser.extensionFilters.addAll(extensionFilters)
+    }
+    if (initialDirectory == null) {
+        val initFile = ChooserExtension.getInitFile()
+        if (!initFile.exists()) {
+            fileChooser.initialDirectory = File(System.getProperty("user.dir"))
+        } else {
+            if (initFile.isDirectory) {
+                fileChooser.initialDirectory = initFile
+            } else {
+                fileChooser.initialDirectory = initFile.parentFile
+            }
+        }
+    } else {
+        fileChooser.initialDirectory = initialDirectory
+    }
+    val file = fileChooser.showOpenMultipleDialog(window)
+    handle.invoke(file)
+    file.let {
+        ChooserExtension.updateInitChooserPath(it[0].absolutePath)
+    }
+}
+
+
+/**
+ * 打开选择目录窗口，并执行操作
+ */
+fun OpenDirectoryDialog(window: Window, title: String, initialDirectory: File? = null, handle: (File?) -> Unit) {
+    val directoryChooser = DirectoryChooser()
+    directoryChooser.title = title
+    if (initialDirectory == null) {
+        val initFile = ChooserExtension.getInitFile()
+        if (!initFile.exists()) {
+            directoryChooser.initialDirectory = File(System.getProperty("user.dir"))
+        } else {
+            if (initFile.isDirectory) {
+                directoryChooser.initialDirectory = initFile
+            } else {
+                directoryChooser.initialDirectory = initFile.parentFile
+            }
+        }
+    } else {
+        directoryChooser.initialDirectory = initialDirectory
+    }
+    val file = directoryChooser.showDialog(window)
+    handle.invoke(file)
+    file.let {
+        ChooserExtension.updateInitChooserPath(it.absolutePath)
+    }
 }

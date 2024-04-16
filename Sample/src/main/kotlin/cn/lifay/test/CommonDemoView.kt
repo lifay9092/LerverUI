@@ -418,11 +418,17 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 )
             },
         )
+
         leftTree.apply {
             root = leftTreeItem
             setCellFactory {
-                LerverCheckBoxTreeCell() {
-                    customLeftFuncNodes(it)
+                object : LerverCheckBoxTreeCell<Person>() {
+                    override fun customNodes(treeItem: TreeItem<Person>): List<Node>? {
+                        return listOf(
+                            Label(treeItem.value.name)
+                        )
+                    }
+
                 }
             }
 //            cellFactory = CheckBoxTreeCell.forTreeView()
@@ -732,6 +738,36 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     fun clearTreeCache(actionEvent: ActionEvent) {
 
+    }
+
+    fun OpenFileDialogTest(actionEvent: ActionEvent) {
+        OpenFileDialog(rootPane.scene.window, "选择文件") {
+            it?.let {
+                showMessage("选择了:${it.absolutePath}")
+            }
+        }
+    }
+
+    fun OpenMultipleFileDialogTest(actionEvent: ActionEvent) {
+        OpenMultipleFileDialog(rootPane.scene.window, "选择多个文件") {
+            it?.let {
+                showMessage("选择了:${it.map { it.absolutePath }.joinToString("\n")}")
+            }
+        }
+    }
+
+    fun OpenDirectoryDialogTest(actionEvent: ActionEvent) {
+        OpenDirectoryDialog(rootPane.scene.window, "选择目录") {
+            showMessage("选择了:${it?.absolutePath}")
+        }
+    }
+
+    fun SaveFileDialogTest(actionEvent: ActionEvent) {
+        SaveFileDialog(rootPane.scene.window, "保存文件") {
+            it?.let {
+                showMessage("保存到:${it.absolutePath}")
+            }
+        }
     }
 
 
