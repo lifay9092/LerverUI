@@ -350,7 +350,7 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
      * 执行UI操作,确保UI更新不会被取消
      */
     suspend fun ui(block: () -> Unit) {
-        withContext(NonCancellable) {
+        withContext(Dispatchers.Main + NonCancellable) {
             block()
         }
     }
