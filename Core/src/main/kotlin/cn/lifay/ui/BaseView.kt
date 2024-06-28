@@ -18,10 +18,12 @@ import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.stage.Window
 import javafx.util.Duration
+import kotlinx.coroutines.*
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2OutlinedAL
 import java.net.URL
 import java.util.*
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -40,7 +42,9 @@ import java.util.*
  * @author lifay
  * @date 2023/2/23 17:01
  **/
-abstract class BaseView<R : Pane>() : Initializable {
+abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main
 
     var ROOT_PANE: R
 
@@ -342,7 +346,14 @@ abstract class BaseView<R : Pane>() : Initializable {
         }
     }
 
-    /*树视图部分*/
-
+    /**
+     * 执行UI操作,确保UI更新不会被取消
+     */
+    suspend fun ui(block: () -> Unit) {
+        withContext(Dispatchers.Main + NonCancellable) {
+            block()
+        }
+    }
 
 }
+

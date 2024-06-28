@@ -36,6 +36,9 @@ object GlobalConfig {
         return if (CONFIG_MAP.containsKey(key)) {
             CONFIG_MAP[key]!!
         } else {
+            if (defaultValue.isNotBlank()) {
+                WriteProperties(key, defaultValue)
+            }
             defaultValue
         }
     }
