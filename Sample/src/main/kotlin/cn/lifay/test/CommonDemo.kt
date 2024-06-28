@@ -2,6 +2,7 @@ package cn.lifay.test
 
 import atlantafx.base.theme.PrimerLight
 import cn.lifay.global.BaseApplication
+import cn.lifay.global.GlobalConfig
 import cn.lifay.global.GlobalResource
 import cn.lifay.ui.BaseView
 import javafx.scene.Scene
@@ -22,7 +23,8 @@ class CommonDemo : BaseApplication(
 ) {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
-        println("首页")
+        GlobalConfig.WriteProperties("test1", "实时")
+        println(GlobalConfig.ReadProperties("test2", "实时"))
         val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
 //        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
 //        val root = fxmlLoader.load<Pane>()

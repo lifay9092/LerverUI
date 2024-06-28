@@ -1,9 +1,9 @@
 package cn.lifay.test
 
+import atlantafx.base.controls.Spacer
 import atlantafx.base.theme.Styles
 import cn.lifay.db.UserData
 import cn.lifay.extension.*
-import cn.lifay.logutil.LerverLog
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
@@ -20,6 +20,8 @@ import javafx.collections.ListChangeListener
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
+import javafx.geometry.Pos
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.CheckBoxTreeCell
 import javafx.scene.control.cell.ProgressBarTableCell
@@ -94,7 +96,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        LerverLog.debug("纯纯粹粹")
 
         val observableArrayList = FXCollections.observableArrayList<TreeListVO>()
         splitMenuBtn.items.addAll(
@@ -282,12 +283,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
 //                LerverCheckBoxTreeCell()
                 LerverCheckBoxTreeCell<TreeTreeVO> {
-                    listOf(Label("name:${it?.value?.name}").apply {
-                        styleClass.addAll(
-                            Styles.TEXT,
-                            Styles.ACCENT
-                        )
-                    })
+                    customFuncNodes(it)
+//                    listOf(Label("name:${it?.value?.name}").apply {
+//                        styleClass.addAll(
+//                            Styles.TEXT,
+//                            Styles.ACCENT
+//                        )
+//                    })
                 }
             }
 //            cellFactory = CheckBoxTreeCell.forTreeView()
@@ -460,6 +462,27 @@ class CommonDemoView : BaseView<AnchorPane>() {
         }
     }
 
+    private fun customFuncNodes(treeItem: TreeItem<TreeTreeVO>?): List<Node> {
+        if (treeItem == null) {
+            return emptyList()
+        }
+        val treeNode = treeItem.value
+        val nodes = ArrayList<Node>()
+        nodes.add(
+            Label(treeNode.name).apply {
+                this.alignment = Pos.CENTER_LEFT
+            })
+        nodes.add(Spacer())
+
+
+        nodes.add(Label("taskStatus").apply {
+            styleClass.addAll(
+                Styles.TEXT,
+                Styles.ACCENT
+            )
+        })
+        return nodes
+    }
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
     fun treeTest(actionEvent: ActionEvent) {

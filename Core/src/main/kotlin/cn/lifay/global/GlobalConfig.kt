@@ -1,6 +1,7 @@
 package cn.lifay.global
 
 import java.io.File
+import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.util.*
 
@@ -16,7 +17,7 @@ object GlobalConfig {
     private lateinit var LERVER_CONFIG_PATH: String
 
     private val CONFIG_MAP = HashMap<String, String>()
-
+    private val CHAR = Charset.defaultCharset()
     fun InitLerverConfigPath(configPath: String) {
         LERVER_CONFIG_PATH = configPath
         val file = File(LERVER_CONFIG_PATH)
@@ -56,7 +57,7 @@ object GlobalConfig {
                 """
                 ${key}=$value
                 
-            """.trimIndent(), Charset.forName("utf-8")
+            """.trimIndent(), CHAR
             )
         }
         ReloadConfigMap()
@@ -68,10 +69,13 @@ object GlobalConfig {
         if (lerverConfigFile.exists()) {
             val properties = Properties()
             lerverConfigFile.inputStream().use {
-                properties.load(it)
-                data.forEach { key, value ->
-                    properties.setProperty(key, value)
+                InputStreamReader(it).use {
+                    properties.load(it)
+                    data.forEach { key, value ->
+                        properties.setProperty(key, value)
+                    }
                 }
+
             }
             lerverConfigFile.outputStream().use {
                 properties.store(it, "")
@@ -80,7 +84,7 @@ object GlobalConfig {
             val text = data.map {
                 "${it.key}=${it.value}"
             }.joinToString("\n")
-            lerverConfigFile.writeText(text, Charset.forName("utf-8"))
+            lerverConfigFile.writeText(text, CHAR)
         }
         ReloadConfigMap()
     }
@@ -116,7 +120,7 @@ object GlobalConfig {
                         db.user = ${dbEntity.user}
                         db.password = ${dbEntity.password}
                         
-                    """.trimIndent(), Charset.forName("utf-8")
+                    """.trimIndent(), CHAR
         )
         ReloadConfigMap()
     }
