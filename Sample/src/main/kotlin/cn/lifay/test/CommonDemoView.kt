@@ -278,18 +278,21 @@ class CommonDemoView : BaseView<AnchorPane>() {
         checkTreeView.apply {
             root = rootCheckTreeItem
             isShowRoot = true
-//            cellFactory = LerverCheckBoxTreeCell.forTreeView<TreeTreeVO>()
+            cellFactory = CheckBoxTreeCell.forTreeView<TreeTreeVO>()
             setCellFactory {
 
 //                LerverCheckBoxTreeCell()
-                LerverCheckBoxTreeCell<TreeTreeVO> {
-                    customFuncNodes(it)
+                object : LerverCheckBoxTreeCell<TreeTreeVO>() {
+                    //                    customFuncNodes(it)
 //                    listOf(Label("name:${it?.value?.name}").apply {
 //                        styleClass.addAll(
 //                            Styles.TEXT,
 //                            Styles.ACCENT
 //                        )
 //                    })
+                    override fun customNodes(treeItem: TreeItem<TreeTreeVO>): List<Node>? {
+                        return customFuncNodes(treeItem)
+                    }
                 }
             }
 //            cellFactory = CheckBoxTreeCell.forTreeView()

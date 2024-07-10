@@ -39,6 +39,12 @@
             <id>lifay-public</id>
             <url>http://www.lifay.cn:8081/repository/maven-public/</url>
         </repository>
+        <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
+        <repository>
+            <id>Sonatype-public</id>
+            <name>SnakeYAML repository</name>
+            <url>http://oss.sonatype.org/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -110,8 +116,12 @@
             <artifactId>ikonli-material2-pack</artifactId>
             <version>12.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.2</version>
+        </dependency>
     </dependencies>
-    <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
 
     <build>
         <plugins>

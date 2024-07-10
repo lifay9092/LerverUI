@@ -8,7 +8,6 @@ import cn.lifay.ui.BaseView
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
-import java.io.File
 
 /*
  * Demo 测试类
@@ -18,7 +17,7 @@ import java.io.File
  */
 class CommonDemo : BaseApplication(
     theme = PrimerLight(),
-    configPath = GlobalResource.USER_DIR + "test" + File.separator + "cc.config",
+    configPath = GlobalResource.USER_DIR + "lerver.yml",
     logPrefix = "test"
 ) {
     @Throws(Exception::class)

@@ -1,9 +1,12 @@
 package cn.lifay.global
 
+import com.moandjiezana.toml.Toml
+import com.moandjiezana.toml.TomlWriter
 import java.io.File
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.util.*
+
 
 data class DbEntity(
 
@@ -16,8 +19,14 @@ object GlobalConfig {
 
     private lateinit var LERVER_CONFIG_PATH: String
 
-    private val CONFIG_MAP = HashMap<String, String>()
+    private val CONFIG_MAP = HashMap<String, Any>()
     private val CHAR = Charset.defaultCharset()
+    private val TOML_WRITER = TomlWriter.Builder()
+        .indentValuesBy(2)
+        .indentTablesBy(4)
+        .padArrayDelimitersBy(0)
+        .build()
+
     fun InitLerverConfigPath(configPath: String) {
         LERVER_CONFIG_PATH = configPath
         val file = File(LERVER_CONFIG_PATH)
@@ -43,53 +52,45 @@ object GlobalConfig {
         }
     }
 
-    @Synchronized
-    fun WriteProperties(key: String, value: String) {
+    fun readConfig(): Toml {
         val lerverConfigFile = getLerverConfigFile()
         if (lerverConfigFile.exists()) {
-            val properties = Properties()
+            val toml = Toml()
             lerverConfigFile.inputStream().use {
-                properties.load(it)
-                properties.setProperty(key, value)
+                toml.read(it)
+                val map = toml.toMap()
+
             }
-            lerverConfigFile.outputStream().use {
-                properties.store(it, "")
-            }
-        } else {
-            lerverConfigFile.writeText(
-                """
-                ${key}=$value
-                
-            """.trimIndent(), CHAR
-            )
+
         }
-        ReloadConfigMap()
+
+    }
+}
+    @Synchronized
+    fun WriteProperties(key: String, value: Any) {
+        WriteProperties(mapOf(Pair(key, value)))
     }
 
     @Synchronized
-    fun WriteProperties(data: Map<String, String>) {
+    fun WriteProperties(data: Map<String, Any>) {
         val lerverConfigFile = getLerverConfigFile()
         if (lerverConfigFile.exists()) {
-            val properties = Properties()
+            val toml = Toml()
             lerverConfigFile.inputStream().use {
                 InputStreamReader(it).use {
-                    properties.load(it)
+                    toml.read(it)
+                    val map = toml.toMap()
                     data.forEach { key, value ->
-                        properties.setProperty(key, value)
+                        map[key] = value
                     }
                 }
 
             }
-            lerverConfigFile.outputStream().use {
-                properties.store(it, "")
-            }
-        } else {
-            val text = data.map {
-                "${it.key}=${it.value}"
-            }.joinToString("\n")
-            lerverConfigFile.writeText(text, CHAR)
+
         }
-        ReloadConfigMap()
+        lerverConfigFile.outputStream().use {
+            TOML_WRITER.write(data, it)
+        }
     }
 
     fun ReadDbConfig(
@@ -125,24 +126,23 @@ object GlobalConfig {
                         
                     """.trimIndent(), CHAR
         )
-        ReloadConfigMap()
     }
 
     private fun getLerverConfigFile(): File {
         return File(LERVER_CONFIG_PATH)
     }
-
-    private fun ReloadConfigMap() {
-        val lerverConfigFile = getLerverConfigFile()
-        val properties = Properties()
-        lerverConfigFile.inputStream().use {
-            properties.load(it)
-            CONFIG_MAP.clear()
-            properties.forEach { p ->
-                CONFIG_MAP[p.key.toString()] = p.value.toString()
-            }
-
-        }
-    }
+//
+//    private fun ReloadConfigMap() {
+//        val lerverConfigFile = getLerverConfigFile()
+//        val toml = Toml()
+//        lerverConfigFile.inputStream().use {
+//            CONFIG_MAP.clear()
+//            toml.read(it)
+//            val map = toml.toMap()
+//            map.forEach { key, value ->
+//                CONFIG_MAP[key] = value
+//            }
+//        }
+//    }
 
 }
