@@ -4,6 +4,8 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
 import cn.lifay.global.DbEntity
 import cn.lifay.global.GlobalConfig
+import cn.lifay.global.GlobalConfig.LoadToConfigMap
+import cn.lifay.global.GlobalConfig.WritePropertiesForKey
 import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import javafx.beans.property.SimpleDoubleProperty
@@ -60,7 +62,7 @@ object DbManage {
             var dbEntity: DbEntity? = null
             val defaultDbPath = GlobalResource.USER_DIR + DB_NAME
             //获取db配置文件
-            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.properties"
+            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.yml"
             val lerverConfigFile = File(lerverConfigPath)
             if (!lerverConfigFile.exists()) {
                 val dbConfigPath = "${GlobalResource.USER_DIR}db.config"
@@ -81,13 +83,13 @@ object DbManage {
                             dbEntity = DbEntity(url, user, password)
                         }
                     }
-                    GlobalConfig.WriteDbConfig(dbEntity!!)
+                    WriteDbConfig(dbEntity!!)
                 } else {
                     output("lerver.properties 不存在...")
                     //配置数据库连接文件:lerver.config
                     val jdbcUrl = "jdbc:sqlite:${defaultDbPath}".replace("\\", "/")
                     dbEntity = DbEntity(jdbcUrl, "", "")
-                    GlobalConfig.WriteDbConfig(dbEntity!!)
+                    WriteDbConfig(dbEntity!!)
                 }
 
             } else {
@@ -99,6 +101,19 @@ object DbManage {
             LerverLog.error(e)
         }
 
+    }
+
+    @Synchronized
+    private fun WriteDbConfig(dbEntity: DbEntity) {
+        WritePropertiesForKey(
+            "db",
+            mapOf(
+                "url" to dbEntity.url,
+                "user" to dbEntity.user,
+                "password" to dbEntity.password,
+            )
+        )
+        LoadToConfigMap()
     }
 
     private fun output(s: String) {

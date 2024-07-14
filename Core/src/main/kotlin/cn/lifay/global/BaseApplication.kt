@@ -15,9 +15,17 @@ abstract class BaseApplication(
     init {
 
         GlobalConfig.InitLerverConfigPath(configPath)
+        GlobalConfig.WritePropertiesForKey(
+            arrayOf("r", "s", "t"), mapOf(
+                "k" to true,
+                "l" to "m",
+            )
+        )
         println(GlobalConfig.ReadProperties("a"))
         println(GlobalConfig.ReadProperties("b"))
         println(GlobalConfig.ReadProperties("c"))
+        println(GlobalConfig.ReadProperties("c.d"))
+        println(GlobalConfig.ReadProperties("c.e.f"))
 
         LerverLog.InitLog(logPrefix, logPath)
         GlobalResource.loadTheme(theme)

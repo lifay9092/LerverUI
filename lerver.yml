@@ -1,0 +1,17 @@
+a: dsaaa
+b: 22
+r:
+  s:
+    t:
+      l: m
+      k: true
+c:
+  d: ffggg
+  e:
+    f: fv
+test1: 实时
+db:
+  auto_target: true
+  password: ''
+  url: jdbc:sqlite:D:/IdeaProjects/LerverUI/db.db
+  user: ''

@@ -1,12 +1,11 @@
 package cn.lifay.global
 
-import com.moandjiezana.toml.Toml
-import com.moandjiezana.toml.TomlWriter
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.LoaderOptions
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.Constructor
+import org.yaml.snakeyaml.representer.Representer
 import java.io.File
-import java.io.InputStreamReader
-import java.nio.charset.Charset
-import java.util.*
-
 
 data class DbEntity(
 
@@ -20,13 +19,24 @@ object GlobalConfig {
     private lateinit var LERVER_CONFIG_PATH: String
 
     private val CONFIG_MAP = HashMap<String, Any>()
-    private val CHAR = Charset.defaultCharset()
-    private val TOML_WRITER = TomlWriter.Builder()
-        .indentValuesBy(2)
-        .indentTablesBy(4)
-        .padArrayDelimitersBy(0)
-        .build()
+    private val LOADER_OPTIONS = LoaderOptions().apply {
+        this.isAllowDuplicateKeys = true
+        this.allowRecursiveKeys = true
+        this.isProcessComments = true
+    }
+    private val DUMPER_OPTIONS = DumperOptions().apply {
+        this.isProcessComments = true
+    }
+    private val YAML = Yaml(
+        Constructor(LOADER_OPTIONS),
+        Representer(DUMPER_OPTIONS),
+        DUMPER_OPTIONS,
+        LOADER_OPTIONS
+    )
 
+    /**
+     * 初始化配置文件
+     */
     fun InitLerverConfigPath(configPath: String) {
         LERVER_CONFIG_PATH = configPath
         val file = File(LERVER_CONFIG_PATH)
@@ -34,63 +44,97 @@ object GlobalConfig {
             file.parentFile.mkdirs()
             file.createNewFile()
         }
-        ReloadConfigMap()
+        LoadToConfigMap()
     }
 
     fun ContainsKey(key: String): Boolean {
+        val keys = splitKeys(key)
+        var current = HashMap<String, Any>()
+        current.putAll(CONFIG_MAP)
+        for ((index, key) in keys.withIndex()) {
+            if (index == keys.size - 1) {
+                return current.containsKey(key)
+            }
+            val newMap = current[key]
+            if (newMap is HashMap<*, *>) {
+                current = newMap as HashMap<String, Any>
+            } else {
+                //取不到值
+                return false
+            }
+        }
         return CONFIG_MAP.containsKey(key)
     }
 
-    fun ReadProperties(key: String, defaultValue: String = ""): String {
-        return if (CONFIG_MAP.containsKey(key)) {
-            CONFIG_MAP[key]!!
-        } else {
-            if (defaultValue.isNotBlank()) {
-                WriteProperties(key, defaultValue)
-            }
-            defaultValue
-        }
+    private fun splitKeys(key: String): Array<String> {
+        return key.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     }
 
-    fun readConfig(): Toml {
-        val lerverConfigFile = getLerverConfigFile()
-        if (lerverConfigFile.exists()) {
-            val toml = Toml()
-            lerverConfigFile.inputStream().use {
-                toml.read(it)
-                val map = toml.toMap()
-
+    fun <T> ReadProperties(key: String, defaultValue: T? = null): T? {
+        val keys = splitKeys(key)
+        var current = HashMap<String, Any>()
+        current.putAll(CONFIG_MAP)
+        for ((index, key) in keys.withIndex()) {
+            if (index == keys.size - 1) {
+                val v = current[key] ?: return defaultValue
+                return v as T
             }
-
+            val newMap = current[key]
+            if (newMap is HashMap<*, *>) {
+                current = newMap as HashMap<String, Any>
+            } else {
+                //取不到值
+                return defaultValue
+            }
         }
-
+        return defaultValue
     }
-}
+
     @Synchronized
     fun WriteProperties(key: String, value: Any) {
-        WriteProperties(mapOf(Pair(key, value)))
+        CONFIG_MAP[key] = value
+        SaveToYaml()
     }
 
     @Synchronized
     fun WriteProperties(data: Map<String, Any>) {
-        val lerverConfigFile = getLerverConfigFile()
-        if (lerverConfigFile.exists()) {
-            val toml = Toml()
-            lerverConfigFile.inputStream().use {
-                InputStreamReader(it).use {
-                    toml.read(it)
-                    val map = toml.toMap()
-                    data.forEach { key, value ->
-                        map[key] = value
-                    }
-                }
-
-            }
-
+        data.forEach { k, v ->
+            CONFIG_MAP[k] = v
         }
-        lerverConfigFile.outputStream().use {
-            TOML_WRITER.write(data, it)
+        SaveToYaml()
+    }
+
+    /**
+     * 向嵌套的 Map 添加键值对。
+     * @param key 用于导航到最内层 Map 的键列表,用逗号分隔
+     * @param data 键值对
+
+     */
+    @Synchronized
+    fun WritePropertiesForKey(key: String, data: Map<String, Any>) {
+        val keys = splitKeys(key)
+        WritePropertiesForKey(keys, data)
+    }
+
+    /**
+     * 向嵌套的 Map 添加键值对。
+     * @param keys 用于导航到最内层 Map 的键列表
+     * @param data 键值对
+     */
+    @Synchronized
+    fun WritePropertiesForKey(keys: Array<String>, data: Map<String, Any>) {
+        var currentMap = CONFIG_MAP
+        keys.dropLast(1).forEach { key ->
+            currentMap = currentMap.getOrPut(key) {
+                HashMap<String, Any>()
+            } as HashMap<String, Any>
         }
+        currentMap[keys.last()] = (currentMap.getOrPut(keys.last()) {
+            HashMap<String, Any>()
+        } as HashMap<String, Any>).apply {
+            putAll(data)
+        }
+        SaveToYaml()
     }
 
     fun ReadDbConfig(
@@ -99,50 +143,49 @@ object GlobalConfig {
         userKey: String = "db.user",
         passwordKey: String = "db.password"
     ): DbEntity {
-        var url = CONFIG_MAP.getOrDefault(urlKey, "")
-        val user = CONFIG_MAP.getOrDefault(userKey, "")
-        val password = CONFIG_MAP.getOrDefault(passwordKey, "")
+        var url = CONFIG_MAP.getOrDefault(urlKey, "") as String
+        val user = CONFIG_MAP.getOrDefault(userKey, "") as String
+        val password = CONFIG_MAP.getOrDefault(passwordKey, "") as String
         if (url.isBlank()) {
             //已有配置文件中写入db配置
             url = "jdbc:sqlite:${(GlobalResource.USER_DIR).replace("\\", "/") + DB_NAME}"
-            WriteProperties(
+            WritePropertiesForKey(
+                "db",
                 mapOf(
-                    "db.url" to url,
-                    "db.user" to user,
-                    "db.password" to password,
+                    "url" to url,
+                    "user" to user,
+                    "password" to password,
                 )
             )
         }
         return DbEntity(url, user, password)
     }
 
-    @Synchronized
-    fun WriteDbConfig(dbEntity: DbEntity) {
-        getLerverConfigFile().writeText(
-            """
-                        db.url = ${dbEntity.url}
-                        db.user = ${dbEntity.user}
-                        db.password = ${dbEntity.password}
-                        
-                    """.trimIndent(), CHAR
-        )
-    }
-
     private fun getLerverConfigFile(): File {
         return File(LERVER_CONFIG_PATH)
     }
-//
-//    private fun ReloadConfigMap() {
-//        val lerverConfigFile = getLerverConfigFile()
-//        val toml = Toml()
-//        lerverConfigFile.inputStream().use {
-//            CONFIG_MAP.clear()
-//            toml.read(it)
-//            val map = toml.toMap()
-//            map.forEach { key, value ->
-//                CONFIG_MAP[key] = value
-//            }
-//        }
-//    }
+
+    /**
+     * 加载yaml文件配置信息到ConfigMap
+     */
+    fun LoadToConfigMap() {
+        val lerverConfigFile = getLerverConfigFile()
+        lerverConfigFile.inputStream().use {
+            val map = YAML.load<Map<String, Any>>(it)
+            map.forEach { p ->
+                CONFIG_MAP[p.key] = p.value
+            }
+        }
+        val s = 1
+    }
+
+    /**
+     * 写出ConfigMap配置到yaml文件
+     */
+    fun SaveToYaml() {
+        val lerverConfigFile = getLerverConfigFile()
+        YAML.dumpAsMap(CONFIG_MAP)
+        lerverConfigFile.writeText(YAML.dumpAsMap(CONFIG_MAP))
+    }
 
 }

@@ -332,7 +332,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
         tableView.apply {
             isEditable = true
             Register(TableTestVO::id)
-            columns.addAll(
+            InitTableColumn(
+                true,
                 TableColumn<TableTestVO, String>("普通").apply {
                     this.cellValueFactory = PropertyValueFactory("id")
                     setCellFactory {

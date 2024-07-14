@@ -2,9 +2,13 @@ package cn.lifay.ui.table
 
 import cn.lifay.ui.DelegateProp
 import javafx.beans.property.Property
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
+import javafx.scene.control.CheckBox
+import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
+import javafx.scene.control.cell.CheckBoxTableCell
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import kotlin.reflect.KMutableProperty1
@@ -70,6 +74,77 @@ class LerverTableView<T : Any, P : Any> : TableView<T> {
         initListener()
     }
 
+    //是否操作所有元素
+    private var selectAll = true
+
+    //为元素提供索引
+    private val checkMap = HashMap<Int, SimpleBooleanProperty>()
+
+    fun InitTableColumn(vararg tableColumns: TableColumn<T, *>) {
+        InitTableColumn(false, *tableColumns)
+    }
+
+    fun InitTableColumn(isCheckBox: Boolean, vararg tableColumns: TableColumn<T, *>) {
+        if (isCheckBox) {
+            val checkBox = CheckBox()
+            val checkTableColumn = TableColumn<T, Boolean>().apply {
+                this.graphic = checkBox
+                this.isEditable = true
+                this.isSortable = false
+                this.cellFactory = CheckBoxTableCell.forTableColumn(this)
+                this.setCellValueFactory {
+                    val code = it.value.hashCode()
+                    if (!checkMap.containsKey(code)) {
+                        val defaultBool = SimpleBooleanProperty(false)
+                        checkMap[code] = defaultBool
+                        return@setCellValueFactory defaultBool
+                    } else {
+                        val result = checkMap[code]
+//                    println("setCellValueFactory:$result")
+                        if (!result!!.value) {
+                            //部分取消勾选
+                            selectAll = false
+                            checkBox.isSelected = false
+                            selectAll = true
+                        } else {
+                            //部分勾选
+                            var all = true
+                            checkMap.forEach { (k, v) ->
+                                if (k != code && !v.value) {
+                                    all = false
+                                    return@forEach
+                                }
+                            }
+                            if (all) {
+                                selectAll = false
+                                checkBox.isSelected = true
+                                selectAll = true
+                            }
+                        }
+                        return@setCellValueFactory result
+                    }
+                }
+            }
+            checkBox.selectedProperty().addListener { observableValue, old, new ->
+                if (selectAll) {
+                    if (!old && new) {
+                        //全选
+                        checkMap.forEach { k, v ->
+                            v.value = true
+                        }
+                    } else if (old && !new) {
+                        //取消全选
+                        checkMap.forEach { k, v ->
+                            v.value = false
+                        }
+                    }
+                }
+
+            }
+            this.columns.add(checkTableColumn)
+        }
+        this.columns.addAll(tableColumns)
+    }
     private fun initListener() {
         val list = itemsProperty().get()
         list.addListener(ListChangeListener<T> { c ->

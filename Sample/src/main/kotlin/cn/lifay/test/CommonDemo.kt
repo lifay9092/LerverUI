@@ -23,7 +23,7 @@ class CommonDemo : BaseApplication(
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
         GlobalConfig.WriteProperties("test1", "实时")
-        println(GlobalConfig.ReadProperties("test2", "实时"))
+        println(GlobalConfig.ReadProperties("test2", "实时-默认"))
         val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
 //        val fxmlLoader = FXMLLoader(CommonDemo::class.java.getResource("demo.fxml"))
 //        val root = fxmlLoader.load<Pane>()
