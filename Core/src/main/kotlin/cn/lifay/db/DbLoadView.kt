@@ -1,7 +1,6 @@
 package cn.lifay.db
 
 import atlantafx.base.theme.Styles
-import cn.lifay.GlobeStartUp
 import cn.lifay.extension.*
 import cn.lifay.global.GlobalConfig
 import cn.lifay.logutil.LerverLog
@@ -13,9 +12,13 @@ import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import java.util.function.Supplier
 
-class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val afterDbInit: (() -> Unit)? = null) :
+class DbLoadView(
+    val isShowStage: Boolean,
+    val primaryStage: Stage,
+    val dbName: String,
+    val afterDbInit: (() -> Unit)? = null
+) :
     VBox(20.0) {
 
     var indexStage: Stage? = null
@@ -54,7 +57,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
         )
     }
     val autoTarget =
-        if (!GlobeStartUp.IS_SHOW_STAGE) {
+        if (!isShowStage) {
             true
         } else {
             "true" == GlobalConfig.ReadProperties("db.auto_target", "false")
@@ -152,7 +155,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
 
     private fun targetIndex() {
         try {
-            indexStage = indexStageGet.get()
+            indexStage = primaryStage
         } catch (e: Exception) {
             e.printStackTrace()
             val msg = "初始化界面失败,请检查db脚本:${e.stackTraceToString()}"

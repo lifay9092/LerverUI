@@ -1,6 +1,7 @@
 package cn.lifay;
 
 import cn.lifay.global.BaseApplication;
+import cn.lifay.global.DefaultApplication;
 import cn.lifay.global.InitDbApplication;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -24,8 +25,21 @@ public class GlobeStartUp {
      * @param stageGet 首页窗口
      */
     public static void launch(Supplier<Stage> stageGet) {
-        launch("db.db", true, stageGet);
+        STAGE_GET = stageGet;
+//        launch("db.db", true, stageGet);
+//        Stage stage = stageGet.get();
+//        BaseApplication baseApplication = new BaseApplication() {
+//            @NotNull
+//            @Override
+//            public Stage addPrimaryStage() {
+//                return stage;
+//            }
+//        };
+//        BaseApplication.launch();
+        Application.launch(DefaultApplication.class);
     }
+
+    public static Supplier<Stage> STAGE_GET = null;
 
     /**
      * 指定窗口启动、指定初始化db名称

@@ -21,11 +21,15 @@ object FormUITest {
             val fxmlLoader = FXMLLoader(FormUITest::class.java.getResource("formTest.fxml"))
             val load = fxmlLoader.load<Parent>()
             val scene = Scene(load)
-            primaryStage.title = "Hello World"
+            primaryStage.title = "Hello World111"
             primaryStage.scene = scene
-            primaryStage.show()
             primaryStage
         }
     }
 
+
+}
+
+fun main() {
+    FormUITest.run()
 }

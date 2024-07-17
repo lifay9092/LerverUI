@@ -1,6 +1,7 @@
 package cn.lifay;
 
 import cn.lifay.test.CommonDemo;
+import javafx.application.Application;
 
 
 /*
@@ -14,6 +15,6 @@ import cn.lifay.test.CommonDemo;
 public class CommomStartup {
 
     public static void main(String[] args) {
-        GlobeStartUp.launch(CommonDemo.class);
+        Application.launch(CommonDemo.class);
     }
 }
