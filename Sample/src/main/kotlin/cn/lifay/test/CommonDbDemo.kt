@@ -1,8 +1,8 @@
 package cn.lifay.test
 
 import atlantafx.base.theme.PrimerLight
+import cn.lifay.application.InitDbApplication
 import cn.lifay.global.GlobalResource
-import cn.lifay.global.InitDbApplication
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.layout.VBox
@@ -20,7 +20,7 @@ class CommonDbDemo : InitDbApplication(
     appLogPrefix = "test"
 ) {
 
-    override fun addPrimaryStage(): Stage {
+    override fun addIndexStage(): Stage {
 
         val pane = VBox(42.0)
         pane.children.add(Button("dasdsadasd"))
@@ -28,6 +28,9 @@ class CommonDbDemo : InitDbApplication(
         val stage = Stage()
         stage.title = "首页"
         stage.centerOnScreen()
+        stage.setOnCloseRequest {
+            println("CommonDbDemo close window...")
+        }
         stage.scene = Scene(pane)
         return stage
     }

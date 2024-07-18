@@ -1,7 +1,7 @@
 package cn.lifay.test
 
 import atlantafx.base.theme.PrimerLight
-import cn.lifay.global.BaseApplication
+import cn.lifay.application.BaseApplication
 import cn.lifay.ui.BaseView
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
@@ -40,7 +40,7 @@ class CommonDemo : BaseApplication(
         primaryStage.show()
 
     }*/
-    override fun addPrimaryStage(): Stage {
+    override fun addIndexStage(): Stage {
         val primaryStage = Stage()
         val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
         val scene = Scene(view.ROOT_PANE)

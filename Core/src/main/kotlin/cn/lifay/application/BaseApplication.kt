@@ -1,7 +1,9 @@
-package cn.lifay.global
+package cn.lifay.application
 
 import atlantafx.base.theme.PrimerLight
 import atlantafx.base.theme.Theme
+import cn.lifay.global.GlobalConfig
+import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import javafx.application.Application
 import javafx.stage.Stage
@@ -11,6 +13,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * javaFX启动类的基类
+ * 定义一些应用配置、应用协程
+ */
 abstract class BaseApplication(
     appLogPrefix: String = "client",
     appLogPath: String = GlobalResource.USER_DIR + "logs",
@@ -26,23 +32,26 @@ abstract class BaseApplication(
     /*
       设置首页容器
      */
-    abstract fun addPrimaryStage(): Stage
+    abstract fun addIndexStage(): Stage
 
 //    /*
 //      设置窗口关闭后回调函数
 //     */
 //    abstract fun addOnCloseRequest(): EventHandler<WindowEvent?>?
 
-    override fun start(primaryStage: Stage?) {
-        GlobalConfig.InitLerverConfigPath(appConfigPath)
-        GlobalResource.loadTheme(appTheme)
-        test()
+    override fun start(primaryStage: Stage) {
+        loadAppConfig()
 
-        val primaryStage = addPrimaryStage()
+        val primaryStage = addIndexStage()
         primaryStage.show()
 
     }
 
+    protected fun loadAppConfig() {
+        GlobalConfig.InitLerverConfigPath(appConfigPath)
+        GlobalResource.loadTheme(appTheme)
+        test()
+    }
     fun test() {
 //        GlobalConfig.WritePropertiesForKey(
 //            arrayOf("r", "s", "t"), mapOf(

@@ -349,8 +349,26 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     /**
      * 执行UI操作,确保UI更新不会被取消
      */
-    suspend fun ui(block: () -> Unit) {
+    suspend fun asyncUI(block: () -> Unit) {
         withContext(Dispatchers.Main + NonCancellable) {
+            block()
+        }
+    }
+
+    /**
+     * 执行cpu操作
+     */
+    suspend fun asyncDefault(block: () -> Unit) {
+        withContext(Dispatchers.Default) {
+            block()
+        }
+    }
+
+    /**
+     * 执行IO操作
+     */
+    suspend fun asyncIO(block: () -> Unit) {
+        withContext(Dispatchers.IO) {
             block()
         }
     }
