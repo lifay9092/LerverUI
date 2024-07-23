@@ -489,7 +489,11 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
-    fun treeTest(actionEvent: ActionEvent) {
+    suspend fun treeTest(actionEvent: ActionEvent) {
+        asyncIO {
+            println("asyncIO")
+        }
+
         println("测试树")
         rootTreeItem.value.name = "测试修改"
         println(rootTreeItem.children[0].treeViewId)

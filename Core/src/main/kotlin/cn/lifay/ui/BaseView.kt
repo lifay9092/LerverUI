@@ -8,6 +8,7 @@ import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import cn.lifay.ui.message.MsgType
+import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
@@ -47,14 +48,11 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
         get() = Dispatchers.Main
 
     var ROOT_PANE: R
-
-
     val NOTIFICATION_PANE = VBox(5.0).apply {
         isManaged = false
         spacing = 15.0
         layoutY = 15.0
     }
-
     val MESSAGE_PANE = VBox(5.0).apply {
         isManaged = false
         spacing = 15.0
@@ -122,7 +120,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
             return baseView
         }
 
-
         /**
          * 创建新的视图fxml、Stage窗口 并返回Stage
          * @param fxml fxml资源
@@ -147,7 +144,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
                 GlobalResource.loadIcon(this)
             }
         }
-
     }
 
 
@@ -282,7 +278,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
 //            }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
-
         openPlay.playFromStart()
         if (millis != 0L) {
             asyncDelayTask(millis) {
@@ -290,7 +285,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
             }
         }
     }
-
 
     /**
      * 弹出错误提示
@@ -350,8 +344,12 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
      * 执行UI操作,确保UI更新不会被取消
      */
     suspend fun asyncUI(block: () -> Unit) {
-        withContext(Dispatchers.Main + NonCancellable) {
+        if (Platform.isFxApplicationThread()) {
             block()
+        } else {
+            withContext(Dispatchers.Main + NonCancellable) {
+                block()
+            }
         }
     }
 

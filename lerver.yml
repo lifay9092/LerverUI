@@ -11,7 +11,6 @@ c:
     f: fv
 test1: 实时
 db:
-  auto_target: true
   password: ''
   url: jdbc:sqlite:D:/IdeaProjects/LerverUI/db.db
   user: ''

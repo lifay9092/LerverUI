@@ -21,15 +21,17 @@ abstract class InitDbApplication(
     override val appConfigPath: String = GlobalResource.USER_DIR + "lerver.yml",
     val dbName: String = "db.db",
     val isShowStage: Boolean = true,
-) : BaseApplication() {
+) : BaseApplication(appLogPrefix, appLogPath, appTheme, appConfigPath) {
 
     override fun start(dbLoadStage: Stage) {
         loadAppConfig()
-
-        val indexStage = addIndexStage()
-        val closeReq = indexStage.onCloseRequestProperty().get()
+        //执行关闭程序时的操作-回调函数
+        val closeAppFunc = {
+            cancelAllJob()
+        }
         //切换到首页的视图-回调函数
         val targetIndexFunc = {
+            val indexStage = addIndexStage()
             dbLoadStage.title = indexStage.title
             dbLoadStage.scene = indexStage.scene
             dbLoadStage.isFullScreen = indexStage.isFullScreen
@@ -38,12 +40,15 @@ abstract class InitDbApplication(
             dbLoadStage.isIconified = indexStage.isIconified
             dbLoadStage.isResizable = indexStage.isResizable
             dbLoadStage.loadIcon()
+            dbLoadStage.setOnCloseRequest {
+                indexStage.onCloseRequestProperty().get().handle(it)
+                indexStage.close()
+                closeAppFunc()
+                Platform.exit()
+            }
             Unit
         }
-        //执行关闭程序时的操作-回调函数
-        val closeAppFunc = {
-            cancelAllJob()
-        }
+
         val dbLoadView = DbLoadView(isShowStage, targetIndexFunc, closeAppFunc, dbName)
         dbLoadStage.apply {
             title = "脚本更新程序"
@@ -52,8 +57,6 @@ abstract class InitDbApplication(
                 Image("/data.png")
             )
             setOnCloseRequest {
-                closeReq.handle(it)
-                indexStage.close()
                 closeAppFunc()
                 Platform.exit()
             }

@@ -1,5 +1,6 @@
 package cn.lifay.application
 
+import atlantafx.base.theme.PrimerDark
 import atlantafx.base.theme.PrimerLight
 import atlantafx.base.theme.Theme
 import cn.lifay.global.GlobalConfig
@@ -49,7 +50,14 @@ abstract class BaseApplication(
 
     protected fun loadAppConfig() {
         GlobalConfig.InitLerverConfigPath(appConfigPath)
-        GlobalResource.loadTheme(appTheme)
+        //loadTheme
+        GlobalConfig.ReadProperties("theme", PrimerLight().name)!!.let {
+            if ("THEME_DARK" == it) {
+                GlobalResource.loadTheme(PrimerDark())
+            } else {
+                GlobalResource.loadTheme()
+            }
+        }
         test()
     }
     fun test() {
