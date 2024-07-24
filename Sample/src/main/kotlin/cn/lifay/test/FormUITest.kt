@@ -1,6 +1,6 @@
 package cn.lifay.test
 
-import cn.lifay.GlobeStartUp
+import cn.lifay.application.GlobeStartUp
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -21,11 +21,18 @@ object FormUITest {
             val fxmlLoader = FXMLLoader(FormUITest::class.java.getResource("formTest.fxml"))
             val load = fxmlLoader.load<Parent>()
             val scene = Scene(load)
-            primaryStage.title = "Hello World"
+            primaryStage.title = "Hello World111"
             primaryStage.scene = scene
-            primaryStage.show()
+            primaryStage.setOnCloseRequest {
+                println("GlobeStartUp.launch close window...")
+            }
             primaryStage
         }
     }
 
+
+}
+
+fun main() {
+    FormUITest.run()
 }

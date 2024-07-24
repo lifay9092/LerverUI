@@ -1,7 +1,6 @@
 package cn.lifay.db
 
 import atlantafx.base.theme.Styles
-import cn.lifay.GlobeStartUp
 import cn.lifay.extension.*
 import cn.lifay.global.GlobalConfig
 import cn.lifay.logutil.LerverLog
@@ -13,9 +12,15 @@ import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-import java.util.function.Supplier
 
-class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val afterDbInit: (() -> Unit)? = null) :
+class DbLoadView(
+    val isShowStage: Boolean,
+    val targetIndexFunc: () -> Unit,
+    val closeAppFunc: () -> Unit,
+    val dbName: String,
+//    val dbLoadStage: Stage,
+    val afterDbInit: (() -> Unit)? = null
+) :
     VBox(20.0) {
 
     var indexStage: Stage? = null
@@ -54,10 +59,10 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
         )
     }
     val autoTarget =
-        if (!GlobeStartUp.IS_SHOW_STAGE) {
+        if (!isShowStage) {
             true
         } else {
-            "true" == GlobalConfig.ReadProperties("db.auto_target", "false")
+            GlobalConfig.ReadProperties("db.auto_target", false)
         }
 
     val checkBox = CheckBox("初始化后自动跳转")
@@ -70,13 +75,13 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
             setMargin(this, Insets(0.0, 0.0, 0.0, 20.0))
             children.addAll(checkBox, targetBtn)
         })
-        println("autoTarget:$autoTarget")
+//        println("autoTarget:$autoTarget")
         checkBox.apply {
-            isSelected = autoTarget
+            isSelected = autoTarget == true
             this.selectedProperty().addListener { observableValue, old, new ->
                 if (autoTarget != new) {
                     GlobalConfig.WriteProperties("db.auto_target", checkBox.isSelected.toString())
-                    println("upt")
+//                    println("upt")
                 }
             }
         }
@@ -135,6 +140,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
                 platformRun {
                     textArea.appendText(msg)
                     if (alertConfirmation("程序将关闭", msg)) {
+                        closeAppFunc()
                         Platform.exit()
                     }
                 }
@@ -152,7 +158,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
 
     private fun targetIndex() {
         try {
-            indexStage = indexStageGet.get()
+            targetIndexFunc()
         } catch (e: Exception) {
             e.printStackTrace()
             val msg = "初始化界面失败,请检查db脚本:${e.stackTraceToString()}"
@@ -163,6 +169,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
                         "初始化界面失败,请检查db脚本和界面初始化是否冲突:${e.message}"
                     )
                 ) {
+                    closeAppFunc()
                     Platform.exit()
                 }
             }
@@ -171,8 +178,7 @@ class DbLoadView(val indexStageGet: Supplier<Stage>, val dbName: String, val aft
             }
             return
         }
-        scene.window.hide()
-        indexStage!!.show()
+
     }
 
 }
