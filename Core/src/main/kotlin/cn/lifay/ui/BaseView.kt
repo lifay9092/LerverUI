@@ -8,7 +8,6 @@ import cn.lifay.extension.platformRun
 import cn.lifay.global.GlobalResource
 import cn.lifay.logutil.LerverLog
 import cn.lifay.ui.message.MsgType
-import javafx.application.Platform
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
 import javafx.scene.Parent
@@ -20,6 +19,7 @@ import javafx.stage.Stage
 import javafx.stage.Window
 import javafx.util.Duration
 import kotlinx.coroutines.*
+import kotlinx.coroutines.javafx.JavaFx
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.material2.Material2OutlinedAL
 import java.net.URL
@@ -45,7 +45,7 @@ import kotlin.coroutines.CoroutineContext
  **/
 abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+        get() = NonCancellable + Dispatchers.JavaFx
 
     var ROOT_PANE: R
     val NOTIFICATION_PANE = VBox(5.0).apply {
@@ -343,21 +343,17 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     /**
      * 执行UI操作,确保UI更新不会被取消
      */
-    suspend fun asyncUI(block: () -> Unit) {
-        if (Platform.isFxApplicationThread()) {
+    protected fun asyncUI(block: suspend () -> Unit): Job {
+        return CoroutineScope(coroutineContext).launch {
             block()
-        } else {
-            withContext(Dispatchers.Main + NonCancellable) {
-                block()
-            }
         }
     }
 
     /**
      * 执行cpu操作
      */
-    suspend fun asyncDefault(block: () -> Unit) {
-        withContext(Dispatchers.Default) {
+    protected fun asyncDefault(block: suspend () -> Unit): Job {
+        return CoroutineScope(Dispatchers.Default).launch {
             block()
         }
     }
@@ -365,8 +361,8 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     /**
      * 执行IO操作
      */
-    suspend fun asyncIO(block: () -> Unit) {
-        withContext(Dispatchers.IO) {
+    protected fun asyncIO(block: suspend () -> Unit): Job {
+        return CoroutineScope(Dispatchers.IO).launch {
             block()
         }
     }

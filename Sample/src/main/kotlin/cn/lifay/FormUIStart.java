@@ -1,7 +1,5 @@
 package cn.lifay;
 
-import cn.lifay.test.FormUITest;
-
 /**
  * StartFormUITest TODO
  *
@@ -10,7 +8,7 @@ import cn.lifay.test.FormUITest;
  **/
 public class FormUIStart {
 
-    public static void main(String[] args) {
-        FormUITest.run();
-    }
+//    public static void main(String[] args) {
+//        FormUITest.run();
+//    }
 }

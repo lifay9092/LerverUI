@@ -6,5 +6,5 @@ package cn.lifay.mq
  *@Author lifay
  *@Date 2023/8/14 23:01
  **/
-interface EventBusId {
+interface BaseEventBusId {
 }

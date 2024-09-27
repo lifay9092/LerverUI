@@ -16,7 +16,6 @@ import javafx.stage.Stage
 class DbLoadView(
     val isShowStage: Boolean,
     val targetIndexFunc: () -> Unit,
-    val closeAppFunc: () -> Unit,
     val dbName: String,
 //    val dbLoadStage: Stage,
     val afterDbInit: (() -> Unit)? = null
@@ -31,6 +30,7 @@ class DbLoadView(
         styleInfo()
         setOnAction {
             targetIndex()
+
         }
     }
 
@@ -80,7 +80,7 @@ class DbLoadView(
             isSelected = autoTarget == true
             this.selectedProperty().addListener { observableValue, old, new ->
                 if (autoTarget != new) {
-                    GlobalConfig.WriteProperties("db.auto_target", checkBox.isSelected.toString())
+                    GlobalConfig.WritePropertiesForKey("db", mapOf("auto_target" to checkBox.isSelected))
 //                    println("upt")
                 }
             }
@@ -114,6 +114,7 @@ class DbLoadView(
                 DbManage.PROGRESS_PROPERTY.addListener(progressChangeListener)
 
                 //执行db初始化
+                println("DbManage.Init(dbName)")
                 DbManage.Init(dbName)
 
                 //解除绑定
@@ -140,7 +141,7 @@ class DbLoadView(
                 platformRun {
                     textArea.appendText(msg)
                     if (alertConfirmation("程序将关闭", msg)) {
-                        closeAppFunc()
+                        closeWindow()
                         Platform.exit()
                     }
                 }
@@ -149,6 +150,9 @@ class DbLoadView(
         }
     }
 
+    fun closeWindow() {
+        (this.scene.window as Stage).close()
+    }
     fun getStage(): Stage {
         if (indexStage == null) {
             throw Exception("请先初始化indexStage")
@@ -169,7 +173,7 @@ class DbLoadView(
                         "初始化界面失败,请检查db脚本和界面初始化是否冲突:${e.message}"
                     )
                 ) {
-                    closeAppFunc()
+                    closeWindow()
                     Platform.exit()
                 }
             }

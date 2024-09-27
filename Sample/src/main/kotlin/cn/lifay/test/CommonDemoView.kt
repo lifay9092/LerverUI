@@ -30,6 +30,7 @@ import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
 import javafx.scene.paint.Color
+import kotlinx.coroutines.delay
 import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.javafx.FontIcon
 import java.net.URL
@@ -489,10 +490,8 @@ class CommonDemoView : BaseView<AnchorPane>() {
     }
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
-    suspend fun treeTest(actionEvent: ActionEvent) {
-        asyncIO {
-            println("asyncIO")
-        }
+    fun treeTest(actionEvent: ActionEvent) {
+
 
         println("测试树")
         rootTreeItem.value.name = "测试修改"
@@ -642,6 +641,20 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     fun chat(actionEvent: ActionEvent) {
         EventBus.publish(TextEvent(DemoId.CHAT.toString(), sendText.text))
+    }
+
+    fun asyncTest() {
+        //  showNotification("111")
+        asyncDefault {
+            println("asyncIO 111...")
+            delay(1111)
+            asyncUI {
+                println("do ui opt...")
+            }
+            println("asyncIO 222...")
+            delay(2222)
+            println("asyncIO 333...")
+        }
     }
 
     fun taskAction() {

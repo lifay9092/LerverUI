@@ -1,13 +1,8 @@
 package cn.lifay.application
 
-import atlantafx.base.theme.PrimerDark
-import atlantafx.base.theme.PrimerLight
-import atlantafx.base.theme.Theme
-import cn.lifay.global.GlobalConfig
-import cn.lifay.global.GlobalResource
-import cn.lifay.logutil.LerverLog
+import cn.lifay.mq.EventBus
+import cn.lifay.mq.event.DefaultEvent
 import javafx.application.Application
-import javafx.stage.Stage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,47 +14,34 @@ import kotlin.coroutines.CoroutineContext
  * 定义一些应用配置、应用协程
  */
 abstract class BaseApplication(
-    appLogPrefix: String = "client",
-    appLogPath: String = GlobalResource.USER_DIR + "logs",
-    open val appTheme: Theme = PrimerLight(),
-    open val appConfigPath: String = GlobalResource.USER_DIR + "lerver.yml",
+
 ) : Application(), CoroutineScope {
     override val coroutineContext: CoroutineContext = Dispatchers.Main + SupervisorJob()
 
     init {
-        LerverLog.InitLog(appLogPrefix, appLogPath)
+        println("init")
+        EventBus.subscribe(EventBusId.CANCEL_JOB, DefaultEvent::class) {
+            cancelAllJob()
+        }
     }
 
     /*
       设置首页容器
      */
-    abstract fun addIndexStage(): Stage
+//    abstract fun addIndexStage(): Stage
 
 //    /*
 //      设置窗口关闭后回调函数
 //     */
 //    abstract fun addOnCloseRequest(): EventHandler<WindowEvent?>?
 
-    override fun start(primaryStage: Stage) {
-        loadAppConfig()
+//    override fun start(primaryStage: Stage) {
+//
+//        val primaryStage = addIndexStage()
+//        primaryStage.show()
+//
+//    }
 
-        val primaryStage = addIndexStage()
-        primaryStage.show()
-
-    }
-
-    protected fun loadAppConfig() {
-        GlobalConfig.InitLerverConfigPath(appConfigPath)
-        //loadTheme
-        GlobalConfig.ReadProperties("theme", PrimerLight().name)!!.let {
-            if ("THEME_DARK" == it) {
-                GlobalResource.loadTheme(PrimerDark())
-            } else {
-                GlobalResource.loadTheme()
-            }
-        }
-        test()
-    }
     fun test() {
 //        GlobalConfig.WritePropertiesForKey(
 //            arrayOf("r", "s", "t"), mapOf(

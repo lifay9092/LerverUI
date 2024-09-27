@@ -1,7 +1,6 @@
 package cn.lifay.test
 
-import atlantafx.base.theme.PrimerLight
-import cn.lifay.application.BaseApplication
+import cn.lifay.application.InitDbApplication
 import cn.lifay.ui.BaseView
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
@@ -13,8 +12,7 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class CommonDemo : BaseApplication(
-    appTheme = PrimerLight(),
+class CommonDemo : InitDbApplication(
 //    configPath = GlobalResource.USER_DIR + "lerver.yml",
 //    logPrefix = "test"
 ) {
@@ -40,7 +38,7 @@ class CommonDemo : BaseApplication(
         primaryStage.show()
 
     }*/
-    override fun addIndexStage(): Stage {
+    override fun addAppStage(): Stage {
         val primaryStage = Stage()
         val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
         val scene = Scene(view.ROOT_PANE)
@@ -51,6 +49,19 @@ class CommonDemo : BaseApplication(
         }
         return primaryStage
     }
+
+//
+//    override fun start(primaryStage: Stage?) {
+//        AppManage.loadAppConfig(AppManage())
+//        val view = BaseView.createView<CommonDemoView, AnchorPane>(CommonDemo::class.java.getResource("demo.fxml"))
+//        val scene = Scene(view.ROOT_PANE)
+//        primaryStage!!.title = "Hello World"
+//        primaryStage.scene = scene
+//        primaryStage.setOnCloseRequest {
+//            println("close...")
+//        }
+//        primaryStage.show()
+//    }
 
 
 }

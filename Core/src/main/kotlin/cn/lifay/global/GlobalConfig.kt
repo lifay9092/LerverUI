@@ -90,12 +90,19 @@ object GlobalConfig {
         return defaultValue
     }
 
+    /**
+     * 添加K-V配置（普通,嵌套的请用WritePropertiesForKey）
+     */
     @Synchronized
     fun WriteProperties(key: String, value: Any) {
         CONFIG_MAP[key] = value
+        //保存到配置
         SaveToYaml()
     }
 
+    /**
+     * 添加K-V配置（普通,嵌套的请用WritePropertiesForKey）
+     */
     @Synchronized
     fun WriteProperties(data: Map<String, Any>) {
         data.forEach { k, v ->
@@ -107,7 +114,7 @@ object GlobalConfig {
     /**
      * 向嵌套的 Map 添加键值对。
      * @param key 用于导航到最内层 Map 的键列表,用逗号分隔
-     * @param data 键值对
+     * @param data 键值对容器
 
      */
     @Synchronized
@@ -119,7 +126,7 @@ object GlobalConfig {
     /**
      * 向嵌套的 Map 添加键值对。
      * @param keys 用于导航到最内层 Map 的键列表
-     * @param data 键值对
+     * @param data 键值对容器
      */
     @Synchronized
     fun WritePropertiesForKey(keys: Array<String>, data: Map<String, Any>) {

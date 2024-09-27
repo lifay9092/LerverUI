@@ -31,7 +31,7 @@ object EventBus {
      * @author lifay
      */
     @JvmName("subscribeByEnum")
-    fun <T : Event> subscribe(id: EventBusId, eventType: KClass<T>, subscriber: (T) -> Unit) {
+    fun <T : Event> subscribe(id: BaseEventBusId, eventType: KClass<T>, subscriber: (T) -> Unit) {
         Objects.requireNonNull(id)
         Objects.requireNonNull(eventType)
         Objects.requireNonNull(subscriber)

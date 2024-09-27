@@ -1,7 +1,7 @@
 package cn.lifay.ui.tree
 
+import cn.lifay.mq.BaseEventBusId
 import cn.lifay.mq.EventBus
-import cn.lifay.mq.EventBusId
 import cn.lifay.mq.event.BodyEvent
 import cn.lifay.ui.tree.TreeViewCache.ITEM_TO_TREE_MAP
 import javafx.scene.control.TreeItem
@@ -50,7 +50,7 @@ class LerverTreeTempNode<T : Any>(
 
 }
 
-enum class LerverTreeBusId : EventBusId {
+enum class LerverTreeBusId : BaseEventBusId {
 
     ITEM_UPT,
     ITEM_UPT_CHILD,

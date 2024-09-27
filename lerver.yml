@@ -9,8 +9,10 @@ c:
   d: ffggg
   e:
     f: fv
+db.auto_target: 'true'
 test1: 实时
 db:
   password: ''
   url: jdbc:sqlite:D:/IdeaProjects/LerverUI/db.db
   user: ''
+  auto_target: true
