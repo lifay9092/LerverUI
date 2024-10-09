@@ -35,10 +35,6 @@
         </repository>
     </distributionManagement>
     <repositories>
-        <repository>
-            <id>lifay-public</id>
-            <url>http://www.lifay.cn:8081/repository/maven-public/</url>
-        </repository>
         <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
         <repository>
             <id>Sonatype-public</id>
