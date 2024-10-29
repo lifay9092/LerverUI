@@ -6,7 +6,7 @@
 
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Parent</artifactId>
-    <version>1.48</version>
+    <version>1.49</version>
     <packaging>pom</packaging>
     <modules>
         <module>Core</module>
@@ -30,10 +30,15 @@
     <distributionManagement>
         <!--稳定版本的仓库地址,必须是允许上传的私服地址-->
         <repository>
-            <id>lifay-host</id>
-            <url>http://www.lifay.cn:8081/repository/lifay-repo/</url>
+            <id>2495402-release-L3jPeo</id>
+            <url>https://packages.aliyun.com/maven/repository/2495402-release-L3jPeo</url>
         </repository>
+        <snapshotRepository>
+            <id>2495402-snapshot-8xPzRs</id>
+            <url>https://packages.aliyun.com/maven/repository/2495402-snapshot-8xPzRs</url>
+        </snapshotRepository>
     </distributionManagement>
+
     <repositories>
         <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
         <repository>
