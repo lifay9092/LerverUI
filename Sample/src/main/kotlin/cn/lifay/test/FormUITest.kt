@@ -1,5 +1,6 @@
 package cn.lifay.test
 
+import cn.lifay.application.AppManage
 import cn.lifay.application.BaseApplication
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
@@ -16,6 +17,7 @@ import javafx.stage.Stage
 class FormUITest : BaseApplication() {
 
     override fun start(primaryStage: Stage?) {
+        AppManage.loadAppConfig()
         val fxmlLoader = FXMLLoader(FormUITest::class.java.getResource("formTest.fxml"))
         val load = fxmlLoader.load<Parent>()
         val scene = Scene(load)

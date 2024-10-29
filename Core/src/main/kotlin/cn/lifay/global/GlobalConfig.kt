@@ -178,8 +178,8 @@ object GlobalConfig {
     fun LoadToConfigMap() {
         val lerverConfigFile = getLerverConfigFile()
         lerverConfigFile.inputStream().use {
-            val map = YAML.load<Map<String, Any>>(it)
-            map.forEach { p ->
+            val map = YAML.load<Map<String, Any>?>(it)
+            map?.forEach { p ->
                 CONFIG_MAP[p.key] = p.value
             }
         }

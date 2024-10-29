@@ -18,8 +18,11 @@ class AppManage(
 ) {
     companion object {
 
-        fun loadAppConfig(appManage: AppManage) {
+        fun loadAppConfig(appManage: AppManage? = AppManage()) {
             println("loadAppConfig")
+            if (appManage == null) {
+                return
+            }
             LerverLog.InitLog(appManage.appLogPrefix, appManage.appLogPath)
             GlobalConfig.InitLerverConfigPath(appManage.appConfigPath)
             //loadTheme
