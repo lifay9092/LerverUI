@@ -39,15 +39,6 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <repositories>
-        <!-- 使用了coding制品库发布maven包，所以设置以下coding的仓库 -->
-        <repository>
-            <id>Sonatype-public</id>
-            <name>SnakeYAML repository</name>
-            <url>http://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.openjfx</groupId>
