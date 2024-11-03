@@ -19,9 +19,6 @@ import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
 import org.kordamp.ikonli.feather.Feather
 import org.kordamp.ikonli.material2.Material2AL
-import org.ktorm.entity.*
-import org.ktorm.schema.BaseTable
-import org.ktorm.schema.ColumnDeclaring
 import java.net.URL
 import java.util.*
 
@@ -32,9 +29,12 @@ import java.util.*
  *@Author lifay
  *@Date 2023/8/19 22:50
  **/
-abstract class CurdUI<T : Any, E : BaseTable<T>>(
+abstract class CurdUI<T : Any>(
     title: String,
-    buildElements: CurdUI<T, E>.() -> Unit,
+    isInitAdd: Boolean = true,
+    isInitEdit: Boolean = true,
+    isInitDel: Boolean = true,
+    buildElements: CurdUI<T>.() -> Unit,
 ) : BaseView<VBox>() {
 
     private val stage = Stage().apply {
@@ -134,30 +134,39 @@ abstract class CurdUI<T : Any, E : BaseTable<T>>(
                         setOnAction {
                             clear(it)
                         }
-                    },
-                    Button("新增").apply {
-                        prefHeight = 23.0
-                        prefWidth = 82.0
-                        stylePrimary()
-                        icon(Material2AL.ADD)
-                        outline()
-                        setOnAction {
-                            addForm(it)
-                        }
-                    },
-                    Button("删除").apply {
-                        alignment = Pos.CENTER
-                        textAlignment = TextAlignment.CENTER
-                        prefHeight = 23.0
-                        prefWidth = 82.0
-                        styleDanger()
-                        icon(Feather.TRASH)
-                        HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
-                        setOnAction {
-                            batchDelete(it)
-                        }
                     }
                 )
+                if (isInitAdd) {
+                    children.add(
+                        Button("新增").apply {
+                            prefHeight = 23.0
+                            prefWidth = 82.0
+                            stylePrimary()
+                            icon(Material2AL.ADD)
+                            outline()
+                            setOnAction {
+                                addForm(it)
+                            }
+                        }
+                    )
+                }
+                if (isInitDel) {
+                    children.add(
+                        Button("删除").apply {
+                            alignment = Pos.CENTER
+                            textAlignment = TextAlignment.CENTER
+                            prefHeight = 23.0
+                            prefWidth = 82.0
+                            styleDanger()
+                            icon(Feather.TRASH)
+                            HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
+                            setOnAction {
+                                batchDelete(it)
+                            }
+                        }
+                    )
+                }
+
             }
             this.dataTable.apply {
                 padding = Insets(1.0, 2.0, 10.0, 2.0)
@@ -173,7 +182,9 @@ abstract class CurdUI<T : Any, E : BaseTable<T>>(
                         val item = row.item
                         if (item != null) {
                             if (event.clickCount == 2) {
-                                editForm(item)
+                                if (isInitEdit) {
+                                    editForm(item)
+                                }
                             }
                         }
                     }
@@ -344,19 +355,9 @@ abstract class CurdUI<T : Any, E : BaseTable<T>>(
      * 分页查询函数
      *
      * @param keyword 关键字
-     * @param pageIndex 页码
-     * @param pageCount 每页数量
-     * @return f-总数量 s-分页数据列表
-     */
-//    abstract fun pageDataFunc(keyword : String,pageIndex: Int, pageCount: Int): Pair<Int, Collection<T>>
-
-    /**
-     * 分页查询函数
-     *
-     * @param keyword 关键字
      * @return f-ObjectBaseTable s-关键字匹配逻辑
      */
-    abstract fun pageInit(keyword: String): Pair<EntitySequence<T, E>, ((E) -> ColumnDeclaring<Boolean>)?>
+    abstract fun pageInit(keyword: String, index: Int, count: Int): Pair<Int, Collection<T>>
 
     /**
      * 保存数据函数
@@ -387,25 +388,13 @@ abstract class CurdUI<T : Any, E : BaseTable<T>>(
             dataTable.items.clear()
             clearDataTableCheck()
 
-            val pageInit = pageInit(keyword.text)
-            val entitySequence = pageInit.first
-            val filterFunc = pageInit.second
-            if (filterFunc != null) {
-                totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
-                dataTable.items.addAll(
-                    entitySequence.filter {
-                        return@filter filterFunc(it)
-                    }.drop(pageIndex * pageCount)
-                        .take(pageCount).toList()
-                )
-            } else {
-                totalCountText.text = "共 ${entitySequence.totalRecordsInAllPages} 条"
-                dataTable.items.addAll(
-                    entitySequence.drop(pageIndex * pageCount)
-                        .take(pageCount).toList()
+            val pageInitResult = pageInit(keyword.text, pageIndex, pageCount)
+            totalCountText.text = "共 ${pageInitResult.first} 条"
+            dataTable.items.apply {
+                addAll(
+                    pageInitResult.second
                 )
             }
-
         }
     }
 

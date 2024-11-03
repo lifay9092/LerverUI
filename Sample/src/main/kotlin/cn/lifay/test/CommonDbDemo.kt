@@ -12,9 +12,7 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class CommonDbDemo : InitDbApplication(
-
-) {
+class CommonDbDemo : InitDbApplication() {
 
     override fun addAppStage(): Stage {
 
@@ -30,6 +28,4 @@ class CommonDbDemo : InitDbApplication(
         stage.scene = Scene(pane)
         return stage
     }
-
-
 }

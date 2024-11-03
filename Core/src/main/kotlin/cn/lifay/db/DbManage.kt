@@ -548,6 +548,19 @@ object DbManage {
         }
         return 1
     }
+    inline fun <reified T : Any, reified E : Any> BaseTable<T>.removeById(primary: E): Int {
+        val column = primaryKeys[0] as Column<E>
+        return delete(this) {
+            column eq primary
+        }
+    }
+
+    inline fun <reified T : Any, reified E : Any> BaseTable<T>.removeByIds(primarys: List<E>): Int {
+        val column = primaryKeys[0] as Column<E>
+        return delete(this) {
+            column inList primarys
+        }
+    }
 
     fun <T : Any> isPrimary(table: BaseTable<T>, colName: String): Boolean {
         for (primaryKey in table.primaryKeys) {

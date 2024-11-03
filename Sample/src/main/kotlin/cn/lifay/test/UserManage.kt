@@ -5,7 +5,7 @@ import cn.lifay.db.UserDatas.userDatas
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.styleWarn
 import cn.lifay.ui.form.BaseFormUI
-import cn.lifay.ui.form.CurdUI
+import cn.lifay.ui.form.DbCurdUI
 import cn.lifay.ui.form.btn.BaseButton
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
@@ -22,7 +22,7 @@ import org.ktorm.schema.ColumnDeclaring
  *@Author lifay
  *@Date 2023/2/4 18:24
  **/
-class UserManage : CurdUI<UserData,UserDatas>("用户管理", buildElements = {
+class UserManage : DbCurdUI<UserData, UserDatas>("用户管理", buildElements = {
     val id = TextElement("ID:", UserData::id, true)
     val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
     val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
@@ -36,7 +36,7 @@ class UserManage : CurdUI<UserData,UserDatas>("用户管理", buildElements = {
 }) {
 
     //分页实现,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
-    override fun pageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
+    override fun dbPageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
         return Pair(DbManage.userDatas) {
             it.name like DbManage.formatLikeKeyword(keyword)
         }

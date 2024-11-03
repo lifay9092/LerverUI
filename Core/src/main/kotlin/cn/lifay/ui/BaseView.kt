@@ -47,18 +47,24 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = NonCancellable + Dispatchers.JavaFx
 
+    //顶级布局容器，每个BaseView的子类都需要注册一个可变的ROOT_PANE实例（通过rootPane()）
     var ROOT_PANE: R
+
+    //内置通知容器
     val NOTIFICATION_PANE = VBox(5.0).apply {
         isManaged = false
         spacing = 15.0
         layoutY = 15.0
     }
+
+    //内置通知容器
     val MESSAGE_PANE = VBox(5.0).apply {
         isManaged = false
         spacing = 15.0
         layoutY = 15.0
     }
 
+    //注入fxml的辅助构造器，可以在定义视图类的时候通过fxml完成界面布局，注入到ROOT_PANE
     constructor(fxml: URL) : this() {
         val loader = FXMLLoader(fxml)
 //        loader.setRoot(rootPane())
@@ -68,26 +74,14 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
         initNotificationPane()
     }
 
+    /**
+     *
+     */
     companion object {
 
-//        /**
-//         * 创建新的视图-fxml
-//         * @param fxml fxml资源
-//         * @param isGlobalResource 是否跟随GlobalResource样式
-//         */
-//        fun <T : BaseView<R>, R : Pane> createView(fxml: URL, isGlobalResource: Boolean = true): T {
-//            val loader = FXMLLoader(fxml)
-//            var load = loader.load<R>()
-//            return loader.getController<T?>().apply {
-//                ROOT_PANE = load
-//                initNotificationPane()
-//            }
-//        }
-
         /**
-         * 创建新的视图-fxml
+         * 创建新的视图-通过fxml
          * @param fxml fxml资源
-         * @param isGlobalResource 是否跟随GlobalResource样式
          * @param initFunc 视图初始化后执行的方法
          */
         fun <T : BaseView<R>, R : Pane> createView(
@@ -104,7 +98,7 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
         }
 
         /**
-         * 创建新的视图-rootPane
+         * 创建新的视图-通过rootPane
          * @param rootPane fxml资源
          */
         fun <R : Pane> createView(rootPane: R): BaseView<R> {
@@ -168,22 +162,12 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     }
 
     protected fun initNotificationPane() {
-//        getRoot().scene.widthProperty().addListener { observableValue, old, new ->
-//            println("root:$new")
-//            println("msg w: ${MESSAGE_PANE.prefWidth}")
-//
-//        }
-//        println(GlobalResource.SCREEN_WIDTH)
-//        println(GlobalResource.MSG_WIDTH)
-//        println(ROOT_PANE.children.size)
         NOTIFICATION_PANE.layoutXProperty()
             .bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
         MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH / 2))
         MESSAGE_PANE.backgroundColor(Color.BLACK)
         ROOT_PANE.children.add(NOTIFICATION_PANE)
         ROOT_PANE.children.add(MESSAGE_PANE)
-//        println(ROOT_PANE.children.size)
-
     }
 
     open fun InitElemntStyle() {
@@ -197,27 +181,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     open fun getWindow(): Window? {
         return rootPane().scene.window
     }
-
-//    /**
-//     * 发送消息
-//     * @param id 接受者ID
-//     * @param body 参数值
-//     * @author lifay
-//     * @return
-//     */
-//    open fun <T : Event> send(id: String, body: T) {
-////        val stackTraceElements = Thread.currentThread().stackTrace
-//////        stackTraceElements.forEach { println(it) }
-////        val element = stackTraceElements[2]
-//////        println(element)
-////        if (EventBus.has(element.className, element.methodName)) {
-////            throw FXEventBusException("@FXReceiver 函数不能递归循环：class=${element.className} method=${element.methodName}")
-////        }
-////        asyncTask {
-////            EventBus.invoke(id, body)
-////        }
-//    }
-
 
     private fun getMsgStyle(msgType: MsgType): String {
         return when (msgType) {
@@ -273,9 +236,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
 
         if (!NOTIFICATION_PANE.children.contains(msg)) {
             platformRun { NOTIFICATION_PANE.children.add(msg) }
-//            if (!rootPane.children.contains(NOTIFICATION_PANE)) {
-//                platformRun { rootPane.children.add(NOTIFICATION_PANE) }
-//            }
         }
         val openPlay = Animations.slideInDown(msg, Duration.millis(250.0))
         openPlay.playFromStart()
@@ -311,9 +271,6 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
         )
         msg.styleClass.addAll(getMsgStyle(msgType), Styles.ELEVATED_1)
 
-//        if (!ROOT_PANE.children.contains(MESSAGE_PANE)) {
-//            platformRun { ROOT_PANE.children.add(MESSAGE_PANE) }
-//        }
         val closeFunc = {
             platformRun { MESSAGE_PANE.children.remove(msg) }
         }
@@ -350,7 +307,7 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
     }
 
     /**
-     * 执行cpu操作
+     * 执行计算操作
      */
     protected fun asyncDefault(block: suspend () -> Unit): Job {
         return CoroutineScope(Dispatchers.Default).launch {

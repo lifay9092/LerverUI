@@ -55,13 +55,13 @@ class CommonDemoView : BaseView<AnchorPane>() {
     var rootPane = AnchorPane()
 
     @FXML
-    var treeView = LerverTreeView<TreeListVO, String>()
+    var centerTreeView = LerverTreeView<TreeListVO, String>()
 
     @FXML
-    var customTree = LerverTreeView<Person, Int>()
+    var rightCustomTree = LerverTreeView<Person, Int>()
 
     @FXML
-    var checkTreeView = LerverTreeView<TreeTreeVO, String>()
+    var leftCheckTreeView = LerverTreeView<TreeTreeVO, String>()
 //    val rootItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
     //  val testItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
 
@@ -139,7 +139,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         // rootItemProperties.value = root
         // testItemProperties.value = treeItem2
 
-        treeView.apply {
+        centerTreeView.apply {
             root = rootTreeItem
             isShowRoot = true
             RegisterByList(
@@ -156,7 +156,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("添加子节点").apply {
                             setOnAction {
                                 println("添加子节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 val id1 = UUID.randomUUID().toString()
                                 val id2 = UUID.randomUUID().toString()
                                 selectedItem.AddChildren(
@@ -182,7 +182,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("更新节点").apply {
                             setOnAction {
                                 println("更新节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 val id = UUID.randomUUID().toString()
                                 selectedItem.UpdateItem(
                                     TreeListVO(
@@ -202,7 +202,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
                                     contentText = null
                                     setOnCloseRequest {
                                         println(editor.text)
-                                        val selectedItem = treeView.selectionModel.selectedItem
+                                        val selectedItem = centerTreeView.selectionModel.selectedItem
                                         if (selectedItem.children.isNotEmpty()) {
                                             selectedItem.UpdateChild(
                                                 TreeListVO(
@@ -221,14 +221,14 @@ class CommonDemoView : BaseView<AnchorPane>() {
                         items.add(MenuItem("删除节点").apply {
                             this.setOnAction {
                                 println("删除节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 selectedItem.DeleteThis()
                             }
                         })
                         items.add(MenuItem("删除子节点").apply {
                             this.setOnAction {
                                 println("删除子节点")
-                                val selectedItem = treeView.selectionModel.selectedItem
+                                val selectedItem = centerTreeView.selectionModel.selectedItem
                                 if (selectedItem.children.isNotEmpty()) {
                                     selectedItem.DeleteChildItem { true }
                                 }
@@ -259,7 +259,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             if (old == new) {
                 return@addListener
             }
-            treeView.FilterTree {
+            centerTreeView.FilterTree {
                 new.isBlank() || (new.isNotBlank() && it.name.contains(new))
             }
         }
@@ -276,7 +276,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             )
 
         }
-        checkTreeView.apply {
+        leftCheckTreeView.apply {
             root = rootCheckTreeItem
             isShowRoot = true
             cellFactory = CheckBoxTreeCell.forTreeView<TreeTreeVO>()
@@ -408,7 +408,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             TreeItem(Person(1, "1", false)),
             TreeItem(Person(2, "2", true)),
         )
-        customTree.apply {
+        rightCustomTree.apply {
             root = customTreeItem
 //            setCellFactory {
 //                LerverCheckBoxTreeCell()
@@ -498,7 +498,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         println(rootTreeItem.children[0].treeViewId)
         rootTreeItem.children[0].value = TreeListVO("5", "1", "5", SimpleStringProperty("5"))
 
-        val selects = findMatchingTreeItemChildrenByTreeItem(checkTreeView.root) {
+        val selects = findMatchingTreeItemChildrenByTreeItem(leftCheckTreeView.root) {
             val checkBoxTreeItem = it as CheckBoxTreeItem<TreeTreeVO>
             checkBoxTreeItem.isSelected
         }
@@ -624,7 +624,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
     fun treeTestUpt(actionEvent: ActionEvent) {
 
         rootTreeItem.children[0].UpdateItem(TreeListVO("修改测试", "5", "修改测试", SimpleStringProperty("修改测试")))
-        val treeItem = treeView.GetItemByBusiId("add1")
+        val treeItem = centerTreeView.GetItemByBusiId("add1")
         treeItem?.UpdateItem(TreeListVO("修改测试222", "5", "修改测试222", SimpleStringProperty("修改测试22")))
         println(treeItem?.value)
 

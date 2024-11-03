@@ -18,7 +18,7 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 <dependency>
     <groupId>cn.lifay.LerverUI</groupId>
     <artifactId>Core</artifactId>
-    <version>1.51</version>
+    <version>1.53</version>
 </dependency>
 
 <repositories>
@@ -38,31 +38,50 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 
 ## 快速入门
 
-1.XXXApplication继承BaseApplication
+1.DemoApplication继承BaseApplication
 
 ```
-class XXXApplication : BaseApplication() {
+//默认启动（不带db组件-sqlite数据库）
+class DemoApplication : BaseApplication() {
+override fun start(primaryStage: Stage?) {
+        AppManage.loadAppConfig()
+        val fxmlLoader = FXMLLoader(DemoApplication::class.java.getResource("formTest.fxml"))
+        val load = fxmlLoader.load<Parent>()
+        val scene = Scene(load)
+        primaryStage!!.title = "Hello World111"
+        primaryStage.scene = scene
+        primaryStage.setOnCloseRequest {
+            println("GlobeStartUp.launch close window...")
+        }
+        primaryStage.show()
+    }
+}
+//以db组件的方式启动（函数体内为程序初始界面）
+class DemoApplication : InitDbApplication() {
 
+    override fun addAppStage(): Stage {
+        val pane = VBox(42.0)
+        pane.children.add(Button("dasdsadasd"))
+
+        val stage = Stage()
+        stage.title = "首页"
+        stage.centerOnScreen()
+        stage.setOnCloseRequest {
+            println("CommonDbDemo close window...")
+        }
+        stage.scene = Scene(pane)
+        return stage
+    }
 }
 ```
 
 2.启动
 
 ```
-//默认启动（不带db组件-sqlite数据库）
-GlobeStartUp.launch(XXXApplication.class);
+fun main() {
+    Application.launch(DemoApplication::class.java)
+}
 
-//以db组件的方式启动（函数体内为程序初始界面）
-GlobeStartUp.launch(() -> {
-    var pane = new VBox(22D);
-    pane.getChildren().add(new Button("dasdsadasd"));
-
-    var stage = new Stage();
-    stage.setTitle("首页");
-    stage.centerOnScreen();
-    stage.setScene(new Scene(pane));
-    return stage;
-});
 ```
 
 3.新建一个CommonDemoView(控制器视图)继承BaseView
