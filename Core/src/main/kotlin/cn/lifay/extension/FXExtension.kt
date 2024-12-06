@@ -585,7 +585,7 @@ fun OpenFileDialog(
 }
 
 /**
- * 打开选择文件窗口，并执行操作
+ * 打开保存文件窗口，并执行操作
  */
 fun SaveFileDialog(
     window: Window,

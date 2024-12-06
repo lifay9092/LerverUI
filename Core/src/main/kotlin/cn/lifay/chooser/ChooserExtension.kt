@@ -1,5 +1,6 @@
 package cn.lifay.chooser
 
+import cn.lifay.chooser.ChooserExtension.getInitFileCommon
 import cn.lifay.global.GlobalConfig
 import cn.lifay.global.GlobalResource
 import javafx.stage.DirectoryChooser
@@ -10,22 +11,16 @@ private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
 private var COMMON_CHOOSER_PATH: String =
     GlobalConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, GlobalResource.USER_DIR)!!
 
-fun DirectoryChooser.getInitFile(key: String? = null): File {
-    if (key != null) {
-        if (GlobalConfig.ContainsKey(key)) {
-            return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
-        }
-    }
-    return File(COMMON_CHOOSER_PATH)
+/**
+ * 获取目录选择器的初始化目录，默认为当前工作目录
+ */
+fun DirectoryChooser.getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
+    return getInitFileCommon(key, defaultFile)
 }
 
-fun FileChooser.getInitFile(key: String? = null): File {
-    if (key != null) {
-        if (GlobalConfig.ContainsKey(key)) {
-            return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
-        }
-    }
-    return File(COMMON_CHOOSER_PATH)
+fun FileChooser.getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
+    return getInitFileCommon(key, defaultFile)
+
 }
 
 object ChooserExtension {
@@ -42,13 +37,22 @@ object ChooserExtension {
         }
     }
 
-    fun getInitFile(key: String? = null): File {
-        if (key != null) {
-            if (GlobalConfig.ContainsKey(key)) {
-                return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
-            }
-        }
-        return File(COMMON_CHOOSER_PATH)
+    fun getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
+        return getInitFileCommon(key)
     }
 
+    fun getInitFileCommon(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
+        var file: File? = null
+        if (key != null) {
+            if (GlobalConfig.ContainsKey(key)) {
+                file = File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+            }
+        } else {
+            file = File(COMMON_CHOOSER_PATH)
+        }
+        if (file == null || !file.exists()) {
+            file = defaultFile
+        }
+        return file
+    }
 }
