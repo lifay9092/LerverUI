@@ -1,6 +1,6 @@
 package cn.lifay.extension
 
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.logutil.LerverLog
 import cn.lifay.logutil.LogLevelEnum
 import java.io.File
@@ -145,7 +145,7 @@ fun <T : Any,V : List<T>> findMatchingTreeChildren(node: T, childrenProp: KMutab
 
 
 fun main() {
-    val testFilePath = GlobalResource.USER_DIR + "pom.xml"
+    val testFilePath = LerverResource.USER_DIR + "pom.xml"
     val testFile = File(testFilePath)
 
     println("fileMainName: ${testFilePath.fileMainName()}")

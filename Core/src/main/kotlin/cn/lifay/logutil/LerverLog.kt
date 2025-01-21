@@ -1,6 +1,7 @@
 package cn.lifay.logutil
 
 import cn.lifay.extension.notExistCreate
+import cn.lifay.global.LerverResource
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Paths
@@ -13,21 +14,26 @@ enum class LogLevelEnum {
     WARN,
     ERROR,
 }
+/*
 
-class GlobeLog(
+class GlobeLogConfig(
     var LOG_PREFIX: String,
     var LOG_PATH: String
 ) {
 
-
-//    var LOGS_DIR = System.getProperty("user.dir") + File.separator
-
-
     init {
-        initLogFile()
+//        initLogFile()
     }
 
 
+}
+*/
+
+object LerverLog {
+
+
+    private var LOG_PATH: String = LerverResource.USER_DIR + "logs"
+    private var LOG_PREFIX: String = "client"
     private lateinit var LOG_DEBUG_PATH: String
     private lateinit var LOG_INFO_PATH: String
     private lateinit var LOG_WARN_PATH: String
@@ -38,7 +44,21 @@ class GlobeLog(
     private lateinit var WARN_FILE: File
     private lateinit var ERROR_FILE: File
 
-    fun initLogFile() {
+
+    fun SetLogPrefix(prefix: String) {
+        println("SetLogPrefix:$prefix")
+        LOG_PREFIX = prefix
+
+    }
+
+    fun SetLogsDirPath(path: String) {
+        println("SetLogsDirPath:$path")
+        LOG_PATH = path
+
+    }
+
+    fun InitConfig() {
+        File(LOG_PATH).notExistCreate()
 
         LOG_DEBUG_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-debug.log")
         LOG_INFO_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-info.log")
@@ -50,19 +70,6 @@ class GlobeLog(
         WARN_FILE = File(LOG_WARN_PATH).notExistCreate()
         ERROR_FILE = File(LOG_ERROR_PATH).notExistCreate()
     }
-
-    fun SetLogPrefix(prefix: String) {
-        println("SetLogPrefix init")
-        LOG_PREFIX = prefix
-        initLogFile()
-    }
-
-    fun SetLogsDirPath(path: String) {
-        println("SetLogsDirPath init")
-        LOG_PATH = path
-        initLogFile()
-    }
-
     fun joinPath(basePath: String, vararg paths: String): String {
         return Paths.get(basePath, *paths).toString()
     }
@@ -93,28 +100,9 @@ class GlobeLog(
     private fun getStackTraceName(stackTraceElement: StackTraceElement): String {
         return stackTraceElement.fileName!!.split(".")[0] + "." + stackTraceElement.methodName + "(${stackTraceElement.lineNumber})"
     }
-
-}
-
-object LerverLog {
-
-    private lateinit var GLOBE_LOG: GlobeLog
-
     val DATE_TIME_FORMAT_STR = DateTimeFormatter.ofPattern("YYYY-MM-dd HH:mm:ss")
 
     fun isWindows(): Boolean = File.separator == "\\"
-
-    fun InitLog(logPrefix: String, logPath: String) {
-        GLOBE_LOG = GlobeLog(logPrefix, logPath)
-    }
-
-    fun SetLogPrefix(prefix: String) {
-        GLOBE_LOG.SetLogPrefix(prefix)
-    }
-
-    fun SetLogsDirPath(path: String) {
-        GLOBE_LOG.SetLogsDirPath(path)
-    }
 
     fun debug(text: String) {
         log(text, LogLevelEnum.DEBUG)
@@ -137,7 +125,4 @@ object LerverLog {
         error(e.message!!)
     }
 
-    fun log(text: String, level: LogLevelEnum = LogLevelEnum.DEBUG) {
-        GLOBE_LOG.log(text, level)
-    }
 }

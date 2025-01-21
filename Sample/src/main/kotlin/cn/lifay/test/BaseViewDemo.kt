@@ -1,6 +1,6 @@
 package cn.lifay.test
 
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.ui.BaseView
 import javafx.application.Application
 import javafx.scene.Scene
@@ -16,7 +16,7 @@ import javafx.stage.Stage
 class BaseViewDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
-        GlobalResource.loadTheme()
+        LerverResource.loadTheme()
 
         val view =
             BaseView.createView<BaseViewDemoView, AnchorPane>(BaseViewDemo::class.java.getResource("baseViewDemo.fxml"))

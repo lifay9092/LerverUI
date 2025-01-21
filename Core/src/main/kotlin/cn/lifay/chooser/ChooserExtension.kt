@@ -1,19 +1,19 @@
 package cn.lifay.chooser
 
-import cn.lifay.global.GlobalConfig
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverConfig
+import cn.lifay.global.LerverResource
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import java.io.File
 
 private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
 private var COMMON_CHOOSER_PATH: String =
-    GlobalConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, GlobalResource.USER_DIR)!!
+    LerverConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, LerverResource.USER_DIR)!!
 
 fun DirectoryChooser.getInitFile(key: String? = null): File {
     if (key != null) {
-        if (GlobalConfig.ContainsKey(key)) {
-            return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+        if (LerverConfig.ContainsKey(key)) {
+            return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
         }
     }
     return File(COMMON_CHOOSER_PATH)
@@ -21,8 +21,8 @@ fun DirectoryChooser.getInitFile(key: String? = null): File {
 
 fun FileChooser.getInitFile(key: String? = null): File {
     if (key != null) {
-        if (GlobalConfig.ContainsKey(key)) {
-            return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+        if (LerverConfig.ContainsKey(key)) {
+            return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
         }
     }
     return File(COMMON_CHOOSER_PATH)
@@ -35,17 +35,17 @@ object ChooserExtension {
             return
         }
         if (key != null) {
-            GlobalConfig.WriteProperties(key, path)
+            LerverConfig.WriteProperties(key, path)
         } else {
             COMMON_CHOOSER_PATH = path
-            GlobalConfig.WriteProperties(COMMON_CHOOSER_PATH_KEY, path)
+            LerverConfig.WriteProperties(COMMON_CHOOSER_PATH_KEY, path)
         }
     }
 
     fun getInitFile(key: String? = null): File {
         if (key != null) {
-            if (GlobalConfig.ContainsKey(key)) {
-                return File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+            if (LerverConfig.ContainsKey(key)) {
+                return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
             }
         }
         return File(COMMON_CHOOSER_PATH)

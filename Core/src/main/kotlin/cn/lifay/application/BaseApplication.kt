@@ -1,5 +1,10 @@
 package cn.lifay.application
 
+import atlantafx.base.theme.PrimerDark
+import atlantafx.base.theme.PrimerLight
+import cn.lifay.global.LerverConfig
+import cn.lifay.global.LerverResource
+import cn.lifay.logutil.LerverLog
 import cn.lifay.mq.EventBus
 import cn.lifay.mq.event.DefaultEvent
 import javafx.application.Application
@@ -8,19 +13,45 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.CoroutineContext
+import kotlin.system.exitProcess
 
 /**
  * javaFX启动类的基类
  * 定义一些应用配置、应用协程
  */
-abstract class BaseApplication(
-
-) : Application(), CoroutineScope {
+abstract class BaseApplication() : Application(), CoroutineScope {
     override val coroutineContext: CoroutineContext = Dispatchers.Main + SupervisorJob()
 
     init {
-        println("init")
-        EventBus.subscribe(EventBusId.CANCEL_JOB, DefaultEvent::class) {
+//        println("init")
+        //加载配置信息
+        try {
+            LerverConfig.InitConfigPath()
+        } catch (e: Exception) {
+            println("加载配置文件失败:${e.stackTraceToString()}")
+            exitProcess(1)
+        }
+        //加载日志组件
+        val logPrefix = LerverConfig.ReadProperties<String>("log.prefix", "client")
+        val logDir = LerverConfig.ReadProperties<String>("log.dir", LerverResource.USER_DIR + "logs")
+        LerverLog.SetLogPrefix(logPrefix!!)
+        LerverLog.SetLogsDirPath(logDir!!)
+        try {
+            LerverLog.InitConfig()
+        } catch (e: Exception) {
+            println("加载日志组件失败:${e.stackTraceToString()}")
+            exitProcess(1)
+        }
+        //加载主题
+        LerverConfig.ReadProperties("theme", PrimerLight().name)!!.let {
+            if ("THEME_DARK" == it) {
+                LerverResource.loadTheme(PrimerDark())
+            } else {
+                LerverResource.loadTheme()
+            }
+        }
+        //注册退出任务
+        EventBus.subscribe<DefaultEvent>(EventBusId.CANCEL_JOB) {
             cancelAllJob()
         }
     }

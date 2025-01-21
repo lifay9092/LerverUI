@@ -1,10 +1,8 @@
 package cn.lifay.test
 
-import cn.lifay.global.GlobalResource
-import cn.lifay.ui.BaseView
+import cn.lifay.global.LerverResource
 import javafx.application.Application
 import javafx.scene.Scene
-import javafx.scene.layout.AnchorPane
 import javafx.stage.Stage
 
 /*
@@ -16,7 +14,7 @@ import javafx.stage.Stage
 class TestBaseViewDemo : Application() {
     @Throws(Exception::class)
     override fun start(primaryStage: Stage) {
-        GlobalResource.loadTheme()
+        LerverResource.loadTheme()
         val baseView = TestBaseView()
         primaryStage.title = "Hello World"
         primaryStage.scene = Scene(baseView.ROOT_PANE)

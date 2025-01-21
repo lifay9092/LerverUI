@@ -2,7 +2,7 @@ package cn.lifay.db
 
 import atlantafx.base.theme.Styles
 import cn.lifay.extension.*
-import cn.lifay.global.GlobalConfig
+import cn.lifay.global.LerverConfig
 import cn.lifay.logutil.LerverLog
 import javafx.application.Platform
 import javafx.beans.value.ChangeListener
@@ -62,7 +62,7 @@ class DbLoadView(
         if (!isShowStage) {
             true
         } else {
-            GlobalConfig.ReadProperties("db.auto_target", false)
+            LerverConfig.ReadProperties("db.auto_target", false)
         }
 
     val checkBox = CheckBox("初始化后自动跳转")
@@ -80,7 +80,7 @@ class DbLoadView(
             isSelected = autoTarget == true
             this.selectedProperty().addListener { observableValue, old, new ->
                 if (autoTarget != new) {
-                    GlobalConfig.WritePropertiesForKey("db", mapOf("auto_target" to checkBox.isSelected))
+                    LerverConfig.WritePropertiesForKey("db", mapOf("auto_target" to checkBox.isSelected))
 //                    println("upt")
                 }
             }

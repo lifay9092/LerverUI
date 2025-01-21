@@ -3,7 +3,7 @@ package cn.lifay.ui.form
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.bindEscKey
 import cn.lifay.extension.platformRun
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.BaseButton
 import javafx.event.EventHandler
@@ -147,7 +147,7 @@ open class BaseFormUI<T : Any>(
      */
     private fun uiInit() {
         stage.initModality(Modality.APPLICATION_MODAL)
-        GlobalResource.loadIcon(stage)
+        LerverResource.loadIcon(stage)
 
         root.children.addAll(form)
 

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
+<AnchorPane fx:id="rootPane" prefHeight="909.0" prefWidth="1267.0" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.view.CommonView">
+    <children>
+        <TextArea fx:id="baseViewCode" editable="false" layoutX="34.0" layoutY="39.0" prefHeight="509.0"
+                  prefWidth="370.0" style="-fx-background-color: black; -fx-text-fill: white;"
+                  text="class CommonView : BaseView&lt;AnchorPane&gt;(){&#10;&#10;    /*&#10;        rootPane 绑定了fxml中的顶级Pane的fx:id&#10;     */&#10;    @FXML&#10;    var rootPane: AnchorPane = AnchorPane()&#10;    /**&#10;     * 注册根容器&#10;     */&#10;    override fun rootPane(): AnchorPane {&#10;        return rootPane&#10;    }&#10;}"/>
+        <Label layoutX="34.0" layoutY="14.0" text="基础视图类定义格式" textFill="#087975">
+            <font>
+                <Font name="System Bold" size="16.0"/>
+            </font>
+        </Label>
+        <TextArea fx:id="fxmlCode" editable="false" layoutX="414.0" layoutY="39.0" prefHeight="509.0" prefWidth="845.0"
+                  style="-fx-background-color: black; -fx-text-fill: white;"
+                  text="&lt;AnchorPane fx:id=&quot;rootPane&quot; prefHeight=&quot;704.0&quot; prefWidth=&quot;827.0&quot; xmlns=&quot;http://javafx.com/javafx/21&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;cn.lifay.view.CommonView&quot;&gt;&#10;   &lt;children&gt;&#10;      &lt;TextArea layoutX=&quot;34.0&quot; layoutY=&quot;39.0&quot; prefHeight=&quot;337.0&quot; prefWidth=&quot;370.0&quot; style=&quot;-fx-background-color: black; -fx-text-fill: white;&quot; text=&quot;class CommonView : BaseView&amp;lt;AnchorPane&amp;gt;(){&amp;#10;&amp;#10;    /*&amp;#10;        rootPane 绑定了fxml中的顶级Pane的fx:id&amp;#10;     */&amp;#10;    @FXML&amp;#10;    var rootPane: AnchorPane = AnchorPane()&amp;#10;    /**&amp;#10;     * 注册根容器&amp;#10;     */&amp;#10;    override fun rootPane(): AnchorPane {&amp;#10;        return rootPane&amp;#10;    }&amp;#10;}&quot; /&gt;&#10;      &lt;Label layoutX=&quot;34.0&quot; layoutY=&quot;14.0&quot; text=&quot;基础视图类定义格式&quot; textFill=&quot;#087975&quot;&gt;&#10;         &lt;font&gt;&#10;            &lt;Font name=&quot;System Bold&quot; size=&quot;16.0&quot; /&gt;&#10;         &lt;/font&gt;&#10;      &lt;/Label&gt;&#10;      &lt;TextArea layoutX=&quot;414.0&quot; layoutY=&quot;39.0&quot; prefHeight=&quot;324.0&quot; prefWidth=&quot;321.0&quot; style=&quot;-fx-background-color: black; -fx-text-fill: white;&quot; text=&quot;package cn.lifay.view&amp;#10;&amp;#10;import cn.lifay.ui.BaseView&amp;#10;import javafx.fxml.FXML&amp;#10;import javafx.scene.layout.AnchorPane&amp;#10;&amp;#10;class CommonView : BaseView&amp;lt;AnchorPane&amp;gt;(){&amp;#10;&amp;#10;    /*&amp;#10;        rootPane 绑定了fxml中的顶级Pane的fx:id&amp;#10;     */&amp;#10;    @FXML&amp;#10;    var rootPane: AnchorPane = AnchorPane()&amp;#10;    /**&amp;#10;     * 注册根容器&amp;#10;     */&amp;#10;    override fun rootPane(): AnchorPane {&amp;#10;        return rootPane&amp;#10;    }&amp;#10;}&quot; /&gt;&#10;      &lt;Label layoutX=&quot;414.0&quot; layoutY=&quot;14.0&quot; text=&quot;fxml绑定&quot; textFill=&quot;#087975&quot;&gt;&#10;         &lt;font&gt;&#10;            &lt;Font name=&quot;System Bold&quot; size=&quot;16.0&quot; /&gt;&#10;         &lt;/font&gt;&#10;      &lt;/Label&gt;&#10;      &lt;Label layoutX=&quot;34.0&quot; layoutY=&quot;382.0&quot; text=&quot;非基础视图类中引用（一般是启动类）&quot; textFill=&quot;#087975&quot;&gt;&#10;         &lt;font&gt;&#10;            &lt;Font name=&quot;System Bold&quot; size=&quot;16.0&quot; /&gt;&#10;         &lt;/font&gt;&#10;      &lt;/Label&gt;&#10;      &lt;TextArea layoutX=&quot;34.0&quot; layoutY=&quot;404.0&quot; prefHeight=&quot;300.0&quot; prefWidth=&quot;784.0&quot; style=&quot;-fx-background-color: black; -fx-text-fill: white;&quot; text=&quot;class CommonApplication : BaseApplication() {&amp;#10;&amp;#10;    override fun start(primaryStage: Stage) {&amp;#10;        //AnchorPane跟CommonView中的Pane类型一致&amp;#10;        val view = BaseView.createView&amp;lt;CommonView, AnchorPane&amp;gt;(&amp;#10;            CommonApplication::class.java.getResource(&amp;quot;common.fxml&amp;quot;)&amp;#10;        )&amp;#10;        val scene = Scene(view.ROOT_PANE)&amp;#10;        primaryStage.title = &amp;quot;Hello World&amp;quot;&amp;#10;        primaryStage.scene = scene&amp;#10;        primaryStage.setOnCloseRequest {&amp;#10;            println(&amp;quot;close...&amp;quot;)&amp;#10;        }&amp;#10;    }&amp;#10;}&quot; /&gt;&#10;   &lt;/children&gt;&#10;&lt;/AnchorPane&gt;"/>
+        <Label layoutX="414.0" layoutY="14.0" text="fxml绑定视图" textFill="#087975">
+            <font>
+                <Font name="System Bold" size="16.0"/>
+            </font>
+        </Label>
+        <Label layoutX="34.0" layoutY="565.0" text="非基础视图类中引用（一般是启动类）" textFill="#087975">
+            <font>
+                <Font name="System Bold" size="16.0"/>
+            </font>
+        </Label>
+        <TextArea fx:id="otherCode" editable="false" layoutX="34.0" layoutY="587.0" prefHeight="300.0" prefWidth="784.0"
+                  style="-fx-background-color: black; -fx-text-fill: white;"
+                  text="class CommonApplication : BaseApplication() {&#10;&#10;    override fun start(primaryStage: Stage) {&#10;        //AnchorPane跟CommonView中的Pane类型一致&#10;        val view = BaseView.createView&lt;CommonView, AnchorPane&gt;(&#10;            CommonApplication::class.java.getResource(&quot;common.fxml&quot;)&#10;        )&#10;        val scene = Scene(view.ROOT_PANE)&#10;        primaryStage.title = &quot;Hello World&quot;&#10;        primaryStage.scene = scene&#10;        primaryStage.setOnCloseRequest {&#10;            println(&quot;close...&quot;)&#10;        }&#10;    }&#10;}"/>
+        <Button layoutX="356.0" layoutY="8.0" mnemonicParsing="false" onAction="#copyBaseViewCode">
+            <graphic>
+                <FontIcon iconColor="green" iconLiteral="fth-copy" iconSize="16" layoutX="365.0" layoutY="32.0"/>
+            </graphic>
+            <styleClass>
+                <String fx:value="button-icon"/>
+                <String fx:value="flat"/>
+            </styleClass>
+        </Button>
+        <Button layoutX="1219.0" layoutY="8.0" mnemonicParsing="false" onAction="#copyFxmlCode">
+            <graphic>
+                <FontIcon iconColor="green" iconLiteral="fth-copy" iconSize="16" layoutX="365.0" layoutY="32.0"/>
+            </graphic>
+            <styleClass>
+                <String fx:value="button-icon"/>
+                <String fx:value="flat"/>
+            </styleClass>
+        </Button>
+        <Button layoutX="784.0" layoutY="548.0" mnemonicParsing="false" onAction="#copyOtherCode">
+            <graphic>
+                <FontIcon iconColor="green" iconLiteral="fth-copy" iconSize="16" layoutX="365.0" layoutY="32.0"/>
+            </graphic>
+            <styleClass>
+                <String fx:value="button-icon"/>
+                <String fx:value="flat"/>
+            </styleClass>
+        </Button>
+
+    </children>
+</AnchorPane>

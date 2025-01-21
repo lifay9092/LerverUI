@@ -455,12 +455,10 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
         }
 
-        EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
+        EventBus.subscribe<TextEvent>(DemoId.CHAT) {
             platformRun {
                 user1.appendText("${it.text}\n")
             }
-        }
-        EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
             platformRun {
                 user2.appendText("${it.text}\n")
             }

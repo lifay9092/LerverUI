@@ -1,6 +1,9 @@
 package cn.lifay.application
 
 import cn.lifay.db.DbLoadView
+import cn.lifay.mq.EventBus
+import cn.lifay.mq.event.DefaultEvent
+import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.image.Image
 import javafx.stage.Stage
@@ -18,7 +21,7 @@ abstract class InitDbApplication(
      */
     abstract fun addAppStage(): Stage
     override fun start(dbLoadStage: Stage) {
-        AppManage.loadAppConfig(AppManage())
+//        AppManage.loadAppConfig(AppManage())
 
         //切换到首页的视图-回调函数
         val targetIndexFunc = {
@@ -58,7 +61,8 @@ abstract class InitDbApplication(
                 Image("/data.png")
             )
             setOnCloseRequest {
-                AppManage.cancelApp()
+                EventBus.publish(DefaultEvent(EventBusId.CANCEL_JOB.name))
+                Platform.exit()
             }
             if (isShowStage) {
                 show()

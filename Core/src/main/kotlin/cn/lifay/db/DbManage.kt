@@ -3,10 +3,10 @@ package cn.lifay.db
 import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.toCamelCase
 import cn.lifay.global.DbEntity
-import cn.lifay.global.GlobalConfig
-import cn.lifay.global.GlobalConfig.LoadToConfigMap
-import cn.lifay.global.GlobalConfig.WritePropertiesForKey
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverConfig
+import cn.lifay.global.LerverConfig.LoadToConfigMap
+import cn.lifay.global.LerverConfig.WritePropertiesForKey
+import cn.lifay.global.LerverResource
 import cn.lifay.logutil.LerverLog
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleStringProperty
@@ -60,12 +60,12 @@ object DbManage {
 
         try {
             var dbEntity: DbEntity? = null
-            val defaultDbPath = GlobalResource.USER_DIR + DB_NAME
+            val defaultDbPath = LerverResource.USER_DIR + DB_NAME
             //获取db配置文件
-            val lerverConfigPath = "${GlobalResource.USER_DIR}lerver.yml"
+            val lerverConfigPath = "${LerverResource.USER_DIR}lerver.yml"
             val lerverConfigFile = File(lerverConfigPath)
             if (!lerverConfigFile.exists()) {
-                val dbConfigPath = "${GlobalResource.USER_DIR}db.config"
+                val dbConfigPath = "${LerverResource.USER_DIR}db.config"
                 val dbConfigFile = File(dbConfigPath)
                 if (dbConfigFile.exists()) {
                     output("从db.config迁移...")
@@ -93,7 +93,7 @@ object DbManage {
                 }
 
             } else {
-                dbEntity = GlobalConfig.ReadDbConfig(DB_NAME)
+                dbEntity = LerverConfig.ReadDbConfig(DB_NAME)
             }
             InitDataBase(dbEntity!!)
 
@@ -142,7 +142,7 @@ object DbManage {
         }
         val lastVersionNo = lastVersion.toInt()
         //脚本目录
-        val sqlDir = File("${GlobalResource.USER_DIR}scripts")
+        val sqlDir = File("${LerverResource.USER_DIR}scripts")
         if (sqlDir.exists()) {
             var newLasVersion = lastVersion
             val sqlFiles = sqlDir.listFiles(FileFilter { it.isFile && it.name.endsWith(".sql") })

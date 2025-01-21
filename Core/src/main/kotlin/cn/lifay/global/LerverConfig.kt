@@ -14,10 +14,11 @@ data class DbEntity(
     val password: String
 )
 
-object GlobalConfig {
+object LerverConfig {
 
     private lateinit var LERVER_CONFIG_PATH: String
 
+    /*配置容器*/
     private val CONFIG_MAP = HashMap<String, Any>()
     private val LOADER_OPTIONS = LoaderOptions().apply {
         this.isAllowDuplicateKeys = true
@@ -35,9 +36,18 @@ object GlobalConfig {
     )
 
     /**
+     * 自定义设置配置文件路径,必须最先执行才能生效
+     */
+    fun SetConfigPath(configPath: String = LerverResource.USER_DIR + "lerver.yml") {
+        if (!this::LERVER_CONFIG_PATH.isInitialized) {
+            LERVER_CONFIG_PATH = configPath
+        }
+    }
+
+    /**
      * 初始化配置文件
      */
-    fun InitLerverConfigPath(configPath: String) {
+    fun InitConfigPath(configPath: String = LerverResource.USER_DIR + "lerver.yml") {
         LERVER_CONFIG_PATH = configPath
         val file = File(LERVER_CONFIG_PATH)
         if (!file.exists()) {
@@ -155,7 +165,7 @@ object GlobalConfig {
         val password = CONFIG_MAP.getOrDefault(passwordKey, "") as String
         if (url.isBlank()) {
             //已有配置文件中写入db配置
-            url = "jdbc:sqlite:${(GlobalResource.USER_DIR).replace("\\", "/") + DB_NAME}"
+            url = "jdbc:sqlite:${(LerverResource.USER_DIR).replace("\\", "/") + DB_NAME}"
             WritePropertiesForKey(
                 "db",
                 mapOf(
