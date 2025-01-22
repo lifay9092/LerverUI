@@ -1,8 +1,7 @@
 package cn.lifay.test;
 
 import atlantafx.base.theme.PrimerLight;
-import cn.lifay.db.DbManage;
-import cn.lifay.global.GlobalResource;
+import cn.lifay.global.LerverResource;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,7 +17,7 @@ import javafx.stage.Stage;
 public class ListViewTest extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        GlobalResource.loadTheme(new PrimerLight());
+        LerverResource.loadTheme(new PrimerLight());
         FXMLLoader fxmlLoader = new FXMLLoader(ListViewTest.class.getResource("list.fxml"));
         Parent load = fxmlLoader.load();
         Scene scene = new Scene(load);

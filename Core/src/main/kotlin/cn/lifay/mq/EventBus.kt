@@ -5,7 +5,6 @@ import cn.lifay.mq.event.Event
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArraySet
-import kotlin.reflect.KClass
 
 object EventBus {
     /*
@@ -18,7 +17,7 @@ object EventBus {
     /*
         订阅者列表 K=事件类型 V=回调函数列表
      */
-    val SUBSCRIBERS_TYPE = ConcurrentHashMap<String, KClass<out Event>>()
+//    val SUBSCRIBERS_TYPE = ConcurrentHashMap<String, KClass<out Event>>()
     val SUBSCRIBERS_FUNC = ConcurrentHashMap<String, CopyOnWriteArraySet<(Event) -> Unit>>()
 
     /**
@@ -31,23 +30,14 @@ object EventBus {
      * @author lifay
      */
     @JvmName("subscribeByEnum")
-    fun <T : Event> subscribe(id: BaseEventBusId, eventType: KClass<T>, subscriber: (T) -> Unit) {
+    fun <T : Event> subscribe(id: BaseEventBusId, subscriber: (T) -> Unit) {
         Objects.requireNonNull(id)
-        Objects.requireNonNull(eventType)
+//        Objects.requireNonNull(eventType)
         Objects.requireNonNull(subscriber)
 
         val idStr = id.toString()
 //        println("func:${subscriber.hashCode()}")
-        if (!SUBSCRIBERS_TYPE.containsKey(idStr)) {
-            val eventFuncs = CopyOnWriteArraySet<(Event) -> Unit>()
-            eventFuncs.add(subscriber as ((Event) -> Unit)?)
-            SUBSCRIBERS_TYPE[idStr] = eventType
-            SUBSCRIBERS_FUNC[idStr] = eventFuncs
-        } else {
-            val eventFuncs = SUBSCRIBERS_FUNC[idStr]
-            eventFuncs!!.add(subscriber as ((Event) -> Unit)?)
-        }
-
+        subscribe(idStr, subscriber)
     }
 
     /**
@@ -60,22 +50,21 @@ object EventBus {
      * @author lifay
      */
     @JvmName("subscribeByStr")
-    fun <T : Event> subscribe(id: String, eventType: KClass<T>, subscriber: (T) -> Unit) {
+    fun <T : Event> subscribe(id: String, subscriber: (T) -> Unit) {
         Objects.requireNonNull(id)
-        Objects.requireNonNull(eventType)
+//        Objects.requireNonNull(eventType)
         Objects.requireNonNull(subscriber)
 
 //        println("func:${subscriber.hashCode()}")
-        if (!SUBSCRIBERS_TYPE.containsKey(id)) {
+        if (!SUBSCRIBERS_FUNC.containsKey(id)) {
             val eventFuncs = CopyOnWriteArraySet<(Event) -> Unit>()
             eventFuncs.add(subscriber as ((Event) -> Unit)?)
-            SUBSCRIBERS_TYPE[id] = eventType
+//            SUBSCRIBERS_TYPE[id] = eventType
             SUBSCRIBERS_FUNC[id] = eventFuncs
         } else {
             val eventFuncs = SUBSCRIBERS_FUNC[id]
             eventFuncs!!.add(subscriber as ((Event) -> Unit)?)
         }
-
     }
 
     /**
@@ -89,11 +78,11 @@ object EventBus {
         isAsync :Boolean = true) {
         Objects.requireNonNull(event)
         val idStr = event.id
-        if (SUBSCRIBERS_TYPE.containsKey(idStr)) {
-            val eventType = SUBSCRIBERS_TYPE[idStr]
-            if (eventType != event::class) {
-                throw EventBusException("event class 不一致！ subscribers:${eventType} publish:${event::class}")
-            }
+        if (SUBSCRIBERS_FUNC.containsKey(idStr)) {
+//            val eventType = SUBSCRIBERS_TYPE[idStr]
+//            if (eventType != event::class) {
+//                throw EventBusException("event class 不一致！ subscribers:${eventType} publish:${event::class}")
+//            }
             val eventFuncs = SUBSCRIBERS_FUNC[idStr]
             //println(eventFuncs?.size)
             eventFuncs?.forEach {
@@ -117,8 +106,8 @@ object EventBus {
      */
     fun unSubscribe(id: String) {
         Objects.requireNonNull(id)
-        if (SUBSCRIBERS_TYPE.containsKey(id)) {
-            SUBSCRIBERS_TYPE.remove(id)
+        if (SUBSCRIBERS_FUNC.containsKey(id)) {
+//            SUBSCRIBERS_TYPE.remove(id)
             SUBSCRIBERS_FUNC.remove(id)
         }
     }

@@ -3,7 +3,7 @@ package cn.lifay.test
 import atlantafx.base.theme.PrimerLight
 import atlantafx.base.theme.Styles
 import cn.lifay.db.DbManage
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.control.Button
@@ -22,7 +22,7 @@ class BtnDemo : Application() {
     override fun start(primaryStage: Stage) {
         DbManage.Init()
         // GlobalResource.enableElement(true)
-        GlobalResource.loadTheme(PrimerLight())
+        LerverResource.loadTheme(PrimerLight())
         var normalBtn = Button("_Normal");
         normalBtn.setMnemonicParsing(true);
 

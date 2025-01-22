@@ -4,7 +4,7 @@ import cn.lifay.db.UserData
 import cn.lifay.db.UserDatas
 import cn.lifay.extension.alertConfirmation
 import cn.lifay.extension.styleInfo
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.ui.form.BaseFormUI
 import cn.lifay.ui.form.btn.BaseButton
 import cn.lifay.ui.form.check.CheckElement
@@ -106,8 +106,8 @@ class FormUIView : Initializable{
         val userForm = UserDataForm(UserData(1, "121212", SelectTypeEnum.C, true, "男"), isUpdate = true)
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
         userForm.ROOT_PANE.apply {
-            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
-            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+            prefWidth = LerverResource.SCREEN_WIDTH * 0.9
+            prefHeight = LerverResource.SCREEN_HEIGHT * 0.9
         }
         userForm.show()
     }

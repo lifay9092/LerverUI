@@ -5,7 +5,7 @@ import atlantafx.base.util.Animations
 import cn.lifay.extension.asyncDelayTask
 import cn.lifay.extension.backgroundColor
 import cn.lifay.extension.platformRun
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.logutil.LerverLog
 import cn.lifay.ui.message.MsgType
 import javafx.fxml.FXMLLoader
@@ -135,7 +135,7 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
                 this.scene = scene
                 this.setOnCloseRequest { closeFunc?.let { it() } }
 //                this.bindEscKey()
-                GlobalResource.loadIcon(this)
+                LerverResource.loadIcon(this)
             }
         }
     }
@@ -163,8 +163,8 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
 
     protected fun initNotificationPane() {
         NOTIFICATION_PANE.layoutXProperty()
-            .bind(ROOT_PANE.widthProperty().subtract(GlobalResource.MSG_WIDTH).subtract(17))
-        MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(GlobalResource.MSG_WIDTH / 2))
+            .bind(ROOT_PANE.widthProperty().subtract(LerverResource.MSG_WIDTH).subtract(17))
+        MESSAGE_PANE.layoutXProperty().bind(ROOT_PANE.widthProperty().divide(2).subtract(LerverResource.MSG_WIDTH / 2))
         MESSAGE_PANE.backgroundColor(Color.BLACK)
         ROOT_PANE.children.add(NOTIFICATION_PANE)
         ROOT_PANE.children.add(MESSAGE_PANE)
@@ -231,8 +231,8 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
             }
             closePlay.playFromStart()
         }
-        msg.maxWidth = GlobalResource.MSG_WIDTH
-        msg.minWidth = GlobalResource.MSG_WIDTH
+        msg.maxWidth = LerverResource.MSG_WIDTH
+        msg.minWidth = LerverResource.MSG_WIDTH
 
         if (!NOTIFICATION_PANE.children.contains(msg)) {
             platformRun { NOTIFICATION_PANE.children.add(msg) }
@@ -281,8 +281,8 @@ abstract class BaseView<R : Pane>() : Initializable, CoroutineScope {
             }
             closePlay.playFromStart()
         }
-        msg.maxWidth = GlobalResource.MSG_WIDTH
-        msg.minWidth = GlobalResource.MSG_WIDTH
+        msg.maxWidth = LerverResource.MSG_WIDTH
+        msg.minWidth = LerverResource.MSG_WIDTH
 
         if (!MESSAGE_PANE.children.contains(msg)) {
             platformRun { MESSAGE_PANE.children.add(msg) }

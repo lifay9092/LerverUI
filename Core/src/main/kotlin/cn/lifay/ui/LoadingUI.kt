@@ -1,6 +1,6 @@
 package cn.lifay.ui
 
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import javafx.application.Platform
 import javafx.scene.Scene
 import javafx.scene.control.Label
@@ -32,7 +32,7 @@ class LoadingUI(
 
     init {
         val loadingView = ImageView(
-            Image(if (animation) GlobalResource.loading() else GlobalResource.loadingGray(), 100.0, 100.0, true, true)
+            Image(if (animation) LerverResource.loading() else LerverResource.loadingGray(), 100.0, 100.0, true, true)
         )
         messageLb.font = Font.font(20.0)
 

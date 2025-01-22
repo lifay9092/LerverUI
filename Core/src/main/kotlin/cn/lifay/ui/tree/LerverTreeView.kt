@@ -211,9 +211,8 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
 
             //注册item操作事件
             if (!IS_REGISTER_EVENT) {
-                EventBus.subscribe(
-                    "${LerverTreeBusId.ITEM_ADD_LIST}_${treeId}",
-                    BodyEvent::class
+                EventBus.subscribe<BodyEvent<LerverTreeItemEventListBody<T>>>(
+                    "${LerverTreeBusId.ITEM_ADD_LIST}_${treeId}"
                 ) {
                     it.body?.let {
                         val itemEventListBody = it as LerverTreeItemEventListBody<T>
@@ -221,32 +220,29 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
                         refreshNodeList()
                     }
                 }
-                EventBus.subscribe(
-                    "${LerverTreeBusId.ITEM_UPT}_${treeId}",
-                    BodyEvent::class
+                EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
+                    "${LerverTreeBusId.ITEM_UPT}_${treeId}"
                 ) {
                     it.body?.let {
-                        val itemEventValueBody = it as LerverTreeItemEventValueBody<T>
+                        val itemEventValueBody = it
                         updateItem(itemEventValueBody.code, itemEventValueBody.value)
                         refreshNodeList()
                     }
                 }
-                EventBus.subscribe(
+                EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
                     "${LerverTreeBusId.ITEM_UPT_CHILD}_${treeId}",
-                    BodyEvent::class
                 ) {
                     it.body?.let {
-                        val itemEventValueBody = it as LerverTreeItemEventValueBody<T>
+                        val itemEventValueBody = it
                         updateChild(itemEventValueBody.code, itemEventValueBody.value)
                         refreshNodeList()
                     }
                 }
-                EventBus.subscribe(
+                EventBus.subscribe<BodyEvent<LerverTreeItemEventCodeBody>>(
                     "${LerverTreeBusId.ITEM_DEL}_${treeId}",
-                    BodyEvent::class
                 ) {
                     it.body?.let {
-                        val itemEventCodeBody = it as LerverTreeItemEventCodeBody
+                        val itemEventCodeBody = it
                         delete(itemEventCodeBody.codes)
                         refreshNodeList()
                     }

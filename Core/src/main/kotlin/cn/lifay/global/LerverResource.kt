@@ -16,7 +16,7 @@ import java.io.File
  * @author lifay
  * @date 2022/10/9 20:26
  */
-object GlobalResource {
+object LerverResource {
     /**
      * 布局参数
      */
@@ -34,7 +34,7 @@ object GlobalResource {
     /**
      * 全局窗口图标资源
      */
-    var ICON_PNG = GlobalResource.javaClass.getResource("/icon.png")?.toExternalForm()
+    var ICON_PNG = LerverResource.javaClass.getResource("/icon.png")?.toExternalForm()
     lateinit var ICON_IMG: Image
 
     /**

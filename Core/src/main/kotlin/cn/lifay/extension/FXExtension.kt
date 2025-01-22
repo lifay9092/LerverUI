@@ -3,7 +3,7 @@ package cn.lifay.extension
 import atlantafx.base.theme.Styles
 import cn.lifay.chooser.ChooserExtension
 import cn.lifay.exception.LerverUIException
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverResource
 import cn.lifay.ui.LoadingUI
 import javafx.application.Platform
 import javafx.css.PseudoClass
@@ -249,7 +249,7 @@ fun Stage.bindEscKey(): Stage {
 }
 
 fun Stage.loadIcon(): Stage {
-    GlobalResource.loadIcon(this)
+    LerverResource.loadIcon(this)
     return this
 }
 
@@ -578,8 +578,8 @@ fun OpenFileDialog(
         fileChooser.initialDirectory = initialDirectory
     }
     val file = fileChooser.showOpenDialog(window)
-    handle.invoke(file)
-    file.let {
+    file?.let {
+        handle.invoke(it)
         ChooserExtension.updateInitChooserPath(it.absolutePath)
     }
 }
@@ -614,10 +614,11 @@ fun SaveFileDialog(
         fileChooser.initialDirectory = initialDirectory
     }
     val file = fileChooser.showSaveDialog(window)
-    handle.invoke(file)
-    file.let {
+    file?.let {
+        handle.invoke(it)
         ChooserExtension.updateInitChooserPath(it.absolutePath)
     }
+
 }
 
 /**
@@ -650,8 +651,8 @@ fun OpenMultipleFileDialog(
         fileChooser.initialDirectory = initialDirectory
     }
     val file = fileChooser.showOpenMultipleDialog(window)
-    handle.invoke(file)
-    file.let {
+    file?.let {
+        handle.invoke(it)
         ChooserExtension.updateInitChooserPath(it[0].absolutePath)
     }
 }
