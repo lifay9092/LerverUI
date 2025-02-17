@@ -54,11 +54,10 @@ object LerverLog {
     fun SetLogsDirPath(path: String) {
         println("SetLogsDirPath:$path")
         LOG_PATH = path
-
+        File(LOG_PATH).notExistCreate()
     }
 
     fun InitConfig() {
-        File(LOG_PATH).notExistCreate()
 
         LOG_DEBUG_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-debug.log")
         LOG_INFO_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-info.log")

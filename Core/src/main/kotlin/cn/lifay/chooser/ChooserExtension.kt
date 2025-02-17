@@ -1,26 +1,38 @@
 package cn.lifay.chooser
 
-import cn.lifay.chooser.ChooserExtension.getInitFileCommon
-import cn.lifay.global.GlobalConfig
-import cn.lifay.global.GlobalResource
+import cn.lifay.global.LerverConfig
+import cn.lifay.global.LerverResource
 import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import java.io.File
 
-private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
-private var COMMON_CHOOSER_PATH: String =
-    GlobalConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, GlobalResource.USER_DIR)!!
-
-/**
- * 获取目录选择器的初始化目录，默认为当前工作目录
+/*
+  默认公共路径-KEY
  */
-fun DirectoryChooser.getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
-    return getInitFileCommon(key, defaultFile)
+private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
+
+/*
+  默认公共路径-VALUE
+ */
+private var COMMON_CHOOSER_PATH: String =
+    LerverConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, LerverResource.USER_DIR)!!
+
+fun DirectoryChooser.getInitFile(key: String? = null): File {
+    if (key != null) {
+        if (LerverConfig.ContainsKey(key)) {
+            return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+        }
+    }
+    return File(COMMON_CHOOSER_PATH)
 }
 
-fun FileChooser.getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
-    return getInitFileCommon(key, defaultFile)
-
+fun FileChooser.getInitFile(key: String? = null): File {
+    if (key != null) {
+        if (LerverConfig.ContainsKey(key)) {
+            return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+        }
+    }
+    return File(COMMON_CHOOSER_PATH)
 }
 
 object ChooserExtension {
@@ -30,29 +42,20 @@ object ChooserExtension {
             return
         }
         if (key != null) {
-            GlobalConfig.WriteProperties(key, path)
+            LerverConfig.WriteProperties(key, path)
         } else {
             COMMON_CHOOSER_PATH = path
-            GlobalConfig.WriteProperties(COMMON_CHOOSER_PATH_KEY, path)
+            LerverConfig.WriteProperties(COMMON_CHOOSER_PATH_KEY, path)
         }
     }
 
-    fun getInitFile(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
-        return getInitFileCommon(key)
-    }
-
-    fun getInitFileCommon(key: String? = null, defaultFile: File = File(GlobalResource.USER_DIR)): File {
-        var file: File? = null
+    fun getInitFile(key: String? = null): File {
         if (key != null) {
-            if (GlobalConfig.ContainsKey(key)) {
-                file = File(GlobalConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
+            if (LerverConfig.ContainsKey(key)) {
+                return File(LerverConfig.ReadProperties(key, COMMON_CHOOSER_PATH)!!)
             }
-        } else {
-            file = File(COMMON_CHOOSER_PATH)
         }
-        if (file == null || !file.exists()) {
-            file = defaultFile
-        }
-        return file
+        return File(COMMON_CHOOSER_PATH)
     }
+
 }
