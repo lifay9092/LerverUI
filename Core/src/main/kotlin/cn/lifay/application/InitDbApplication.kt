@@ -30,7 +30,7 @@ abstract class InitDbApplication(
             val eventHandler = appStage.onCloseRequestProperty().get()
             appStage.apply {
                 setOnCloseRequest {
-                    eventHandler.handle(it)
+                    eventHandler?.handle(it)
                     dbLoadStage.close()
                 }
                 show()
