@@ -59,4 +59,5 @@
     <Button layoutX="526.0" layoutY="724.0" mnemonicParsing="false" onAction="#OpenDirectoryDialogTest"
             text="选择目录"/>
     <Button layoutX="641.0" layoutY="724.0" mnemonicParsing="false" onAction="#SaveFileDialogTest" text="保存文件"/>
+    <Button layoutX="785.0" layoutY="724.0" mnemonicParsing="false" onAction="#treeViewTest" text="树视图测试"/>
 </AnchorPane>

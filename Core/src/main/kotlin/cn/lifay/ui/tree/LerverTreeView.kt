@@ -162,7 +162,7 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
      * 重新传入初始化数据的函数
      */
     fun ResetInitDataCall(
-         getInitDataCall: () -> List<T>
+        getInitDataCall: () -> List<T>
     ) {
         TREE_DATA_CALL = getInitDataCall
     }
@@ -172,83 +172,83 @@ class LerverTreeView<T : Any, P : Any> : TreeView<T> {
     fun RefreshTree(
         filterFunc: ((T) -> Boolean)? = null
     ) {
-            //println("RefreshTree")
+        //println("RefreshTree")
 
-            //根据初始化数据函数获取数据
-            val datas = initDatas()
+        //根据初始化数据函数获取数据
+        val datas = initDatas()
 
-            //清除item缓存
-            clearItemCache()
-            //清除旧item的数据
-            this.root.apply {
-                children.clear()
-                //添加到缓存
-                treeViewId = treeId
-                treeView = this@LerverTreeView
-                initTreeItem(this)
+        //清除item缓存
+        clearItemCache()
+        //清除旧item的数据
+        this.root.apply {
+            children.clear()
+            //添加到缓存
+            treeViewId = treeId
+            treeView = this@LerverTreeView
+            initTreeItem(this)
+        }
+
+        //重载
+        if (DATA_TYPE == LerverTreeDataType.LIST) {
+            initList(this.root, datas, filterFunc)
+        } else {
+            val childtren = datas.map {
+                val item = createTreeItem(it)
+                initTree(item, filterFunc)
+                item
+            }.filter {
+                if (filterFunc == null || filterFunc(it.value)) {
+                    return@filter true
+                }
+                it.children.isNotEmpty()
             }
+            //添加子节点
+            if (childtren.isNotEmpty()) {
+                this.root.children.addAll(childtren)
+            }
+        }
+        refreshNodeList()
 
-            //重载
-            if (DATA_TYPE == LerverTreeDataType.LIST) {
-                initList(this.root, datas, filterFunc)
-            } else {
-                val childtren = datas.map {
-                    val item = createTreeItem(it)
-                    initTree(item, filterFunc)
-                    item
-                }.filter {
-                    if (filterFunc == null || filterFunc(it.value)) {
-                        return@filter true
-                    }
-                    it.children.isNotEmpty()
-                }
-                //添加子节点
-                if (childtren.isNotEmpty()) {
-                    this.root.children.addAll(childtren)
+        //注册item操作事件
+        if (!IS_REGISTER_EVENT) {
+            EventBus.subscribe<BodyEvent<LerverTreeItemEventListBody<T>>>(
+                "${LerverTreeBusId.ITEM_ADD_LIST}_${treeId}"
+            ) {
+                it.body?.let {
+                    val itemEventListBody = it as LerverTreeItemEventListBody<T>
+                    addChildren(itemEventListBody.code, itemEventListBody.list)
+                    refreshNodeList()
                 }
             }
-            refreshNodeList()
-
-            //注册item操作事件
-            if (!IS_REGISTER_EVENT) {
-                EventBus.subscribe<BodyEvent<LerverTreeItemEventListBody<T>>>(
-                    "${LerverTreeBusId.ITEM_ADD_LIST}_${treeId}"
-                ) {
-                    it.body?.let {
-                        val itemEventListBody = it as LerverTreeItemEventListBody<T>
-                        addChildren(itemEventListBody.code, itemEventListBody.list)
-                        refreshNodeList()
-                    }
+            EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
+                "${LerverTreeBusId.ITEM_UPT}_${treeId}"
+            ) {
+                it.body?.let {
+                    val itemEventValueBody = it
+                    updateItem(itemEventValueBody.code, itemEventValueBody.value)
+                    refreshNodeList()
                 }
-                EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
-                    "${LerverTreeBusId.ITEM_UPT}_${treeId}"
-                ) {
-                    it.body?.let {
-                        val itemEventValueBody = it
-                        updateItem(itemEventValueBody.code, itemEventValueBody.value)
-                        refreshNodeList()
-                    }
-                }
-                EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
-                    "${LerverTreeBusId.ITEM_UPT_CHILD}_${treeId}",
-                ) {
-                    it.body?.let {
-                        val itemEventValueBody = it
-                        updateChild(itemEventValueBody.code, itemEventValueBody.value)
-                        refreshNodeList()
-                    }
-                }
-                EventBus.subscribe<BodyEvent<LerverTreeItemEventCodeBody>>(
-                    "${LerverTreeBusId.ITEM_DEL}_${treeId}",
-                ) {
-                    it.body?.let {
-                        val itemEventCodeBody = it
-                        delete(itemEventCodeBody.codes)
-                        refreshNodeList()
-                    }
-                }
-                IS_REGISTER_EVENT = true
             }
+            EventBus.subscribe<BodyEvent<LerverTreeItemEventValueBody<T>>>(
+                "${LerverTreeBusId.ITEM_UPT_CHILD}_${treeId}",
+            ) {
+                it.body?.let {
+                    val itemEventValueBody = it
+                    updateChild(itemEventValueBody.code, itemEventValueBody.value)
+                    refreshNodeList()
+                }
+            }
+            EventBus.subscribe<BodyEvent<LerverTreeItemEventCodeBody>>(
+                "${LerverTreeBusId.ITEM_DEL}_${treeId}",
+            ) {
+                it.body?.let {
+                    val itemEventCodeBody = it
+                    delete(itemEventCodeBody.codes)
+                    refreshNodeList()
+                }
+            }
+            IS_REGISTER_EVENT = true
+        }
 
     }
 

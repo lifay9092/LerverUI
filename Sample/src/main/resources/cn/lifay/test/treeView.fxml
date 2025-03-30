@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import cn.lifay.ui.tree.LerverTreeView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane fx:id="rootPane" prefHeight="816.0" prefWidth="951.0" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.lifay.test.TreeViewDemoView">
+    <LerverTreeView fx:id="leftCheckTreeView" layoutX="14.0" layoutY="20.0" prefHeight="426.0" prefWidth="253.0"/>
+    <LerverTreeView fx:id="centerTreeView" layoutX="290.0" layoutY="77.0" prefHeight="312.0" prefWidth="282.0"/>
+    <LerverTreeView fx:id="rightCustomTree" layoutX="590.0" layoutY="77.0" prefHeight="312.0" prefWidth="262.0"/>
+    <Button layoutX="885.0" layoutY="66.0" mnemonicParsing="false" onAction="#treeTest" text="测试树"/>
+    <Button layoutX="885.0" layoutY="98.0" mnemonicParsing="false" onAction="#treeTestAdd1" text="添加1"/>
+    <Button layoutX="885.0" layoutY="133.0" mnemonicParsing="false" onAction="#treeTestAdd2" text="添加2"/>
+    <Button layoutX="885.0" layoutY="169.0" mnemonicParsing="false" onAction="#treeTestUpt" text="修改"/>
+    <Button layoutX="885.0" layoutY="207.0" mnemonicParsing="false" onAction="#treeTestDel1" text="删除1"/>
+    <Button layoutX="885.0" layoutY="247.0" mnemonicParsing="false" onAction="#treeTestDel2" text="删除2"/>
+    <TextField fx:id="keywordText" layoutX="428.0" layoutY="33.0"/>
+    <LerverTreeView fx:id="botTreeView" layoutX="290.0" layoutY="416.0" prefHeight="361.0" prefWidth="282.0"/>
+
+</AnchorPane>

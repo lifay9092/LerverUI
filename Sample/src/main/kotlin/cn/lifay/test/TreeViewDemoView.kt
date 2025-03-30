@@ -4,15 +4,8 @@ import atlantafx.base.controls.Spacer
 import atlantafx.base.theme.Styles
 import cn.lifay.db.UserData
 import cn.lifay.extension.*
-import cn.lifay.mq.EventBus
-import cn.lifay.mq.event.TextEvent
 import cn.lifay.ui.BaseView
-import cn.lifay.ui.DelegateProp
-import cn.lifay.ui.table.LerverTableView
-import cn.lifay.ui.table.TableEditCell
 import cn.lifay.ui.tree.*
-import javafx.beans.binding.Bindings
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -22,19 +15,11 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.CheckBoxTreeCell
-import javafx.scene.control.cell.ProgressBarTableCell
-import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.control.cell.TextFieldTableCell
 import javafx.scene.input.MouseButton
 import javafx.scene.layout.AnchorPane
-import javafx.scene.paint.Color
-import javafx.stage.Stage
 import kotlinx.coroutines.delay
-import org.kordamp.ikonli.feather.Feather
-import org.kordamp.ikonli.javafx.FontIcon
 import java.net.URL
 import java.util.*
 
@@ -45,10 +30,7 @@ import java.util.*
  * @Author 李方宇
  * @Date 2023/1/9 16:14
  */
-class CommonDemoView : BaseView<AnchorPane>() {
-
-    @FXML
-    var splitMenuBtn = SplitMenuButton()
+class TreeViewDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var keywordText = TextField()
@@ -64,35 +46,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     @FXML
     var leftCheckTreeView = LerverTreeView<TreeTreeVO, String>()
-//    val rootItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
-    //  val testItemProperties = SimpleObjectProperty<TreeItem<TreeTestVO>>()
+
+    @FXML
+    var botTreeView = LerverTreeView<Person, Int>()
 
     lateinit var rootTreeItem: TreeItem<TreeListVO>
     lateinit var rootCheckTreeItem: CheckBoxTreeItem<TreeTreeVO>
-
-    @FXML
-    var tableView = LerverTableView<TableTestVO, String>()
-
-    @FXML
-    var tableViewJava = LerverTableView<Person, Int>()
-
-    @FXML
-    var sendText = TextArea()
-
-    @FXML
-    lateinit var sendBtn: Button
-
-    @FXML
-    var user1 = TextArea()
-
-    @FXML
-    var user2 = TextArea()
-
-    @FXML
-    lateinit var copyBtn: Button
-
-    @FXML
-    lateinit var testTbBtn: Button
 
     override fun rootPane(): AnchorPane {
         return rootPane
@@ -100,23 +59,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
 
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
 
-        val observableArrayList = FXCollections.observableArrayList<TreeListVO>()
-        splitMenuBtn.items.addAll(
-            MenuItem("1111").apply {
-                setOnAction {
-                    println("11111")
-                }
-            },
-            MenuItem("2222").apply {
-                setOnAction {
-                    println("22222")
-                }
-            }
-        )
-        splitMenuBtn.text = "ddddddddd"
-        splitMenuBtn.setOnAction {
-            println("点击了")
-        }
         val treeItem1 = TreeItem(TreeListVO("3", "2", "4", SimpleStringProperty("3")))
         val treeItem2 = TreeItem(TreeListVO("2", "1", "2", SimpleStringProperty("2")))
         val treeItem3 = TreeItem(TreeListVO("4", "1", "4", SimpleStringProperty("4")))
@@ -278,6 +220,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
             )
 
         }
+
         leftCheckTreeView.apply {
             root = rootCheckTreeItem
             isShowRoot = true
@@ -332,75 +275,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
             }
         }
 
-        tableView.apply {
-            isEditable = true
-            Register(TableTestVO::id)
-            InitTableColumn(
-                true,
-                TableColumn<TableTestVO, String>("普通").apply {
-                    this.cellValueFactory = PropertyValueFactory("id")
-                    setCellFactory {
-                        object : TableEditCell<TableTestVO, String>() {}
-                    }
-                    setOnEditCommit { t: TableColumn.CellEditEvent<TableTestVO, String> ->
-                        (t.tableView.items[t.tablePosition.row] as TableTestVO).id = t.newValue
-                    }
-                    prefWidth = 150.0
-                },
-                TableColumn<TableTestVO, String>("自定义Property").apply {
-                    this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
-                        SimpleStringProperty(p.value.info)
-                    }
-                },
-                TableColumn<TableTestVO, String>("字段Property").apply {
-                    this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, String> ->
-                        p.value.msg
-                    }
-                    isEditable = true
-                    cellFactory = TextFieldTableCell.forTableColumn()
-                    prefWidth = 150.0
-                },
-                TableColumn<TableTestVO, Double>("进度条").apply {
-                    this.setCellValueFactory { p: TableColumn.CellDataFeatures<TableTestVO, Double> ->
-                        Bindings.createObjectBinding({ p.value.processBar.value }, p.value.processBar)
-
-                    }
-                    this.cellFactory = ProgressBarTableCell.forTableColumn()
-                }
-            )
-
-            items.apply {
-                clear()
-                addAll(
-                    TableTestVO("111", "1111", SimpleStringProperty("111"), SimpleDoubleProperty(0.0)),
-                    TableTestVO("222", "2222", SimpleStringProperty("222"), SimpleDoubleProperty(0.0))
-                )
-            }
-        }
-
-        tableViewJava.apply {
-            isEditable = false
-            RegisterByFunction(Person::id)
-            columns.addAll(
-                TableColumn<Person, Int>("ID").apply {
-                    this.cellValueFactory = PropertyValueFactory("id")
-                    prefWidth = 150.0
-                },
-                TableColumn<Person, String>("名称").apply {
-                    this.cellValueFactory = PropertyValueFactory("name")
-                    prefWidth = 150.0
-                }
-            )
-
-            items.apply {
-                clear()
-                addAll(
-                    Person(111, "111", false),
-                    Person(222, "222", true)
-                )
-            }
-        }
-
         val customTreeItem = CheckBoxTreeItem(Person(0, "根节点", false)).apply {
             selectedProperty().addListener { observableValue, old, new ->
                 println("old:$old new:$new")
@@ -416,6 +290,12 @@ class CommonDemoView : BaseView<AnchorPane>() {
 //                LerverCheckBoxTreeCell()
 //            }
             cellFactory = CheckBoxTreeCell.forTreeView()
+
+        }
+        val botTreeItem = LerverTreeItem<Person, Int>(Person(0, "根节点", false))
+        botTreeView.apply {
+            root = botTreeItem
+
 
         }
 
@@ -448,23 +328,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
             Person(3, "3", false)
         )
 
-        testTbBtn.graphic = FontIcon("mdal-adb")
-            .customStyle(16, Color.RED)
-        copyBtn.graphic = FontIcon(Feather.COPY)
-            .customStyle(18, Color.LIGHTSKYBLUE)
-        sendBtn.graphic = FontIcon().apply {
-            style =
-                "-fx-font-family: 'Material Icons';-fx-icon-code: mdal-5g;-fx-icon-size: 16px;-fx-icon-color: #0014ea;"
-        }
-
-        EventBus.subscribe<TextEvent>(DemoId.CHAT) {
-            platformRun {
-                user1.appendText("${it.text}\n")
-            }
-            platformRun {
-                user2.appendText("${it.text}\n")
-            }
-        }
     }
 
     private fun customFuncNodes(treeItem: TreeItem<TreeTreeVO>?): List<Node> {
@@ -488,6 +351,7 @@ class CommonDemoView : BaseView<AnchorPane>() {
         })
         return nodes
     }
+
     val list = SimpleListProperty(FXCollections.observableArrayList<Person>())
 
     fun treeTest(actionEvent: ActionEvent) {
@@ -575,42 +439,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
         )
     }
 
-    fun tableTestAdd(actionEvent: ActionEvent) {
-        val id = UUID.randomUUID().toString()
-        tableView.items.add(
-            TableTestVO(id, id, SimpleStringProperty(id), SimpleDoubleProperty(0.3))
-        )
-
-    }
-
-    fun tableTestDel(actionEvent: ActionEvent) {
-        tableView.items.removeIf {
-            it.id == "111"
-        }
-
-    }
-
-    fun tableTestClear(actionEvent: ActionEvent) {
-        tableView.items.clear()
-    }
-
-    fun tableTestUpt(actionEvent: ActionEvent) {
-        tableView.UpdateItem(
-            TableTestVO("111", "33333", SimpleStringProperty("33333"), SimpleDoubleProperty(0.1))
-        )
-        tableView.UpdateItem("222", TableTestVO::msg, "444444444")
-        tableView.UpdateItem("222", TableTestVO::processBar, 0.5)
-
-    }
-
-    fun tableTestUptJava(actionEvent: ActionEvent) {
-        tableViewJava.UpdateItem(
-            Person(111, "333", false)
-        )
-        tableViewJava.UpdateItem(222, DelegateProp("name"), "444444444")
-
-    }
-
     fun treeTestAdd1(actionEvent: ActionEvent) {
         rootTreeItem.children[0].AddChildren(TreeListVO("add1", "5", "add1", SimpleStringProperty("add1")))
         rootCheckTreeItem.children[0].children[1].children.add(CheckBoxTreeItem(TreeTreeVO("8", "3", "8", true, null)))
@@ -637,10 +465,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
     fun treeTestDel2(actionEvent: ActionEvent) {
         rootTreeItem.DeleteChildItem { it.id == "4" }
 
-    }
-
-    fun chat(actionEvent: ActionEvent) {
-        EventBus.publish(TextEvent(DemoId.CHAT.toString(), sendText.text))
     }
 
     fun asyncTest() {
@@ -737,20 +561,6 @@ class CommonDemoView : BaseView<AnchorPane>() {
                 showMessage("保存到:${it.absolutePath}")
             }
         }
-    }
-
-    fun treeViewTest(actionEvent: ActionEvent) {
-        val view = createView<TreeViewDemoView, AnchorPane>(
-            CommonApplication::class.java.getResource("treeView.fxml")
-        )
-        val stage = Stage()
-        val scene = Scene(view.ROOT_PANE)
-        stage.title = "treeViewTest"
-        stage.scene = scene
-        stage.setOnCloseRequest {
-            println("close...")
-        }
-        stage.show()
     }
 
 
