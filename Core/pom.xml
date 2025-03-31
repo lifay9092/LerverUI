@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.lifay.LerverUI</groupId>
         <artifactId>Parent</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
@@ -22,7 +22,7 @@
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <plugins>
-            <!--   &lt;!&ndash;临时打胖包 用于SceneBuilder&ndash;&gt;
+            <!--临时打胖包 用于SceneBuilder-->
                <plugin>
                    <groupId>org.apache.maven.plugins</groupId>
                    <artifactId>maven-assembly-plugin</artifactId>
@@ -43,7 +43,7 @@
                            </goals>
                        </execution>
                    </executions>
-               </plugin>-->
+               </plugin>
         </plugins>
     </build>
 </project>

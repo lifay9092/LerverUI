@@ -61,7 +61,7 @@ class SelectElement<T : Any, R : Any> constructor(
         inline operator fun <reified T : Any, reified R : Any> invoke(
             label: String,
             customProp: DelegateProp<T, R>,
-            items: Collection<R?>,
+            items: Collection<R>,
             required: Boolean = false,
             initValue: R? = null,
             noinline nodeBuild: (ChoiceBox<R>.() -> Unit)? = null
@@ -78,8 +78,8 @@ class SelectElement<T : Any, R : Any> constructor(
         }
     }
 
-    override fun graphic(): ChoiceBox<*> {
-        return node as ChoiceBox<*>
+    override fun graphic(): ChoiceBox<R?> {
+        return node as ChoiceBox<R?>
     }
 
     override fun getElementValue(): R? {
@@ -99,7 +99,7 @@ class SelectElement<T : Any, R : Any> constructor(
     }
 
     override fun defaultValue(): R? {
-        return null
+        return initValue
     }
 
     fun loadItems(items: Collection<R?>) {

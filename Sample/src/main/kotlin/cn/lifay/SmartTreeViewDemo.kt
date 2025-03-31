@@ -1,19 +1,21 @@
-package cn.lifay.ui.tree.test
+package cn.lifay
 
-import cn.lifay.ui.tree.test.ty.*
-import javafx.application.Application
+import cn.lifay.ui.tree.*
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.CheckBoxTreeCell
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
 import kotlin.random.Random
 
 
-class SmartTreeViewDemo : Application() {
+object SmartTreeViewDemo {
 
-    override fun start(primaryStage: Stage) {
+    fun start() {
+        val primaryStage: Stage = Stage()
         val rootItem1 = CheckBoxTreeItem(Department(0, "根节点1", -1))
         val rootItem2 = CheckBoxTreeItem(Department(0, "根节点2", -1))
         val rootItem3 = TreeItem<Department>(Department(0, "根节点3", -1))
@@ -57,28 +59,34 @@ class SmartTreeViewDemo : Application() {
         // 懒加载配置示例：
         val lazyConfig = TreeConfig.LazyLoadingConfig<Department, Int>(
             idProperty = Department::id,
+            imgCall = { it ->
+                ImageView(Image("cn/lifay/test/folder.png"))
+            }
         )
 
 
         /* ----------------------------------- 创建树 -----------------------------------*/
 
         // 创建ID-PARENT_ID树
-        val idParentTreeView = SmartTreeView(idParentConfig).apply {
+        val idParentTreeView = LerverTreeView<Department, Int>().apply {
             root = rootItem1
             cellFactory = CheckBoxTreeCell.forTreeView()
-            loadData { idParentData }
+            LoadTreeConfig(idParentConfig)
+            LoadTree { idParentData }
         }
         // 创建CHILDREN树
-        val childrenTreeView = SmartTreeView(childrenConfig).apply {
+        val childrenTreeView = LerverTreeView<Department, Int>().apply {
             root = rootItem2
             cellFactory = CheckBoxTreeCell.forTreeView()
-            loadData { childrenData }
+            LoadTreeConfig(childrenConfig)
+            LoadTree { childrenData }
         }
 
         // 创建懒加载树
-        val lazyTreeView = SmartTreeView(lazyConfig).apply {
+        val lazyTreeView = LerverTreeView<Department, Int>().apply {
             root = rootItem3
-            loadData {
+            LoadTreeConfig(lazyConfig)
+            LoadTree {
                 listOf(
                     Department(
                         it.id + 100, "${it.name}_${it.id}"
@@ -91,27 +99,13 @@ class SmartTreeViewDemo : Application() {
         val filterText = TextField("").apply {
             textProperty().addListener { _, _, text ->
                 if (text.isBlank()) {
-                    childrenTreeView.restore()
+                    childrenTreeView.Restore()
                 } else {
-                    childrenTreeView.filter { it.id.toString().contains(text) }
+                    childrenTreeView.FilterTree { it.id.toString().contains(text) }
                 }
             }
 
         }
-        // 增删改操作示例
-//        val addButton = Button("添加节点").apply {
-//            setOnAction {
-//                (treeView.selectionModel.selectedItem?.value as? Department)?.let { selected ->
-//                    val newDept = Department(
-//                        id = Random.nextInt(),
-//                        name = "新部门",
-//                        parentId = selected.id
-//                    )
-//                    (treeView.selectionModel.selectedItem as FilterableTreeItem<Department>)
-//                        .addChild(newDept)
-//                }
-//            }
-//        }
 
         val scene = Scene(
             VBox(
@@ -124,7 +118,7 @@ class SmartTreeViewDemo : Application() {
                                     setOnAction {
                                         val nextInt = Random.nextInt()
                                         (if (childrenConfig.isCheckBox) childrenTreeView.root as CheckBoxTreeItem<Department> else childrenTreeView.root as TreeItem<Department>)
-                                            .AddChild(
+                                            .AddChildren(
                                                 Department(
                                                     id = nextInt,
                                                     name = "新部门-$nextInt",
@@ -137,7 +131,7 @@ class SmartTreeViewDemo : Application() {
                                         val nextInt = Random.nextInt()
                                         childrenTreeView.selectionModel.selectedItem?.let {
                                             it.apply {
-                                                UptItem(
+                                                UpdateItem(
                                                     Department(
                                                         id = nextInt,
                                                         name = "${value.name}-$nextInt",
@@ -158,7 +152,7 @@ class SmartTreeViewDemo : Application() {
                                                     name = "${value.name}-$nextInt"
                                                 }
                                                 // println("new:${value.hashCode()}")
-                                                UptItem(
+                                                UpdateItem(
                                                     value
                                                 )
                                             }
@@ -167,7 +161,7 @@ class SmartTreeViewDemo : Application() {
                                 }, Button("删除节点").apply {
                                     setOnAction {
                                         childrenTreeView.selectionModel.selectedItem?.let {
-                                            (it as TreeItem<Department>).removeNode(
+                                            (it as TreeItem<Department>).DeleteThis(
                                             )
 
                                         }
@@ -195,8 +189,4 @@ class SmartTreeViewDemo : Application() {
         }
     }
 
-}
-
-fun main() {
-    Application.launch(SmartTreeViewDemo::class.java)
 }

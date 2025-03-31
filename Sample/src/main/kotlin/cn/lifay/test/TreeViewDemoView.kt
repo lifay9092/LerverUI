@@ -86,11 +86,12 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
         centerTreeView.apply {
             root = rootTreeItem
             isShowRoot = true
-            RegisterByList(
-                LerverTreeNodeListProp(TreeListVO::id, TreeListVO::parentId),
-                checkBox = false, init = true
-            ) {
-                println("treeView initDataCall...")
+            LoadTreeConfig(
+                TreeConfig.IdParentIdConfig<TreeListVO, String>(
+                    TreeListVO::id, TreeListVO::parentId
+                )
+            )
+            LoadTree {
                 listOf(test1, test2, test3)
             }
             setOnMouseClicked {
@@ -138,30 +139,6 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
                                 )
                             }
                         })
-                        items.add(MenuItem("根据主键更新子节点").apply {
-                            setOnAction {
-                                println("根据主键更新子节点")
-                                TextInputDialog().apply {
-                                    headerText = "输入主键"
-                                    contentText = null
-                                    setOnCloseRequest {
-                                        println(editor.text)
-                                        val selectedItem = centerTreeView.selectionModel.selectedItem
-                                        if (selectedItem.children.isNotEmpty()) {
-                                            selectedItem.UpdateChild(
-                                                TreeListVO(
-                                                    editor.text,
-                                                    selectedItem.value.id,
-                                                    "${editor.text}_修改了",
-                                                    SimpleStringProperty(editor.text)
-                                                )
-                                            )
-                                        }
-                                    }
-                                    show()
-                                }
-                            }
-                        })
                         items.add(MenuItem("删除节点").apply {
                             this.setOnAction {
                                 println("删除节点")
@@ -174,7 +151,7 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
                                 println("删除子节点")
                                 val selectedItem = centerTreeView.selectionModel.selectedItem
                                 if (selectedItem.children.isNotEmpty()) {
-                                    selectedItem.DeleteChildItem { true }
+                                    selectedItem.DeleteThis()
                                 }
                             }
                         })
@@ -184,14 +161,6 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
                     val selectedItem = this.selectionModel.selectedItem
                     selectedItem?.let {
                         val value = selectedItem.value
-                        if (selectedItem.AllowLoadChildren()) {
-                            asyncTask {
-                                val id = UUID.randomUUID().toString()
-                                selectedItem.AddChildren(
-                                    TreeListVO(id, value.id, "${value.name}-$id", SimpleStringProperty())
-                                )
-                            }
-                        }
                     }
 
                 }
@@ -242,24 +211,14 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
                 }
             }
 //            cellFactory = CheckBoxTreeCell.forTreeView()
-            RegisterByTree(
-                LerverTreeNodeTreeProp(TreeTreeVO::id, TreeTreeVO::children, TreeTreeVO::leaf),
-                true, true
-            ) {
-                println("checkTreeView initDataCall...")
-
-//                findMatchingTreeChildren(TreeTreeVO(
-//                    "1", "0", "1", false, arrayListOf(
-//                        TreeTreeVO(
-//                            "2", "1", "2", false, arrayListOf(
-//                                TreeTreeVO("4", "2", "4", true, null)
-//                            )
-//                        ),
-//                        TreeTreeVO("3", "1", "3", true, null)
-//                    )
-//                ),TreeTreeVO::children){
-//                    true
-//                }
+            LoadTreeConfig(
+                TreeConfig.ChildrenPropertyConfig<TreeTreeVO, String>(
+                    TreeTreeVO::id,
+                    TreeTreeVO::children,
+                    isCheckBox = true
+                )
+            )
+            LoadTree {
                 listOf(
                     TreeTreeVO(
                         "1", "0", "1", false, arrayListOf(
@@ -292,7 +251,7 @@ class TreeViewDemoView : BaseView<AnchorPane>() {
             cellFactory = CheckBoxTreeCell.forTreeView()
 
         }
-        val botTreeItem = LerverTreeItem<Person, Int>(Person(0, "根节点", false))
+        val botTreeItem = TreeItem<Person>(Person(0, "根节点", false))
         botTreeView.apply {
             root = botTreeItem
 

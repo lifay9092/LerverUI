@@ -1,6 +1,6 @@
 package cn.lifay.test
 
-import cn.lifay.application.BaseApplication
+import cn.lifay.application.InitDbApplication
 import cn.lifay.ui.BaseView
 import javafx.scene.Scene
 import javafx.scene.layout.AnchorPane
@@ -18,23 +18,37 @@ import org.graphstream.ui.view.Viewer
  * @author lifay
  * @date 2023/1/9 16:07
  */
-class CommonApplication : BaseApplication() {
-
-    override fun start(primaryStage: Stage) {
-//        start1(primaryStage)
-//        //AnchorPane跟CommonView中的Pane类型一致
+class CommonApplication : InitDbApplication() {
+    override fun addAppStage(): Stage {
+        val primaryStage = Stage()
         val view = BaseView.createView<CommonDemoView, AnchorPane>(
-//            CommonApplication::class.java.getResource("common.fxml")
             CommonApplication::class.java.getResource("demo.fxml")
         )
         val scene = Scene(view.ROOT_PANE)
-        primaryStage.title = "Hello World"
+        primaryStage.title = "常规Demo"
         primaryStage.scene = scene
         primaryStage.setOnCloseRequest {
             println("close...")
         }
         primaryStage.show()
+        return primaryStage
     }
+
+//    override fun start(primaryStage: Stage) {
+////        start1(primaryStage)
+////        //AnchorPane跟CommonView中的Pane类型一致
+//        val view = BaseView.createView<CommonDemoView, AnchorPane>(
+////            CommonApplication::class.java.getResource("common.fxml")
+//            CommonApplication::class.java.getResource("demo.fxml")
+//        )
+//        val scene = Scene(view.ROOT_PANE)
+//        primaryStage.title = "Hello World"
+//        primaryStage.scene = scene
+//        primaryStage.setOnCloseRequest {
+//            println("close...")
+//        }
+//        primaryStage.show()
+//    }
 
     fun start1(stage: Stage) {
         // 创建图对象

@@ -37,7 +37,7 @@ object TreeViewCache {
 
     /*数据缓存*/
     // treeItem的hascode=TreeViewId
-    val ITEM_TO_TREE_MAP = HashMap<Int, LerverTreeView<*, *>>()
+//    val ITEM_TO_TREE_MAP = HashMap<Int, LerverTreeView<*, *>>()
 
     // value业务ID=treeItem 辅助提供ID直接查询
 //    val ITEM_BUSI_TO_TREEITEM_MAP = HashMap<String, TreeItem<*>>()
