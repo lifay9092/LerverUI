@@ -7,6 +7,7 @@ import cn.lifay.extension.styleWarn
 import cn.lifay.ui.form.BaseFormUI
 import cn.lifay.ui.form.DbCurdUI
 import cn.lifay.ui.form.btn.BaseButton
+import cn.lifay.ui.form.btn.CurdButton
 import cn.lifay.ui.form.check.CheckElement
 import cn.lifay.ui.form.radio.RadioElement
 import cn.lifay.ui.form.select.SelectElement
@@ -30,9 +31,14 @@ class UserManage : DbCurdUI<UserData, UserDatas>("用户管理", buildElements =
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
     addElements(id, name, type, child, sex)
 
-    addCustomButtons(BaseButton<BaseFormUI<UserData>>(Button("测试自定义按钮").styleWarn()) {
+    addFormButtons(BaseButton<BaseFormUI<UserData>>(Button("测试表单按钮").styleWarn()) {
         println(it)
     })
+
+    addCurdButtons(CurdButton(Button("测试CURD按钮").styleWarn()) {
+        println(it)
+    })
+
 }) {
 
     //分页实现,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑

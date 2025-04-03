@@ -39,7 +39,7 @@ var <T> TreeItem<T>.treeView: LerverTreeView<*, *>
         return ITEM_TO_TREE_MAP[this.hashCode()]!!
     }
     set(value) {
-        println("$this ${this.hashCode()} set了 treeViewIdddd:${value.id}")
+//        println("$this ${this.hashCode()} set了 treeViewIdddd:${value.id}")
         ITEM_TO_TREE_MAP[this.hashCode()] = value
     }
 
@@ -55,50 +55,50 @@ var <T> TreeItem<T>.treeViewId: String
     }
 
 inline fun <reified T : Any> TreeItem<T>.AddChildren(vararg datas: T) {
-    treeView!!.printFunc {
+    //treeView!!.printFunc {
         EventBus.publish(
             BodyEvent(
                 "${SmartTreeBusId.ITEM_ADD_LIST}_${this.treeViewId}",
                 SmartTreeItemEventListBody(hashCode(), datas.toList())
             ), false
         )
-    }
+    //  }
 
 }
 
 inline fun <reified T : Any> TreeItem<T>.AddChildrenList(datas: List<T>) {
-    this.treeView!!.printFunc {
+    // this.treeView!!.printFunc {
         EventBus.publish(
             BodyEvent(
                 "${SmartTreeBusId.ITEM_ADD_LIST}_${this.treeViewId}",
                 SmartTreeItemEventListBody(hashCode(), datas.toList())
             ), false
         )
-    }
+    //  }
 }
 
 inline fun <reified T : Any> TreeItem<T>.UpdateItem(data: T) {
-    this.treeView!!.printFunc {
+    // this.treeView!!.printFunc {
         EventBus.publish(
             BodyEvent(
                 "${SmartTreeBusId.ITEM_UPT}_${this.treeViewId}",
                 SmartTreeItemEventValueBody(hashCode(), data)
             ), false
         )
-    }
+    //  }
 
 }
 
 // 删除当前节点
 inline fun <reified T : Any> TreeItem<T>.DeleteThis() {
-    this.treeView!!.printFunc {
+    // this.treeView!!.printFunc {
         EventBus.publish(
             BodyEvent(
                 "${SmartTreeBusId.ITEM_DEL}_${this.treeViewId}",
                 SmartTreeItemEventCodeBody(listOf(hashCode()))
             ), false
         )
-    }
+    // }
 }
 
 /**

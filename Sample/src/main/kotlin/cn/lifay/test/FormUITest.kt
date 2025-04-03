@@ -1,6 +1,6 @@
 package cn.lifay.test
 
-import cn.lifay.application.BaseApplication
+import cn.lifay.application.InitDbApplication
 import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -13,10 +13,10 @@ import javafx.stage.Stage
  * @author lifay
  * @date 2023/2/24 17:19
  */
-class FormUITest : BaseApplication() {
+class FormUITest : InitDbApplication() {
 
-    override fun start(primaryStage: Stage?) {
-//        AppManage.loadAppConfig()
+    override fun addAppStage(): Stage {
+        val primaryStage = Stage()
         val fxmlLoader = FXMLLoader(FormUITest::class.java.getResource("formTest.fxml"))
         val load = fxmlLoader.load<Parent>()
         val scene = Scene(load)
@@ -25,7 +25,7 @@ class FormUITest : BaseApplication() {
         primaryStage.setOnCloseRequest {
             println("GlobeStartUp.launch close window...")
         }
-        primaryStage.show()
+        return primaryStage
     }
 
 

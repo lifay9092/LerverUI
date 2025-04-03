@@ -5,6 +5,7 @@ import cn.lifay.exception.LerverUIException
 import cn.lifay.extension.*
 import cn.lifay.ui.BaseView
 import cn.lifay.ui.form.btn.BaseButton
+import cn.lifay.ui.form.btn.CurdButton
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
@@ -99,7 +100,8 @@ abstract class CurdUI<T : Any>(
 
     private val elements = ArrayList<FormElement<T, *>>()
 
-    protected val customButtons = ArrayList<BaseButton<BaseFormUI<T>>>()
+    protected val formButtons = ArrayList<BaseButton<BaseFormUI<T>>>()
+    protected val curdButtons = ArrayList<CurdButton<CurdUI<T>>>()
 
     private fun CurdUI() {}
 
@@ -165,6 +167,14 @@ abstract class CurdUI<T : Any>(
                             }
                         }
                     )
+                }
+                if (curdButtons.isNotEmpty()) {
+                    curdButtons.forEach { baseButton ->
+                        baseButton.btn.setOnAction {
+                            baseButton.actionFunc(this@CurdUI)
+                        }
+                        children.addAll(baseButton.btn)
+                    }
                 }
 
             }
@@ -355,6 +365,8 @@ abstract class CurdUI<T : Any>(
      * 分页查询函数
      *
      * @param keyword 关键字
+     * @param index 页码 从0开始
+     * @param count 分页数量
      * @return f-ObjectBaseTable s-关键字匹配逻辑
      */
     abstract fun pageInit(keyword: String, index: Int, count: Int): Pair<Int, Collection<T>>
@@ -424,7 +436,7 @@ abstract class CurdUI<T : Any>(
 //            dataTable1.items.addAll(add!!)
             val dataFormUI = object : DataFormUI<T>(buildFormUI = {
                 addElements(elements)
-                addCustomButtons(*customButtons.toTypedArray())
+                addCustomButtons(*this@CurdUI.formButtons.toTypedArray())
             }) {
                 override fun saveData(entity: T): Boolean {
                     if (this@CurdUI.saveDataFunc(entity)) {
@@ -454,7 +466,7 @@ abstract class CurdUI<T : Any>(
             val dataFormUI = object : DataFormUI<T>(_isUpdate = true, buildFormUI = {
                 defaultEntity(entity)
                 addElements(elements)
-                addCustomButtons(*customButtons.toTypedArray())
+                addCustomButtons(*this@CurdUI.formButtons.toTypedArray())
             }) {
                 override fun saveData(entity: T): Boolean {
                     if (this@CurdUI.saveDataFunc(entity)) {
@@ -512,8 +524,12 @@ abstract class CurdUI<T : Any>(
         this.elements.addAll(elements)
     }
 
-    fun addCustomButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {
-        this.customButtons.addAll(customButtons)
+    fun addFormButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {
+        this.formButtons.addAll(customButtons)
+    }
+
+    fun addCurdButtons(vararg customButtons: CurdButton<CurdUI<T>>) {
+        this.curdButtons.addAll(customButtons)
     }
 
     fun show() {
