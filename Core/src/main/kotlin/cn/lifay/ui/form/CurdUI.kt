@@ -37,46 +37,32 @@ abstract class CurdUI<T : Any>(
     isInitDel: Boolean = true,
     buildElements: CurdUI<T>.() -> Unit,
 ) : BaseView<VBox>() {
-
     private val stage = Stage().apply {
+        this.title = title
         bindEscKey()
         loadIcon()
     }
-
     @FXML
     val root = VBox().apply {
-        prefHeight = 576.0
-        prefWidth = 918.0
+        prefHeight = 676.0
+        prefWidth = 1024.0
     }
-
-
     @FXML
     val btnGroup = HBox()
-
-
     @FXML
     var dataTable = TableView<T>()
-//
-//    @FXML
-//    var dataTable1 = TableView<T>()
-
     @FXML
     val endPane = HBox()
-
     @FXML
     var pagination = Pagination()
-
     @FXML
     var totalCountText = Label()
-
     @FXML
     var keyword = TextField().apply {
-        HBox.setMargin(this, Insets(0.0, 20.0, 0.0, 10.0))
+        HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
     }
-
     @FXML
     var pageIndexText = TextField()
-
     @FXML
     var pageCountText = TextField()
     val pageIndex: Int
@@ -97,33 +83,29 @@ abstract class CurdUI<T : Any>(
             }
         }
 
-
     private val elements = ArrayList<FormElement<T, *>>()
-
     protected val formButtons = ArrayList<BaseButton<BaseFormUI<T>>>()
     protected val curdButtons = ArrayList<CurdButton<CurdUI<T>>>()
 
     private fun CurdUI() {}
 
     init {
-
         // println("CurdUI init")
         try {
             buildElements()
-
             ROOT_PANE = root
-
+            //按钮组
             btnGroup.apply {
                 alignment = Pos.CENTER_LEFT
                 prefHeight = 47.0
                 prefWidth = 850.0
-                VBox.setMargin(this, Insets(20.0, 0.0, 10.0, 0.0))
+                VBox.setMargin(this, Insets(10.0, 0.0, 10.0, 0.0))
                 children.addAll(
                     keyword,
                     Button("搜索").apply {
                         prefHeight = 23.0
                         prefWidth = 62.0
-                        HBox.setMargin(this, Insets(0.0, 20.0, 0.0, 0.0))
+                        HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 0.0))
                         stylePrimary()
                         setOnAction {
                             search(it)
@@ -132,7 +114,7 @@ abstract class CurdUI<T : Any>(
                     Button("重置").apply {
                         prefHeight = 23.0
                         prefWidth = 62.0
-                        HBox.setMargin(this, Insets(0.0, 300.0, 0.0, 0.0))
+                        HBox.setMargin(this, Insets(0.0, 30.0, 0.0, 0.0))
                         setOnAction {
                             clear(it)
                         }
@@ -176,8 +158,8 @@ abstract class CurdUI<T : Any>(
                         children.addAll(baseButton.btn)
                     }
                 }
-
             }
+            //数据表格
             this.dataTable.apply {
                 padding = Insets(1.0, 2.0, 10.0, 2.0)
                 prefHeight = 558.0
@@ -201,6 +183,7 @@ abstract class CurdUI<T : Any>(
                     return@setRowFactory row
                 }
             }
+            //页码、页数、跳转等
             endPane.apply {
                 alignment = Pos.CENTER_LEFT
                 prefHeight = 26.0
@@ -246,8 +229,6 @@ abstract class CurdUI<T : Any>(
             root.children.addAll(btnGroup, dataTable, endPane)
             stage.scene = Scene(root)
 
-            //   println(this.dataTable.columns.size)
-
             pagination.currentPageIndexProperty().addListener { observableValue, old, new ->
                 pageIndexText.text = (new.toInt() + 1).toString()
                 search()
@@ -256,7 +237,6 @@ abstract class CurdUI<T : Any>(
             pageCountText.text = "10"
 
             initNotificationPane()
-
             search()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -279,6 +259,11 @@ abstract class CurdUI<T : Any>(
 
     //清空checkMap回调函数
     lateinit var clearDataTableCheck: () -> Unit
+
+
+    override fun initialize(p0: URL?, p1: ResourceBundle?) {
+        super.initialize(p0, p1)
+    }
 
     fun InitTableHeads(): List<TableColumn<T, *>> {
         val checkBox = CheckBox()
@@ -345,20 +330,6 @@ abstract class CurdUI<T : Any>(
         ).apply {
             addAll(elements.map { it.getTableHead() }.toList())
         }
-
-    }
-
-//    fun InitFormFunc(saveDataFunc: KFunction1<T, Boolean>, updateDataFunc: KFunction1<T, Boolean>) {
-//        this.saveDataFunc = saveDataFunc
-//        this.updateDataFunc = updateDataFunc
-//    }
-
-
-    override fun initialize(p0: URL?, p1: ResourceBundle?) {
-        //  println("CurdUI initialize")
-        super.initialize(p0, p1)
-
-        //  initNotificationPane()
     }
 
     /**
@@ -367,7 +338,7 @@ abstract class CurdUI<T : Any>(
      * @param keyword 关键字
      * @param index 页码 从0开始
      * @param count 分页数量
-     * @return f-ObjectBaseTable s-关键字匹配逻辑
+     * @return f-数据总数量 s-当前数据列表
      */
     abstract fun pageInit(keyword: String, index: Int, count: Int): Pair<Int, Collection<T>>
 
@@ -395,6 +366,9 @@ abstract class CurdUI<T : Any>(
      */
     abstract fun delDataFunc(entity: T): Boolean
 
+    /**
+     * 查询函数
+     */
     fun search(actionEvent: ActionEvent? = null) {
         platformRun {
             dataTable.items.clear()
@@ -524,10 +498,16 @@ abstract class CurdUI<T : Any>(
         this.elements.addAll(elements)
     }
 
+    /**
+     * 添加自定义按钮-FORM界面
+     */
     fun addFormButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {
         this.formButtons.addAll(customButtons)
     }
 
+    /**
+     * 添加自定义按钮-CURD界面
+     */
     fun addCurdButtons(vararg customButtons: CurdButton<CurdUI<T>>) {
         this.curdButtons.addAll(customButtons)
     }
