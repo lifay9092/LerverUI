@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
@@ -59,6 +60,7 @@
                 <String fx:value="flat"/>
             </styleClass>
         </Button>
+        <VBox fx:id="vBox" layoutX="837.0" layoutY="582.0" prefHeight="300.0" prefWidth="418.0"/>
 
     </children>
 </AnchorPane>

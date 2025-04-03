@@ -6,12 +6,16 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.TextArea
 import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.VBox
+import java.net.URL
+import java.util.*
 
 class CommonView : BaseView<AnchorPane>() {
 
+
     /*
-        rootPane 绑定了fxml中的顶级Pane的fx:id
-     */
+            rootPane 绑定了fxml中的顶级Pane的fx:id
+         */
     @FXML
     var rootPane: AnchorPane = AnchorPane()
 
@@ -30,11 +34,24 @@ class CommonView : BaseView<AnchorPane>() {
 
     @FXML
     private lateinit var otherCode: TextArea
+    lateinit var vBox: VBox
+
+    override fun initialize(location: URL?, resources: ResourceBundle?) {
+//        val snippet = Snippet(javaClass, "dddddd")
+
+//        vBox.children.add(
+//            snippet.render()
+//        )
+    }
+
 
     @FXML
     fun copyBaseViewCode(event: ActionEvent) {
+        //snippet_1:start
         copyToClipboard(baseViewCode.text)
         showNotification("复制成功")
+        //snippet_1:start
+
     }
 
     @FXML
@@ -48,4 +65,6 @@ class CommonView : BaseView<AnchorPane>() {
         copyToClipboard(otherCode.text)
         showNotification("复制成功")
     }
+
+
 }

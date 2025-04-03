@@ -94,7 +94,7 @@ class DbLoadView(
         asyncTask {
             try {
                 //添加消息文本、进度条绑定
-                val textChangeListener = ChangeListener { ob, old, now ->
+                val textChangeListener = ChangeListener<String> { ob, old, now ->
                     if (now.isNotBlank()) {
                         platformRun {
                             textArea.appendText(now)

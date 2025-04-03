@@ -68,6 +68,7 @@ open class BaseFormUI<T : Any>(
     protected var initDefaultEntity: T? = null
     protected val BEFORE_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
     protected var AFTER_FORM_INIT_CALL_LIST = ArrayList<BaseFormUI<T>.() -> Unit>()
+    protected val ELEMENTS_PROP_INDEX = HashMap<String, Int>()
 
     init {
         try {
@@ -79,8 +80,24 @@ open class BaseFormUI<T : Any>(
             uiInit()
             if (initDefaultEntity == null) {
                 val tc = ELEMENTS_LIST[0].tc
+                //获取参数值
                 val args = getElementInitValue()
-                this.entity = tc!!.primaryConstructor!!.call(*args)
+                //补全和对齐参数位置
+                val array = Array<Any?>(tc!!.primaryConstructor!!.parameters.size) {
+                    val kParameter = tc.primaryConstructor!!.parameters[it]
+                    val index = ELEMENTS_PROP_INDEX[kParameter.name]
+                    val v = if (index != null && index != -1) {
+                        args[index]
+                    } else {
+                        null
+                    }
+                    if (v == null && !kParameter.type.isMarkedNullable) {
+                        throw LerverUIException("${kParameter.name}参数未初始化")
+                    }
+                    v
+                }
+
+                this.entity = tc!!.primaryConstructor!!.call(*array)
             } else {
                 refreshForm(initDefaultEntity!!)
             }
@@ -105,10 +122,16 @@ open class BaseFormUI<T : Any>(
 
     fun addElements(vararg elements: FormElement<T, *>) {
         this.ELEMENTS_LIST.addAll(elements)
+        for (element in elements) {
+            ELEMENTS_PROP_INDEX[element.getPropName()] = ELEMENTS_LIST.indexOf(element)
+        }
     }
 
     fun addElements(elements: ArrayList<FormElement<T, *>>) {
         this.ELEMENTS_LIST.addAll(elements)
+        for (element in elements) {
+            ELEMENTS_PROP_INDEX[element.getPropName()] = ELEMENTS_LIST.indexOf(element)
+        }
     }
 
     fun addCustomButtons(vararg customButtons: BaseButton<BaseFormUI<T>>) {

@@ -3,6 +3,7 @@ package cn.lifay.test
 import cn.lifay.db.UserData
 import cn.lifay.db.UserDatas
 import cn.lifay.extension.alertConfirmation
+import cn.lifay.extension.alertError
 import cn.lifay.extension.styleInfo
 import cn.lifay.global.LerverResource
 import cn.lifay.ui.form.BaseFormUI
@@ -93,13 +94,18 @@ class FormUIView : Initializable{
     }
 
     fun formAddTest(actionEvent: ActionEvent) {
-        val userForm = UserDataForm()
+        try {
+            val userForm = UserDataForm()
 //        val userForm = UserForm("测试", UserData(1, "111111", SelectTypeEnum.C, true, "男"))
-        userForm.ROOT_PANE.apply {
-//            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
-//            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+            userForm.ROOT_PANE.apply {
+                //            prefWidth = GlobalResource.SCREEN_WIDTH * 0.9
+                //            prefHeight = GlobalResource.SCREEN_HEIGHT * 0.9
+            }
+            userForm.show()
+        } catch (e: Exception) {
+            alertError("表单初始化失败:${e.message}")
+
         }
-        userForm.show()
     }
 
     fun formUpdateTest(actionEvent: ActionEvent) {
