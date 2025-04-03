@@ -24,25 +24,27 @@ abstract class BaseApplication() : Application(), CoroutineScope {
 
     init {
 //        println("init")
-        //加载配置信息
         try {
+            //加载配置文件和配置信息
             LerverConfig.InitConfigPath()
         } catch (e: Exception) {
             println("加载配置文件失败:${e.stackTraceToString()}")
             exitProcess(1)
         }
-        //加载日志组件
+        /*加载日志组件*/
+        //获取日志配置
         val logPrefix = LerverConfig.ReadProperties<String>("log.prefix", "client")
         val logDir = LerverConfig.ReadProperties<String>("log.dir", LerverResource.USER_DIR + "logs")
         LerverLog.SetLogPrefix(logPrefix!!)
         LerverLog.SetLogsDirPath(logDir!!)
         try {
-            LerverLog.InitConfig()
+            //初始化日志组件
+            LerverLog.Init()
         } catch (e: Exception) {
             println("加载日志组件失败:${e.stackTraceToString()}")
             exitProcess(1)
         }
-        //加载主题
+        //从配置中加载主题
         LerverConfig.ReadProperties("theme", PrimerLight().name)!!.let {
             if ("THEME_DARK" == it) {
                 LerverResource.loadTheme(PrimerDark())

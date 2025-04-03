@@ -57,7 +57,7 @@ object LerverLog {
 
     }
 
-    fun InitConfig() {
+    fun Init() {
         File(LOG_PATH).notExistCreate()
 
         LOG_DEBUG_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-debug.log")

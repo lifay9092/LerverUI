@@ -35,7 +35,7 @@ class UserManage : DbCurdUI<UserData, UserDatas>("用户管理", buildElements =
     })
 }) {
 
-    //分页实现,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
+    //分页实现,可根据搜索关键字进行筛选,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
     override fun dbPageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
         return Pair(DbManage.userDatas) {
             it.name like DbManage.formatLikeKeyword(keyword)

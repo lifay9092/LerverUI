@@ -13,85 +13,7 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 
 ---
 
-## 模块总览
-
-### 启动应用方式
-
-#### 默认启动
-
-#### DB方式启动（sqlite）：脚本自动升级、升级信息窗口
-
-### 配置管理
-
-#### 应用配置
-
-##### 配置文件路径
-
-##### 日志
-
-##### 主题
-
-##### 数据库
-
-#### 业务配置
-
-##### 自定义配置管理sdk
-
-##### 文件选择路径
-
-### 事件总线
-
-#### 事件类型
-
-##### 发布
-
-##### 订阅
-
-#### 业务类型
-
-##### 无业务参数
-
-##### 单文本业务参数
-
-##### 对象业务参数
-
-### ui
-
-#### 视图+窗体
-
-##### 基础视图
-
-1. form表单
-   1.1 自定义按钮
-   1.2 数据新增+编辑
-2. curd组件
-   2.1 自定义数据源
-   2.2 DB数据源
-
-##### Loading组件
-
-#### 控件加强
-
-##### 树
-
-##### 表格
-
-### 日志组件
-
-### 消息
-
-#### 通知
-
-#### 提示
-
-### 扩展sdk方法
-
-#### ui
-
-#### 普通
-## 使用方式
-
-### 通过Maven引入
+## 模块引入
 
 ```
 <dependency>
@@ -108,22 +30,22 @@ JavaFX的样式UI组件引用了[atlantafx](https://github.com/mkpaz/atlantafx)�
 </repositories>
 ```
 
-### 下载源码编译
+## 下载源码编译
 
 ```
-1.需要jdk17和kotlin环境
-2.Parent模块clean install
+1. 需要jdk17和kotlin环境
+2. Parent模块clean install
 ```
 
-## 快速入门
+## 模块总览
 
-1.DemoApplication继承BaseApplication
+### 启动应用方式(2选1)
+
+#### 快速启动
 
 ```
-//默认启动（不带db组件-sqlite数据库）
 class DemoApplication : BaseApplication() {
 override fun start(primaryStage: Stage?) {
-        AppManage.loadAppConfig()
         val fxmlLoader = FXMLLoader(DemoApplication::class.java.getResource("formTest.fxml"))
         val load = fxmlLoader.load<Parent>()
         val scene = Scene(load)
@@ -135,7 +57,14 @@ override fun start(primaryStage: Stage?) {
         primaryStage.show()
     }
 }
-//以db组件的方式启动（函数体内为程序初始界面）
+```
+
+---
+
+#### DB方式启动（sqlite）：脚本自动升级、升级信息窗口
+
+```
+//函数体内为程序初始界面
 class DemoApplication : InitDbApplication() {
 
     override fun addAppStage(): Stage {
@@ -154,13 +83,452 @@ class DemoApplication : InitDbApplication() {
 }
 ```
 
-2.启动
+### 启动程序
 
 ```
 fun main() {
     Application.launch(DemoApplication::class.java)
 }
 
+```
+
+### 配置管理
+
+#### 应用配置
+
+##### 配置文件路径
+
+- 默认
+  `程序目录中的lerver.yml`
+
+- 自定义配置文件路径
+
+```
+LerverConfig.SetConfigPath(LerverResource.USER_DIR + "xxx.yml")
+//启动程序代码
+...
+```
+
+##### 日志
+
+- log.prefix 日志名称，默认：client 输出：client.log
+- log.dir 日志目录路径，默认：LerverResource.USER_DIR + "logs"
+
+##### 主题
+
+- theme 主题名：默认白色 THEME_DARK-黑色
+
+##### 数据库
+
+继承InitDbApplication时指定
+
+- dbName db文件名称
+- isShowStage 升级界面后是否自动跳转到业务界面
+
+```
+//伪代码
+InitDbApplication(
+    val dbName: String = "db.db",
+    val isShowStage: Boolean = true,
+) 
+```
+
+#### 业务配置
+
+##### 自定义配置管理
+
+```
+//是否存在
+ContainsKey(key: String): Boolean
+//获取配置，配置默认值（可选）
+ReadProperties("key", "defaultValue")
+//按多层路径获取配置，配置默认值（可选）
+ReadProperties("path.key")
+//新增或更新配置
+WriteProperties("key", "value")
+
+```
+
+##### 文件选择路径（内置）
+
+记录文件、目录选择及打开等操作的目录信息
+`COMMON_CHOOSER_PATH: 用于缓存打开文件选择框时的目录路径，默认key`
+使用示例
+
+```
+//
+val directoryChooser = DirectoryChooser().apply {
+    title = "选择输出目录"
+    initialDirectory = ChooserExtension.getInitFile("可空，也可自定义")
+}
+val directory = directoryChooser.showDialog(index.rootPane.scene.window)
+//...业务代码
+//更新路径
+ChooserExtension.updateInitChooserPath("/path/...", "可空，也可自定义")
+```
+
+### 事件总线
+
+#### 事件类型
+
+##### 订阅
+
+订阅注册：会被触发执行的匿名函数
+DemoId: 创建继承BaseEventBusId的枚举，也可用字符串代替
+```
+//DefaultEvent为内置无参事件传输DTO
+EventBus.subscribe(DemoId.RELOAD_UI, DefaultEvent::class) {
+    platformRun {
+        tableView.refresh()
+    }
+}
+
+```
+
+##### 发布,订阅
+
+#### 参数类型
+
+##### 无参
+
+```
+//DefaultEvent为内置无参事件传输DTO
+EventBus.subscribe(DemoId.RELOAD_UI, DefaultEvent::class) {
+    platformRun {
+        tableView.refresh()
+    }
+}
+//发布
+EventBus.publish(DefaultEvent(DemoId.RELOAD_UI))
+```
+
+##### 单文本参数
+
+```
+//TextEvent为内置事件传输DTO，包含一个String类型参数
+EventBus.subscribe(DemoId.CHAT, TextEvent::class) {
+    platformRun {
+        user1.appendText("${it.text}\n")
+    }
+}
+//发布
+EventBus.publish(TextEvent(DemoId.CHAT, sendText.text))
+```
+
+##### 对象参数
+
+```
+//TextEvent为内置事件传输DTO，包含一个String类型参数
+EventBus.subscribe<BodyEvent<EventListBody<T>>>(
+            DemoId.INFO
+        ) {
+            it.body?.let {
+                val itemEventListBody = it as EventListBody<T>
+            }
+        }
+//发布
+EventBus.publish(
+            BodyEvent(
+                DemoId.INFO,
+                EventListBody(hashCode(), datas.toList())
+            )
+        )
+```
+
+##### 改成同步执行（默认异步执行）
+
+```
+EventBus.publish(DefaultEvent(DemoId.RELOAD_UI),false)
+```
+
+### ui
+
+#### 视图
+
+##### 基础视图
+
+- 新建一个CommonDemoView(控制器视图)继承BaseView
+
+```kotlin
+class CommonDemoView : BaseView<AnchorPane>() {
+
+    //注意var
+    @FXML
+    var rootPane = AnchorPane()
+
+    override fun rootPane(): AnchorPane {
+        return rootPane
+    }
+
+}
+```
+
+- 创建控制器视图实例示例代码
+
+```kotlin
+    //CommonDemoView映射demo.fxml
+    val view = BaseView.createView<CommonDemoView, AnchorPane>(XXXApplication::class.java.getResource("demo.fxml"))
+    val scene = Scene(view.ROOT_PANE)
+    primaryStage.title = "Hello World"
+    primaryStage.scene = scene
+    primaryStage.show()
+```
+
+##### 扩展视图
+
+1. 普通表单
+   `BaseFormUI（这里选择直接实例化,也可创建一个类继承和实现BaseFormUI）`
+
+```kotlin
+val baseFormUI = BaseFormUI<UserData>("测试基础表单") {
+    //设置默认填充内容
+    defaultEntity(UserData(11, "11", SelectTypeEnum.A, true, "男"))
+
+    //定义和添加元素
+    val nameElement =
+        TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值") {
+            isDisable = false
+            isEditable = true
+        }
+    addElements(
+        TextElement("ID:", UserData::id, true),
+        nameElement,
+        SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList()),
+        CheckElement("是否未成年:", UserData::child),
+        RadioElement("性别:", UserData::sex, listOf("男", "女")) {
+            //ui操作
+        }
+    )
+
+    //添加按钮和操作
+    addCustomButtons(
+        BaseButton(Button("测试").styleInfo()) {
+            showNotification("测试获取name内容:${nameElement.getElementValue()}")
+        },
+        clearBtn()
+    )
+
+    //表单初始化前操作
+    beforeFormInitCall {
+        showNotification("还没初始化")
+    }
+
+    //表单初始化后操作
+    afterFormInitCall {
+        showNotification("已经初始化完毕")
+    }
+
+    //窗口关闭操作
+    setOnCloseRequest {
+        println("窗口已关闭")
+    }
+}
+//展示窗口
+baseFormUI.show()
+```
+
+![baseform](doc/baseform.png)
+
+2.定义数据表单（可扩展新增、编辑数据功能）
+`DataFormUI（这里选择创建一个类继承和实现DataFormUI,也可直接实例化并实现）`
+
+```kotlin
+//注意变量需要可修改,定义为var
+data class UserData(
+    var id: Int,
+    var name: String,
+    var type: SelectTypeEnum?,
+    var child: Boolean,
+    var sex: String,
+)
+
+class UserDataForm(t: UserData? = null, isUpdate: Boolean = false) :
+    DataFormUI<UserData>(_isUpdate = isUpdate, buildFormUI = {
+        if (t != null) {
+            defaultEntity(t)
+        }
+        val id = TextElement("ID:", UserData::id, true)
+        id.fillValue = 666
+
+        val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
+        val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
+        val child = CheckElement("是否未成年:", UserData::child)
+        val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+        addElements(id, name, type, child, sex)
+
+        addCustomButtons(BaseButton(Button("测试自定义按钮").styleWarn()) {
+            println(it)
+        })
+    }) {
+
+    //保存操作
+    override fun saveDataFunc(entity: UserData): Boolean {
+        if (entity!!.name!!.isBlank()) {
+            throw LerverUIException("名称不能为空!")
+        }
+        UserDatas.add(entity)
+        return true
+    }
+
+    //更新操作
+    override fun updateDataFunc(entity: UserData): Boolean {
+        UserDatas.update(entity)
+        return true
+    }
+}
+```
+
+![dataform](doc/dataform.png)
+
+3. 定义CURD增删查改界面（分页查询、新增、查看明细、修改、删除）
+   `CurdUI（这里选择创建一个类继承和实现CurdUI,也可直接实例化并实现）`
+
+```kotlin
+class UserManage : CurdUI<UserData>("用户管理", buildElements = {
+
+    val id = TextElement("ID:", UserData::id, true)
+    val name = TextElement("名称:", UserData::name, isTextArea = true, primary = false, initValue = "初始值")
+    val type = SelectElement("类型:", UserData::type, SelectTypeEnum.values().toList())
+    val child = CheckElement("是否未成年:", UserData::child)
+    val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
+    addElements(id, name, type, child, sex)
+
+    addCustomButtons(BaseButton<DataFormUI<UserData>>(Button("测试自定义按钮").styleWarn()) {
+        println(it)
+    })
+}) {
+
+    //分页实现,可根据搜索关键字进行筛选,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
+    override fun dbPageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
+        return Pair(DbManage.userDatas) {
+            it.name like DbManage.formatLikeKeyword(keyword)
+        }
+    }
+
+    //更新操作
+    override fun updateDataFunc(entity: UserData): Boolean {
+        return true
+    }
+
+    //保存操作
+    override fun saveDataFunc(entity: UserData): Boolean {
+        if (entity!!.name!!.isBlank()) {
+            throw LerverUIException("名称不能为空!")
+        }
+        return true
+    }
+
+    //删除操作
+    override fun delDataFunc(entity: UserData): Boolean {
+        return true
+    }
+
+}
+```
+
+![curd](doc/curd.png)
+
+#### 控件加强
+
+##### 树
+
+##### 表格
+
+### 日志组件
+
+### 消息
+
+#### 通知
+
+#### 提示
+
+- 常用弹出提示
+
+![info](doc/info.png)
+![warn](doc/warn.png)
+![error](doc/error.png)
+
+```
+alertInfo("信息打印")
+alertWarn("警告打印")
+alertError(
+    "错误打印","头部信息", "异常详细信息fun tableText(actionEvent: ActionEvent) {\n" +
+            "        tableView.items[0].text = \"33333\"\n" +
+    
+            "    }\n"
+)
+```
+
+### 扩展sdk方法
+
+- 为窗体指定图标（图标默认路径：/icon.png，即将icon.png放在resources目录下，会自动引入）
+
+```
+//为stage指定图标（如果是通过框架创建的stage，一般已经默认设置了）
+GlobalResource.loadIcon(stage)
+
+//自定义图标路径
+GlobalResource.setGlobalIconImage(imgPath)
+```
+
+- 主线程执行(简化Platform.runLater)
+
+```
+platformRun{
+    tudo()
+}
+
+```
+
+- 校验参数
+
+```
+if(!checkParam("名称",name)){
+    return
+}
+```
+
+- 异步协程执行
+
+```
+asyncTask {
+    //后台执行
+}
+```
+
+- 异步延迟执行耗时操作 时间：毫秒
+
+```
+asyncDelayTask(500) {
+    platformRun { closeFunc() }
+}
+```
+
+- 异步执行耗时操作,同时有加载图标提示
+
+```
+asyncTaskLoading(getWindow(), "保存中") {
+    try {
+        //后台操作
+    } catch (e: Exception) {
+        e.printStackTrace()
+        showErrMessage("保存失败:" + e.message)
+    } finally {
+        //结束操作
+    }
+}
+```
+
+- 为Stage绑定快捷键:ESC关闭窗口
+
+```
+stage.bindEscKey()
+```
+
+- 快速复制文本到粘贴板
+
+```
+copyToClipboard("文字")
 ```
 
 3.新建一个CommonDemoView(控制器视图)继承BaseView
@@ -188,109 +556,9 @@ class CommonDemoView : BaseView<AnchorPane>() {
     primaryStage.show()
 ```
 
-## 常用操作
-
-1.初始化样式主题
-
-```
-
-//通过启动类继承BaseApplication指定theme
-abstract class BaseApplication(
-    theme: Theme = PrimerLight(),
-    logPrefix: String = "client",
-    logPath: String = System.getProperty("user.dir") + File.separator + "logs"
-)
-
-//通过GlobalResource实时设置样式主题
-GlobalResource.loadTheme(PrimerDark())
-```
-
-2.为窗体指定图标（图标默认路径：/icon.png，即将icon.png放在resources目录下，会自动引入）
-
-```
-//为stage指定图标（如果是通过框架创建的stage，一般已经默认设置了）
-GlobalResource.loadIcon(stage)
-
-//自定义图标路径
-GlobalResource.setGlobalIconImage(imgPath)
-```
-
-3.主线程执行(Platform.runLater)
-
-```
-platformRun{
-    tudo()
-}
-
-```
-
-4.校验参数
-
-```
-if(!checkParam("名称",name)){
-    return
-}
-```
-
-5.异步协程执行
-
-```
-asyncTask {
-    //后台执行
-}
-```
-
-6.异步延迟执行耗时操作 时间：毫秒
-
-```
-asyncDelayTask(500) {
-    platformRun { closeFunc() }
-}
-```
-
-7.异步执行耗时操作,同时有加载图标提示
-
-```
-asyncTaskLoading(getWindow(), "保存中") {
-    try {
-        //后台操作
-    } catch (e: Exception) {
-        e.printStackTrace()
-        showErrMessage("保存失败:" + e.message)
-    } finally {
-        //结束操作
-    }
-}
-```
-
-8.为Stage绑定快捷键:ESC关闭窗口
-
-```
-stage.bindEscKey()
-```
-
-9.常用弹出提示
-
-![info](doc/info.png)
-![warn](doc/warn.png)
-![error](doc/error.png)
-
-```
-alertInfo("信息打印")
-alertWarn("警告打印")
-alertError(
-    "错误打印","头部信息", "异常详细信息fun tableText(actionEvent: ActionEvent) {\n" +
-            "        tableView.items[0].text = \"33333\"\n" +
-    
-            "    }\n"
-)
-```
-
-10.快速复制文本到粘贴板
-
-```
-copyToClipboard("文字")
-```
+---
+---
+---
 
 ## 视图容器
 

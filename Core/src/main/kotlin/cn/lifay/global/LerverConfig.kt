@@ -47,8 +47,11 @@ object LerverConfig {
     /**
      * 初始化配置文件
      */
-    fun InitConfigPath(configPath: String = LerverResource.USER_DIR + "lerver.yml") {
-        LERVER_CONFIG_PATH = configPath
+    fun InitConfigPath() {
+        if (!this::LERVER_CONFIG_PATH.isInitialized) {
+            //使用默认配置文件路径
+            SetConfigPath()
+        }
         val file = File(LERVER_CONFIG_PATH)
         if (!file.exists()) {
             file.parentFile.mkdirs()
