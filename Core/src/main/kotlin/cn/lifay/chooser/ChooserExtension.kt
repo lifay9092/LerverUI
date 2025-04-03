@@ -6,7 +6,14 @@ import javafx.stage.DirectoryChooser
 import javafx.stage.FileChooser
 import java.io.File
 
+/*
+  默认公共路径-KEY
+ */
 private val COMMON_CHOOSER_PATH_KEY = "COMMON_CHOOSER_PATH"
+
+/*
+  默认公共路径-VALUE
+ */
 private var COMMON_CHOOSER_PATH: String =
     LerverConfig.ReadProperties(COMMON_CHOOSER_PATH_KEY, LerverResource.USER_DIR)!!
 
