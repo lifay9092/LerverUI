@@ -23,7 +23,7 @@
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <kotlin.version>2.1.0</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-        <serialization.version>1.5.0-RC</serialization.version>
+        <serialization.version>1.8.1</serialization.version>
         <ktorm.version>3.6.0</ktorm.version>
     </properties>
 
