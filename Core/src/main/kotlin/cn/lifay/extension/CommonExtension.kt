@@ -51,10 +51,17 @@ fun File.extName(): String {
     return srcFileName.substring(srcFileName.lastIndexOf(".") + 1, srcFileName.length)
 }
 
-fun File.notExistCreate(): File {
+fun File.notExistCreateFile(): File {
     if (!this.exists()) {
         this.parentFile.mkdirs()
         this.createNewFile()
+    }
+    return this
+}
+
+fun File.notExistCreateDir(): File {
+    if (!this.exists()) {
+        this.mkdirs()
     }
     return this
 }
