@@ -30,6 +30,7 @@ class UserManage : DbCurdUI<UserData, UserDatas>("用户管理", buildElements =
     val child = CheckElement("是否未成年:", UserData::child)
     val sex = RadioElement("性别:", UserData::sex, listOf("男", "女", "中间"))
     addElements(id, name, type, child, sex)
+    addParamElements(type, child, sex)
 
     addFormButtons(BaseButton<BaseFormUI<UserData>>(Button("测试表单按钮").styleWarn()) {
         println(it)
@@ -43,6 +44,7 @@ class UserManage : DbCurdUI<UserData, UserDatas>("用户管理", buildElements =
 
     //分页实现,可根据搜索关键字进行筛选,返回：1-数据总数量 2-根据页码和每页数量的查询逻辑
     override fun dbPageInit(keyword: String): Pair<EntitySequence<UserData, UserDatas>, ((UserDatas) -> ColumnDeclaring<Boolean>)?> {
+
         return Pair(DbManage.userDatas) {
             it.name like DbManage.formatLikeKeyword(keyword)
         }

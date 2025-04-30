@@ -14,6 +14,7 @@ import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.CheckBoxTableCell
+import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.TextAlignment
@@ -48,7 +49,7 @@ abstract class CurdUI<T : Any>(
         prefWidth = 1024.0
     }
     @FXML
-    val btnGroup = HBox()
+    val btnGroup = FlowPane()
     @FXML
     var dataTable = TableView<T>()
     @FXML
@@ -60,6 +61,7 @@ abstract class CurdUI<T : Any>(
     @FXML
     var keyword = TextField().apply {
         HBox.setMargin(this, Insets(0.0, 10.0, 0.0, 10.0))
+        minWidth = 80.0
     }
     @FXML
     var pageIndexText = TextField()
@@ -84,6 +86,7 @@ abstract class CurdUI<T : Any>(
         }
 
     private val elements = ArrayList<FormElement<T, *>>()
+    protected val paramElements = ArrayList<FormElement<T, *>>()
     protected val formButtons = ArrayList<BaseButton<BaseFormUI<T>>>()
     protected val curdButtons = ArrayList<CurdButton<CurdUI<T>>>()
 
@@ -98,10 +101,12 @@ abstract class CurdUI<T : Any>(
             btnGroup.apply {
                 alignment = Pos.CENTER_LEFT
                 prefHeight = 47.0
-                prefWidth = 850.0
-                VBox.setMargin(this, Insets(10.0, 0.0, 10.0, 0.0))
+//                prefWidth = 850.0
+                VBox.setMargin(this, Insets(10.0, 0.0, 10.0, 10.0))
+                hgap = 5.0
+                children.add(keyword)
+                children.addAll(paramElements)
                 children.addAll(
-                    keyword,
                     Button("搜索").apply {
                         prefHeight = 23.0
                         prefWidth = 62.0
@@ -243,6 +248,12 @@ abstract class CurdUI<T : Any>(
             throw LerverUIException("表单初始化失败:${e.message}")
         }
     }
+
+//    private fun initParamElements(): List<Node> {
+////        paramElements.map {
+////            it.
+////        }.toList()
+//    }
 
     /**
      * 注册根容器
@@ -496,6 +507,13 @@ abstract class CurdUI<T : Any>(
 
     fun addElements(vararg elements: FormElement<T, *>) {
         this.elements.addAll(elements)
+    }
+
+    /**
+     * 添加自定义查询条件
+     */
+    fun addParamElements(vararg elements: FormElement<T, *>) {
+        this.paramElements.addAll(elements)
     }
 
     /**
