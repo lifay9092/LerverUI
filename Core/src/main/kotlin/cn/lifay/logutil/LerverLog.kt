@@ -1,6 +1,7 @@
 package cn.lifay.logutil
 
-import cn.lifay.extension.notExistCreate
+import cn.lifay.extension.notExistCreateDir
+import cn.lifay.extension.notExistCreateFile
 import cn.lifay.global.LerverResource
 import java.io.File
 import java.nio.charset.Charset
@@ -58,17 +59,17 @@ object LerverLog {
     }
 
     fun Init() {
-        File(LOG_PATH).notExistCreate()
+        File(LOG_PATH).notExistCreateDir()
 
         LOG_DEBUG_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-debug.log")
         LOG_INFO_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-info.log")
         LOG_WARN_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-warn.log")
         LOG_ERROR_PATH = joinPath(LOG_PATH, "${LOG_PREFIX}-error.log")
 
-        DEBUG_FILE = File(LOG_DEBUG_PATH).notExistCreate()
-        INFO_FILE = File(LOG_INFO_PATH).notExistCreate()
-        WARN_FILE = File(LOG_WARN_PATH).notExistCreate()
-        ERROR_FILE = File(LOG_ERROR_PATH).notExistCreate()
+        DEBUG_FILE = File(LOG_DEBUG_PATH).notExistCreateFile()
+        INFO_FILE = File(LOG_INFO_PATH).notExistCreateFile()
+        WARN_FILE = File(LOG_WARN_PATH).notExistCreateFile()
+        ERROR_FILE = File(LOG_ERROR_PATH).notExistCreateFile()
     }
     fun joinPath(basePath: String, vararg paths: String): String {
         return Paths.get(basePath, *paths).toString()
